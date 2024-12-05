@@ -26,7 +26,7 @@ const OnBoardingPage: React.FC<OnBoardingPageProps> = ({ navigation }) => {
       >
         <View style={styles.slide}>
           <Image
-            source={require('../../assets/images/onBoarding/logo.png')}
+            source={require('../../assets/images/preAuth/onBoarding/logo.png')}
             style={styles.image}
           />
           <Text style={styles.title}>Maximize your benefits</Text>
@@ -35,7 +35,7 @@ const OnBoardingPage: React.FC<OnBoardingPageProps> = ({ navigation }) => {
         </View>
         <View style={styles.slide}>
           <Image
-            source={require('../../assets/images/onBoarding/logo.png')}
+            source={require('../../assets/images/preAuth/onBoarding/logo.png')}
             style={styles.image}
           />
           <Text style={styles.title}>Benefits at a glance</Text>
@@ -48,7 +48,7 @@ const OnBoardingPage: React.FC<OnBoardingPageProps> = ({ navigation }) => {
         </View>
         <View style={styles.slide}>
           <Image
-            source={require('../../assets/images/onBoarding/logo.png')}
+            source={require('../../assets/images/preAuth/onBoarding/logo.png')}
             style={styles.image}
           />
           <Text style={styles.title}>More Benefits</Text>
@@ -56,7 +56,7 @@ const OnBoardingPage: React.FC<OnBoardingPageProps> = ({ navigation }) => {
         </View>
         <View style={styles.slide}>
           <Image
-            source={require('../../assets/images/onBoarding/logo.png')}
+            source={require('../../assets/images/preAuth/onBoarding/logo.png')}
             style={styles.image}
           />
           <Text style={styles.title}>Get Started Now</Text>
