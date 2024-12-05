@@ -53,3 +53,11 @@ Join our community of developers creating universal apps.
 package.json setting change to run ios simulator
         "start": "expo start",
 --> "start": "open -i Simulator && expo start", 
+
+Centralized Navigation (Router): Keep navigation in one place (Router.tsx) for both mobile and desktop.
+MobileView and DesktopView: Handle layout and styling only.
+Device-Specific Styling: Use isMobile to differentiate layouts and ensure responsiveness.
+Consistency: Even though DesktopView simulates mobile, keep layout styles intuitive for the end-user.
+
+in app.json
+    "icon": "./assets/images/logo.svg",
