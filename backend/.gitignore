@@ -1,0 +1,11 @@
+# Virtual environment
+venv/
+
+# Environment variables
+.env
+
+# SQLite database
+*.sqlite3
+
+# macOS
+.DS_Store

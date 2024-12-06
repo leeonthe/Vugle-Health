@@ -7,12 +7,21 @@ import {
   GestureResponderEvent,
 } from 'react-native';
 import ConnectRecord from '../../assets/images/preAuth/loginPage/connect_record.svg';
+import {APIHandler } from '../../utils/APIHandler'
 
-type LoginPageProps = {
-  handleLogin: (event: GestureResponderEvent) => void;
-};
+type LoginPageProps = {};
 
-const LoginPage: React.FC<LoginPageProps> = ({ handleLogin }) => {
+const LoginPage: React.FC<LoginPageProps> = () => {
+  const handleLogin = async () => {
+    try {
+      await APIHandler.initiateLogin(); // Redirect to the backend to start OAuth
+    } catch (error) {
+
+      console.error('Error initiating login:', error);
+    }
+  };
+
+
   return (
     <View style={styles.container}>
       <View style={styles.svgContainer}>

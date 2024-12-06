@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,6 +28,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+VA_CLIENT_ID = config('VA_CLIENT_ID')
+VA_CLIENT_SECRET = config('VA_CLIENT_SECRET')
+VA_AUTHORIZATION_URL = config('VA_AUTHORIZATION_URL')
+VA_TOKEN_URL = config('VA_TOKEN_URL')
+VA_REDIRECT_URI = config('VA_REDIRECT_URI')
 
 # Application definition
 
