@@ -8,15 +8,18 @@ import {
 } from 'react-native';
 import ConnectRecord from '../../assets/images/preAuth/loginPage/connect_record.svg';
 import {APIHandler } from '../../utils/APIHandler'
+import { useDevice } from '../../hooks/useDevice';
 
-type LoginPageProps = {};
 
-const LoginPage: React.FC<LoginPageProps> = () => {
+
+const LoginPage: React.FC = () => {
+  const { isMobile } = useDevice(); // Determine platform using useDevice
+
   const handleLogin = async () => {
     try {
-      await APIHandler.initiateLogin(); // Redirect to the backend to start OAuth
+      const platform = isMobile ? 'mobile' : 'web'; // Use existing device detection
+      await APIHandler.initiateLogin(platform);
     } catch (error) {
-
       console.error('Error initiating login:', error);
     }
   };

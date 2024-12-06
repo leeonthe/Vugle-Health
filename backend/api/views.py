@@ -25,6 +25,7 @@ class OAuthHandler:
     def oauth_login(self, request):
         """Redirect to VA.gov authorization URL."""
         state = self.generate_state()
+        request.session['oauth_state'] = state
         params = {
             'client_id': self.client_id,
             'redirect_uri': self.redirect_uri,
@@ -32,13 +33,15 @@ class OAuthHandler:
             'scope': 'profile openid offline_access disability_rating.read service_history.read veteran_status.read',
             'state': state,
         }
+        print("OAUTH URL: ")
         return redirect(f"{self.authorization_url}?{urlencode(params)}")
 
     def oauth_callback(self, request):
         """Handle the callback and exchange the code for tokens."""
         code = request.GET.get('code')
         state = request.GET.get('state')
-        if not code or not state:
+        saved_state = request.session.get('oauth_state')
+        if not code or not state or state != saved_state:
             return redirect('/error') 
 
         token_response = requests.post(
