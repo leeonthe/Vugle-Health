@@ -11,13 +11,17 @@ export interface DeviceState {
   isLandscapeOrientation: boolean;
   isPortraitOrientation: boolean;
 }
+export const useDevice = (): DeviceState => {
+  const deviceState: DeviceState = {
+    isDesktop: DeviceDetector.isDesktopDevice(),
+    isMobile: DeviceDetector.isMobileDevice(),
+    isTablet: DeviceDetector.isTabletDevice(),
+    mobileOS: DeviceDetector.getMobileOS(),
+    desktopOS: DeviceDetector.getDesktopOS(),
+    isLandscapeOrientation: OrientationDetector.isLandscape(),
+    isPortraitOrientation: OrientationDetector.isPortrait(),
+  };
 
-export const useDevice = (): DeviceState => ({
-  isDesktop: DeviceDetector.isDesktopDevice(),
-  isMobile: DeviceDetector.isMobileDevice(),
-  isTablet: DeviceDetector.isTabletDevice(),
-  mobileOS: DeviceDetector.getMobileOS(),
-  desktopOS: DeviceDetector.getDesktopOS(),
-  isLandscapeOrientation: OrientationDetector.isLandscape(),
-  isPortraitOrientation: OrientationDetector.isPortrait(),
-});
+  console.log('Device State in useDevice:', deviceState);
+  return deviceState;
+};

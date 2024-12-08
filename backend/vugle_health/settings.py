@@ -29,11 +29,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-VA_CLIENT_ID = config('VA_CLIENT_ID')
-VA_CLIENT_SECRET = config('VA_CLIENT_SECRET')
-VA_AUTHORIZATION_URL = config('VA_AUTHORIZATION_URL')
-VA_TOKEN_URL = config('VA_TOKEN_URL')
-VA_REDIRECT_URI = config('VA_REDIRECT_URI')
 
 # Application definition
 
@@ -46,9 +41,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',  
     'vugle_health',    # App name
+    # 'corsheaders',
 ]
 
 MIDDLEWARE = [
+    # 'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -56,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'vugle_health.urls'
@@ -78,6 +76,29 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'vugle_health.wsgi.application'
 
+# # CORS: for WEB VIEW
+# CORS_ALLOW_CREDENTIALS = True
+
+# # CORS_ALLOW_ALL_ORIGINS = False  # Restrict to specific origins for security
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:8081',  # Add your frontend origin here
+# ]
+
+# # Allow HTTP methods
+# CORS_ALLOW_METHODS = [
+#     'GET',
+#     'POST',
+#     'PUT',
+#     'DELETE',
+#     'OPTIONS',
+# ]
+
+# # Allow specific headers if needed
+# CORS_ALLOW_HEADERS = [
+#     'Authorization',
+#     'Content-Type',
+#     'X-CSRFToken',
+# ]
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

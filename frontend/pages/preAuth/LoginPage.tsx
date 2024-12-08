@@ -1,28 +1,50 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
+  Pressable,
   TouchableOpacity,
   GestureResponderEvent,
 } from 'react-native';
 import ConnectRecord from '../../assets/images/preAuth/loginPage/connect_record.svg';
 import {APIHandler } from '../../utils/APIHandler'
+import { WebView } from 'react-native-webview';
+
 import { useDevice } from '../../hooks/useDevice';
 
-
-
 const LoginPage: React.FC = () => {
-  const { isMobile } = useDevice(); // Determine platform using useDevice
+  const { isMobile, isDesktop } = useDevice(); // Use both isMobile and isDesktop
+  const [showWebView, setShowWebView] = useState(false); // For mobile WebView
+  const [authUrl, setAuthUrl] = useState<string>(''); // OAuth URL
 
+  /**
+   * Handles login flow based on device type.
+   */
   const handleLogin = async () => {
     try {
-      const platform = isMobile ? 'mobile' : 'web'; // Use existing device detection
-      await APIHandler.initiateLogin(platform);
+      console.log(`Device Type: ${isMobile ? 'Mobile' : isDesktop ? 'Desktop' : 'Unknown'}`);
+      const platform  = isMobile ? 'mobile' : 'web';
+      console.log(platform)
+      await APIHandler.initiateLogin(platform, setShowWebView, setAuthUrl);
     } catch (error) {
       console.error('Error initiating login:', error);
     }
   };
+
+  // Mobile: Show WebView for OAuth
+  if (showWebView) {
+    return (
+      <WebView
+        source={{ uri: authUrl }}
+        // onMessage={handleWebViewMessage}
+        javaScriptEnabled={true}
+        domStorageEnabled={true}
+        style={{ marginTop: 20 }}
+      />
+    );
+  }
+
 
 
   return (
@@ -47,8 +69,8 @@ const LoginPage: React.FC = () => {
       </View>
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        {/* <View style={styles.buttonContent}> */}
-        <Text style={styles.buttonText}>VA Continue with VA.gov</Text>
+        {/* <View> */}
+          <Text style={styles.buttonText}>VA Continue with VA.gov</Text>
         {/* </View> */}
       </TouchableOpacity>
     </View>
