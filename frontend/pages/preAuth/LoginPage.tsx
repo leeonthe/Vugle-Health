@@ -1,39 +1,60 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  GestureResponderEvent,
-  
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Import navigation hook
 import ConnectRecord from '../../assets/images/preAuth/loginPage/connect_record.svg';
-import {APIHandler } from '../../utils/APIHandler'
+import { APIHandler } from '../../utils/APIHandler';
 import { useDevice } from '../../hooks/useDevice';
 import { WebView } from 'react-native-webview';
+import UserWelcomePage from '../postAuth/UserWelcomePage'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../router/types'; // Adjust the path as needed
 
 
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
 const LoginPage: React.FC = () => {
-  const { isMobile } = useDevice(); // Determine platform using useDevice
-  const [showWebView, setShowWebView] = useState(false); // For mobile WebView
-  const [authUrl, setAuthUrl] = useState<string>(''); // OAuth URL
+  const { isMobile } = useDevice();
+  const [showWebView, setShowWebView] = useState(false);
+  const [authUrl, setAuthUrl] = useState<string>('');
+  const navigation = useNavigation<NavigationProp>(); // Add proper typing for navigation
+
   const handleLogin = async () => {
     try {
-      const platform = isMobile ? 'mobile' : 'web'; // Use existing device detection
-      console.log("platform", platform)
+      const platform = isMobile ? 'mobile' : 'web';
       await APIHandler.initiateLogin(platform, setShowWebView, setAuthUrl);
     } catch (error) {
       console.error('Error initiating login:', error);
     }
   };
+
+  const handleWebViewNavigationStateChange = (navState: any) => {
+    const { url } = navState;
+    if (url.includes('http://localhost:8081/')) {
+      const params = new URLSearchParams(url.split('?')[1]);
+      const success = params.get('success');
+  
+      if (success === 'true') {
+        console.log('Login successful');
+        setShowWebView(false);
+        navigation.navigate('UserWelcomePage');
+      }
+    }
+  };
+  
+  
+
   if (showWebView) {
     return (
       <WebView
         source={{ uri: authUrl }}
-        // onMessage={handleWebViewMessage}
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
+        onNavigationStateChange={handleWebViewNavigationStateChange} // Detect navigation changes
+        javaScriptEnabled
+        domStorageEnabled
         style={{ marginTop: 20 }}
       />
     );

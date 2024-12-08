@@ -9,11 +9,13 @@ import {
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../router/types';
+
+type OnBoardingPageProps = NativeStackScreenProps<RootStackParamList, 'OnBoarding'>;
 
 const { width, height } = Dimensions.get('window');
 
 // Use `any` for navigation type
-type OnBoardingPageProps = NativeStackScreenProps<any, 'OnBoarding'>;
 
 const OnBoardingPage: React.FC<OnBoardingPageProps> = ({ navigation }) => {
   return (

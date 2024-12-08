@@ -2,8 +2,9 @@ import React, { useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import LOGO from '../../assets/images/logo/logo.svg'; 
+import { RootStackParamList } from '../../router/types';
 
-type StartPageProps = NativeStackScreenProps<any, 'Start'>; 
+type StartPageProps = NativeStackScreenProps<RootStackParamList, 'Start'>;
 
 const StartPage: React.FC<StartPageProps> = ({ navigation }) => {
   useEffect(() => {

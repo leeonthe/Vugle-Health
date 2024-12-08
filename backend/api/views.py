@@ -65,7 +65,9 @@ class OAuthHandler:
         request.session['refresh_token'] = token_data.get('refresh_token')
 
         # Redirect to the frontend on success
-        return redirect('http://localhost:8081/home')
+        # return redirect(f"http://localhost:8081/?access_token={token_data.get('access_token')}&refresh_token={token_data.get('refresh_token')}")
+        return redirect(f"http://localhost:8081/?success=true")
+
 
 
 def oauth_login(request):
