@@ -1,66 +1,57 @@
 import { Platform, Dimensions } from 'react-native';
 import { DesktopOS, MobileOS } from '../enums/DeviceOS';
-
 export const DeviceDetector = {
   isMobileDevice(): boolean {
     const { width } = Dimensions.get('window');
-
-    // Native platforms
-    if (Platform.OS === 'ios' || Platform.OS === 'android') {
-      return true;
-    }
-
-    // Web platform: use screen width to differentiate
-    if (Platform.OS === 'web') {
-      return width <= 768; // Assume width <= 768px as mobile
-    }
-
-    return false; 
+    const isMobile = (Platform.OS === 'ios' || Platform.OS === 'android') || (Platform.OS === 'web' && width <= 768);
+    console.log('isMobileDevice:', isMobile, 'Platform:', Platform.OS, 'Width:', width);
+    return isMobile;
   },
 
   isTabletDevice(): boolean {
     const { width, height } = Dimensions.get('window');
     const aspectRatio = Math.min(width, height) / Math.max(width, height);
-
-    if (Platform.OS === 'ios' || Platform.OS === 'android') {
-      return Math.min(width, height) > 600 && aspectRatio > 0.5;
-    }
-
-    if (Platform.OS === 'web') {
-      return width > 768 && width <= 1024; 
-    }
-
-    return false;
+    const isTablet = (Platform.OS === 'ios' || Platform.OS === 'android') && Math.min(width, height) > 600 && aspectRatio > 0.5;
+    console.log('isTabletDevice:', isTablet, 'Platform:', Platform.OS, 'Width:', width, 'Height:', height, 'AspectRatio:', aspectRatio);
+    return isTablet;
   },
 
   isDesktopDevice(): boolean {
-    // Consider as desktop if Platform.OS is web and width > 1024px
     if (Platform.OS === 'web') {
       const { width } = Dimensions.get('window');
-      return width > 1024;
+      const isDesktop = width > 1024;
+      console.log('isDesktopDevice:', isDesktop, 'Platform:', Platform.OS, 'Width:', width);
+      return isDesktop;
     }
-
-    return false; 
+    return false;
   },
 
   getMobileOS(): MobileOS | undefined {
-    if (this.isMobileDevice()) {
-      if (Platform.OS === 'android') return MobileOS.Android;
-      if (Platform.OS === 'ios') return MobileOS.iOS;
-      return MobileOS.Unknown;
-    }
-    return undefined;
+    const mobileOS = this.isMobileDevice()
+      ? Platform.OS === 'android'
+        ? MobileOS.Android
+        : Platform.OS === 'ios'
+        ? MobileOS.iOS
+        : MobileOS.Unknown
+      : undefined;
+    console.log('getMobileOS:', mobileOS, 'Platform:', Platform.OS);
+    return mobileOS;
   },
 
   getDesktopOS(): DesktopOS | undefined {
-    if (this.isDesktopDevice()) {
-      const platform = typeof navigator !== 'undefined' ? navigator.platform.toLowerCase() : '';
-      if (platform.includes('win')) return DesktopOS.Windows;
-      if (platform.includes('mac')) return DesktopOS.MacOS;
-      if (platform.includes('x11') || platform.includes('unix')) return DesktopOS.Unix;
-      if (platform.includes('linux')) return DesktopOS.Linux;
-      return DesktopOS.Unknown;
-    }
-    return undefined;
+    const desktopOS =
+      this.isDesktopDevice() && typeof navigator !== 'undefined'
+        ? navigator.platform.toLowerCase().includes('win')
+          ? DesktopOS.Windows
+          : navigator.platform.toLowerCase().includes('mac')
+          ? DesktopOS.MacOS
+          : navigator.platform.toLowerCase().includes('x11') || navigator.platform.toLowerCase().includes('unix')
+          ? DesktopOS.Unix
+          : navigator.platform.toLowerCase().includes('linux')
+          ? DesktopOS.Linux
+          : DesktopOS.Unknown
+        : undefined;
+    console.log('getDesktopOS:', desktopOS, 'Platform:', typeof navigator !== 'undefined' ? navigator.platform : 'Unknown');
+    return desktopOS;
   },
 };

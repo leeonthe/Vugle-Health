@@ -17,7 +17,7 @@ export class APIHandler {
       const authUrl = await this.getOAuthUrl();
 
       if (platform === 'web') {
-        setShowWebView(true);
+        // setShowWebView(true);
         console.log('Redirecting to OAuth in browser:', authUrl);
         window.location.href = authUrl; // Desktop browser redirect
       } else if (platform === 'mobile') {

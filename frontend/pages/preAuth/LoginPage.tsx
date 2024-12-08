@@ -24,16 +24,9 @@ const LoginPage: React.FC = () => {
   const handleLogin = async () => {
     try {
       console.log(`Device Type: ${isMobile ? 'Mobile' : isDesktop ? 'Desktop' : 'Unknown'}`);
-      
-      if (isDesktop) {
-        // Desktop-specific logic
-        await APIHandler.initiateLogin('web', setShowWebView, setAuthUrl);
-      } else if (isMobile) {
-        // Mobile-specific logic
-        await APIHandler.initiateLogin('mobile', setShowWebView, setAuthUrl);
-      } else {
-        console.warn('Unsupported platform');
-      }
+      const platform  = isMobile ? 'mobile' : 'web';
+      console.log(platform)
+      await APIHandler.initiateLogin(platform, setShowWebView, setAuthUrl);
     } catch (error) {
       console.error('Error initiating login:', error);
     }
