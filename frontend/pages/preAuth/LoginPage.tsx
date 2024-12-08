@@ -1,28 +1,43 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   GestureResponderEvent,
+  
 } from 'react-native';
 import ConnectRecord from '../../assets/images/preAuth/loginPage/connect_record.svg';
 import {APIHandler } from '../../utils/APIHandler'
 import { useDevice } from '../../hooks/useDevice';
+import { WebView } from 'react-native-webview';
 
 
 
 const LoginPage: React.FC = () => {
   const { isMobile } = useDevice(); // Determine platform using useDevice
-
+  const [showWebView, setShowWebView] = useState(false); // For mobile WebView
+  const [authUrl, setAuthUrl] = useState<string>(''); // OAuth URL
   const handleLogin = async () => {
     try {
       const platform = isMobile ? 'mobile' : 'web'; // Use existing device detection
-      await APIHandler.initiateLogin(platform);
+      console.log("platform", platform)
+      await APIHandler.initiateLogin(platform, setShowWebView, setAuthUrl);
     } catch (error) {
       console.error('Error initiating login:', error);
     }
   };
+  if (showWebView) {
+    return (
+      <WebView
+        source={{ uri: authUrl }}
+        // onMessage={handleWebViewMessage}
+        javaScriptEnabled={true}
+        domStorageEnabled={true}
+        style={{ marginTop: 20 }}
+      />
+    );
+  }
 
 
   return (
