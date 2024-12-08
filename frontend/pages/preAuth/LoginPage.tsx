@@ -1,38 +1,32 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  Pressable,
   TouchableOpacity,
   GestureResponderEvent,
+  
 } from 'react-native';
 import ConnectRecord from '../../assets/images/preAuth/loginPage/connect_record.svg';
 import {APIHandler } from '../../utils/APIHandler'
+import { useDevice } from '../../hooks/useDevice';
 import { WebView } from 'react-native-webview';
 
-import { useDevice } from '../../hooks/useDevice';
+
 
 const LoginPage: React.FC = () => {
-  const { isMobile, isDesktop } = useDevice(); // Use both isMobile and isDesktop
+  const { isMobile } = useDevice(); // Determine platform using useDevice
   const [showWebView, setShowWebView] = useState(false); // For mobile WebView
   const [authUrl, setAuthUrl] = useState<string>(''); // OAuth URL
-
-  /**
-   * Handles login flow based on device type.
-   */
   const handleLogin = async () => {
     try {
-      console.log(`Device Type: ${isMobile ? 'Mobile' : isDesktop ? 'Desktop' : 'Unknown'}`);
-      const platform  = isMobile ? 'mobile' : 'web';
-      console.log(platform)
+      const platform = isMobile ? 'mobile' : 'web'; // Use existing device detection
+      console.log("platform", platform)
       await APIHandler.initiateLogin(platform, setShowWebView, setAuthUrl);
     } catch (error) {
       console.error('Error initiating login:', error);
     }
   };
-
-  // Mobile: Show WebView for OAuth
   if (showWebView) {
     return (
       <WebView
@@ -44,7 +38,6 @@ const LoginPage: React.FC = () => {
       />
     );
   }
-
 
 
   return (
@@ -69,8 +62,8 @@ const LoginPage: React.FC = () => {
       </View>
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        {/* <View> */}
-          <Text style={styles.buttonText}>VA Continue with VA.gov</Text>
+        {/* <View style={styles.buttonContent}> */}
+        <Text style={styles.buttonText}>VA Continue with VA.gov</Text>
         {/* </View> */}
       </TouchableOpacity>
     </View>
