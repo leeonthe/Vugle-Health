@@ -11,34 +11,47 @@ import ConnectRecord from '../../assets/images/preAuth/loginPage/connect_record.
 import {APIHandler } from '../../utils/APIHandler'
 import { useDevice } from '../../hooks/useDevice';
 import { WebView } from 'react-native-webview';
-
-
+import { useNavigation } from '@react-navigation/native';
 
 const LoginPage: React.FC = () => {
   const { isMobile } = useDevice(); // Determine platform using useDevice
   const [showWebView, setShowWebView] = useState(false); // For mobile WebView
   const [authUrl, setAuthUrl] = useState<string>(''); // OAuth URL
+  const navigation = useNavigation(); // Access navigation
+
   const handleLogin = async () => {
     try {
-      const platform = isMobile ? 'mobile' : 'web'; // Use existing device detection
-      console.log("platform", platform)
+      const platform = isMobile ? 'mobile' : 'web';
+      console.log('Platform:', platform);
       await APIHandler.initiateLogin(platform, setShowWebView, setAuthUrl);
     } catch (error) {
       console.error('Error initiating login:', error);
     }
   };
+
+  const handleWebViewNavigation = (navState: any) => {
+    const { url } = navState;
+    console.log('WebView State Change:', url);
+    if (url.includes('/success')) {
+      console.log('Login Success: Navigating to Welcome');
+      navigation.navigate('Welcome'); // Navigate to WelcomePage
+    }
+  };
+
   if (showWebView) {
     return (
       <WebView
         source={{ uri: authUrl }}
-        // onMessage={handleWebViewMessage}
+        onNavigationStateChange={handleWebViewNavigation}
         javaScriptEnabled={true}
         domStorageEnabled={true}
         style={{ marginTop: 20 }}
       />
     );
   }
+  
 
+  
 
   return (
     <View style={styles.container}>

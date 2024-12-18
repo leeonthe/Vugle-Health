@@ -1,5 +1,6 @@
 from django.shortcuts import redirect
 from urllib.parse import urlencode
+from django.http import JsonResponse
 from django.conf import settings
 from decouple import config
 import requests
@@ -25,6 +26,8 @@ class OAuthHandler:
     def oauth_login(self, request):
         """Redirect to VA.gov authorization URL."""
         state = self.generate_state()
+        # state = str(uuid.uuid4())
+
         request.session['oauth_state'] = state
         params = {
             'client_id': self.client_id,
@@ -40,9 +43,12 @@ class OAuthHandler:
         """Handle the callback and exchange the code for tokens."""
         code = request.GET.get('code')
         state = request.GET.get('state')
+        platform = request.GET.get('platform', 'web')
+
+
         saved_state = request.session.get('oauth_state')
         if not code or not state or state != saved_state:
-            return redirect('/error') 
+            return redirect('/error')
 
         token_response = requests.post(
             self.token_url,
@@ -58,14 +64,25 @@ class OAuthHandler:
         )
 
         if token_response.status_code != 200:
-            return redirect('/error') 
+            return redirect('/error')
 
         token_data = token_response.json()
         request.session['access_token'] = token_data.get('access_token')
         request.session['refresh_token'] = token_data.get('refresh_token')
 
-        # Redirect to the frontend on success
-        return redirect('http://localhost:8081/home')
+
+        response_data = {
+            'success': True,
+            'redirect_url': '/success',  # Or '/postAuth/WelcomePage'
+        }
+        
+        if platform == 'web':
+        # Redirect web users directly
+            return redirect('http://localhost:8081/Welcome')
+        else:
+            # For mobile apps, return JSON response
+            return JsonResponse(response_data)
+       
 
 
 def oauth_login(request):
