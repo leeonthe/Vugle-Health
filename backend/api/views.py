@@ -25,10 +25,20 @@ class OAuthHandler:
 
     def oauth_login(self, request):
         """Redirect to VA.gov authorization URL."""
-        state = self.generate_state()
+        # state = self.generate_state()
         # state = str(uuid.uuid4())
+        platform = request.GET.get('platform', 'web')
+
+        state = f"{self.generate_state()}|{platform}"
+
+        request.session['oauth_state'] = state.split('|')[0]
+        request.session.save()
 
         request.session['oauth_state'] = state
+        request.session['platform'] = platform
+        request.session.save()
+        print("PLATFORM STORED IN SESSION:", platform)
+        print("SESSION DATA AFTER LOGIN:", request.session.items())
         params = {
             'client_id': self.client_id,
             'redirect_uri': self.redirect_uri,
@@ -40,11 +50,17 @@ class OAuthHandler:
         return redirect(f"{self.authorization_url}?{urlencode(params)}")
 
     def oauth_callback(self, request):
+        print("INCOMING COOKIES:", request.COOKIES)
         """Handle the callback and exchange the code for tokens."""
         code = request.GET.get('code')
-        state = request.GET.get('state')
-        platform = request.GET.get('platform', 'web')
-
+        # state = request.GET.get('state')
+        state = request.GET.get('state', '')
+        state_parts = state.split('|')
+        platform = state_parts[1] if len(state_parts) > 1 else None
+        # platform = request.GET.get('platform')
+        print("PLATFORM RETRIEVED FROM SESSION:", platform)
+        print("SESSION DATA DURING CALLBACK:", request.session.items())
+        print("PLATFORM IS ", platform)
 
         saved_state = request.session.get('oauth_state')
         if not code or not state or state != saved_state:
@@ -78,10 +94,15 @@ class OAuthHandler:
         
         if platform == 'web':
         # Redirect web users directly
-            return redirect('http://localhost:8081/Welcome')
+            print("WEB CALLED")
+            return redirect('http://localhost:8081/welcome')
         else:
             # For mobile apps, return JSON response
-            return JsonResponse(response_data)
+            # For now, return the url instead. 
+            print("APP CALLED") 
+            return redirect('http://localhost:8081/Welcome')
+
+            # return JsonResponse(response_data)
        
 
 

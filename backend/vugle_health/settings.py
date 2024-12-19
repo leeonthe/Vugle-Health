@@ -33,10 +33,10 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'django.contrib.sessions',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',  
@@ -55,6 +55,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
 ]
+
+
+SESSION_COOKIE_SECURE = False  # For local dev (set True in production)
+SESSION_COOKIE_SAMESITE = 'None'  # Prevent SameSite cookie restrictions
+CSRF_COOKIE_SAMESITE = 'None'  # For CSRF cookies during OAuth
+CSRF_COOKIE_SECURE = False
+
+
 
 ROOT_URLCONF = 'vugle_health.urls'
 

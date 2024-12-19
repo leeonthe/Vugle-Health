@@ -4,7 +4,7 @@ export const DeviceDetector = {
   isMobileDevice(): boolean {
     const { width } = Dimensions.get('window');
     const isMobile = (Platform.OS === 'ios' || Platform.OS === 'android') || (Platform.OS === 'web' && width <= 768);
-    console.log('isMobileDevice:', isMobile, 'Platform:', Platform.OS, 'Width:', width);
+    // console.log('isMobileDevice:', isMobile, 'Platform:', Platform.OS, 'Width:', width);
     return isMobile;
   },
 
@@ -12,7 +12,7 @@ export const DeviceDetector = {
     const { width, height } = Dimensions.get('window');
     const aspectRatio = Math.min(width, height) / Math.max(width, height);
     const isTablet = (Platform.OS === 'ios' || Platform.OS === 'android') && Math.min(width, height) > 600 && aspectRatio > 0.5;
-    console.log('isTabletDevice:', isTablet, 'Platform:', Platform.OS, 'Width:', width, 'Height:', height, 'AspectRatio:', aspectRatio);
+    // console.log('isTabletDevice:', isTablet, 'Platform:', Platform.OS, 'Width:', width, 'Height:', height, 'AspectRatio:', aspectRatio);
     return isTablet;
   },
 
@@ -20,7 +20,7 @@ export const DeviceDetector = {
     if (Platform.OS === 'web') {
       const { width } = Dimensions.get('window');
       const isDesktop = width > 1024;
-      console.log('isDesktopDevice:', isDesktop, 'Platform:', Platform.OS, 'Width:', width);
+      // console.log('isDesktopDevice:', isDesktop, 'Platform:', Platform.OS, 'Width:', width);
       return isDesktop;
     }
     return false;
@@ -34,7 +34,7 @@ export const DeviceDetector = {
         ? MobileOS.iOS
         : MobileOS.Unknown
       : undefined;
-    console.log('getMobileOS:', mobileOS, 'Platform:', Platform.OS);
+    // console.log('getMobileOS:', mobileOS, 'Platform:', Platform.OS);
     return mobileOS;
   },
 
@@ -51,7 +51,7 @@ export const DeviceDetector = {
           ? DesktopOS.Linux
           : DesktopOS.Unknown
         : undefined;
-    console.log('getDesktopOS:', desktopOS, 'Platform:', typeof navigator !== 'undefined' ? navigator.platform : 'Unknown');
+    // console.log('getDesktopOS:', desktopOS, 'Platform:', typeof navigator !== 'undefined' ? navigator.platform : 'Unknown');
     return desktopOS;
   },
 };

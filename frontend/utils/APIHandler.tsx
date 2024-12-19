@@ -6,6 +6,7 @@ export class APIHandler {
     setShowWebView: Function,
     setAuthUrl: Function
   ) {
+    console.log("PLATFORM IS ", platform);
     const loginUrl = `${this.backendUrl}/api/auth/login?platform=${platform}`;
 
     try {

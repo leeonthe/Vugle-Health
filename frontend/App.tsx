@@ -6,7 +6,6 @@ import DesktopView from './components/deviceLayout/DesktopView';
 import { useDevice } from './hooks/useDevice';
 import { Platform, Dimensions } from 'react-native';
 
-console.log('Platform Info:', Platform.OS);
 console.log('Initial Dimensions:', Dimensions.get('window'));
 
 const App: React.FC = () => {
