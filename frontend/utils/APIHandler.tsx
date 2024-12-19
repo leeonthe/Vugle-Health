@@ -3,7 +3,7 @@ export class APIHandler {
 
   static async initiateLogin(
     platform: 'mobile' | 'web',
-    setShowWebView: Function,
+    setShowMobileView: Function,
     setAuthUrl: Function
   ) {
     console.log("PLATFORM IS ", platform);
@@ -16,7 +16,7 @@ export class APIHandler {
       } else {
         // Mobile users open WebView
         setAuthUrl(loginUrl);
-        setShowWebView(true);
+        setShowMobileView(true);
       }
     } catch (error) {
       console.error('Error initiating login:', error);

@@ -95,7 +95,7 @@ class OAuthHandler:
         if platform == 'web':
         # Redirect web users directly
             print("WEB CALLED")
-            return redirect('http://localhost:8081/welcome')
+            return redirect('http://localhost:8081/Welcome')
         else:
             # For mobile apps, return JSON response
             # For now, return the url instead. 

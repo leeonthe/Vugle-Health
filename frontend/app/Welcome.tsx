@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import DesktopView from '../components/deviceLayout/DesktopView'; 
+import { useDevice } from '../hooks/useDevice'; 
 
 const WelcomePage: React.FC = () => {
   return (
@@ -28,6 +30,19 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function Welcome() {
+const Welcome: React.FC = () => {
+  const { isDesktop } = useDevice(); 
+
+  if (isDesktop) {
+    return (
+      <DesktopView>
+        <WelcomePage />
+      </DesktopView>
+    );
+  }
+
+  // Default view for mobile
   return <WelcomePage />;
-}
+};
+
+export default Welcome;

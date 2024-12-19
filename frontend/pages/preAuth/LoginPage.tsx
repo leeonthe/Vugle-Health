@@ -15,7 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 
 const LoginPage: React.FC = () => {
   const { isMobile } = useDevice(); // Determine platform using useDevice
-  const [showWebView, setShowWebView] = useState(false); // For mobile WebView
+  const [showMobileView, setShowMobileView] = useState(false); // For mobile WebView
   const [authUrl, setAuthUrl] = useState<string>(''); // OAuth URL
   const navigation = useNavigation(); // Access navigation
 
@@ -23,13 +23,13 @@ const LoginPage: React.FC = () => {
     try {
       const platform = isMobile ? 'mobile' : 'web';
       console.log('Platform:', platform);
-      await APIHandler.initiateLogin(platform, setShowWebView, setAuthUrl);
+      await APIHandler.initiateLogin(platform, setShowMobileView, setAuthUrl);
     } catch (error) {
       console.error('Error initiating login:', error);
     }
   };
 
-  const handleWebViewNavigation = (navState: any) => {
+  const handleMobileViewNavigation = (navState: any) => {
     const { url } = navState;
     // console.log('WebView State Change:', url);
   
@@ -39,11 +39,11 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  if (showWebView) {
+  if (showMobileView) {
     return (
       <WebView
         source={{ uri: authUrl }}
-        onNavigationStateChange={handleWebViewNavigation}
+        onNavigationStateChange={handleMobileViewNavigation}
         javaScriptEnabled={true}
         domStorageEnabled={true}
         style={{ marginTop: 20 }}

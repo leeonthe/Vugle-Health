@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import StartPage from '../pages/preAuth/StartPage';
 import OnBoardingPage from '../pages/preAuth/OnBoardingPage';
 import LoginPage from '../pages/preAuth/LoginPage';
-import WelcomePage from '../pages/postAuth/WelcomePage'; 
+import Welcome from '../app/Welcome'; 
 
 // import ChatbotPage from '../pages/chatbot/ChatbotPage';
 // import LobbyPage from '../pages/postAuth/LobbyPage';
@@ -20,7 +20,7 @@ const Router: React.FC = () => {
       <Stack.Screen name="Login" component={LoginPage} options={{ headerShown: false }}/>
 
       {/* PostAuth Pages */}
-      <Stack.Screen name="Welcome" component={WelcomePage} options={{ headerShown: false }} /> 
+      <Stack.Screen name="Welcome" component={Welcome} options={{ headerShown: false }} /> 
       {/* <Stack.Screen name="Lobby" component={LobbyPage} /> */}
       {/* <Stack.Screen name="Chatbot" component={ChatbotPage} /> */}
     </Stack.Navigator>
