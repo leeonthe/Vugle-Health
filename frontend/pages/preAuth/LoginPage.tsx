@@ -32,7 +32,8 @@ const LoginPage: React.FC = () => {
   const handleWebViewNavigation = (navState: any) => {
     const { url } = navState;
     console.log('WebView State Change:', url);
-    if (url.includes('/success')) {
+  
+    if (url.includes('/success') || url.includes('/Welcome')) {
       console.log('Login Success: Navigating to Welcome');
       navigation.navigate('Welcome'); // Navigate to WelcomePage
     }

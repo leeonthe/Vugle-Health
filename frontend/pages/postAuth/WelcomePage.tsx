@@ -28,4 +28,6 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WelcomePage;
+export default function Welcome() {
+  return <WelcomePage />;
+}

@@ -10,6 +10,8 @@ console.log('Platform Info:', Platform.OS);
 console.log('Initial Dimensions:', Dimensions.get('window'));
 
 const App: React.FC = () => {
+  console.log('App.tsx re-rendered');
+
   // const { isMobile } = useDevice();
   const { isMobile, isDesktop } = useDevice();
   console.log('useDevice Hook Output:', { isMobile, isDesktop });
