@@ -195,46 +195,46 @@ class UserInfoView(View):
     """
 
     def validate_access_token(self, token):
-    """Validate the access token for mobile clients."""
-    keys_url = config('VA_KEYS_URL')
-    try:
-        jwk_client = jwt.PyJWKClient(keys_url)
-        signing_key = jwk_client.get_signing_key_from_jwt(token)
+        """Validate the access token for mobile clients."""
+        keys_url = config('VA_KEYS_URL')
+        try:
+            jwk_client = jwt.PyJWKClient(keys_url)
+            signing_key = jwk_client.get_signing_key_from_jwt(token)
 
-        # Decode token without verifying signature to inspect its structure
-        unverified_payload = jwt.decode(token, options={"verify_signature": False})
-        print("Unverified Token Payload:", unverified_payload)
+            # Decode token without verifying signature to inspect its structure
+            unverified_payload = jwt.decode(token, options={"verify_signature": False})
+            print("Unverified Token Payload:", unverified_payload)
 
-        # Dynamically extract the audience from the unverified payload
-        expected_audience = unverified_payload.get("aud")
+            # Dynamically extract the audience from the unverified payload
+            expected_audience = unverified_payload.get("aud")
 
-        # Decode and validate the token
-        payload = jwt.decode(
-            token,
-            signing_key.key,
-            algorithms=["RS256"],
-            audience=expected_audience,
-        )
-        print("Decoded Payload:", payload)
+            # Decode and validate the token
+            payload = jwt.decode(
+                token,
+                signing_key.key,
+                algorithms=["RS256"],
+                audience=expected_audience,
+            )
+            print("Decoded Payload:", payload)
 
-        # Extract user info with fallback logic
-        name = payload.get("name", "")  # Full name
-        given_name = payload.get("given_name") or (name.split(" ")[0] if name else None)
-        family_name = payload.get("family_name") or (
-            name.split(" ")[1] if len(name.split(" ")) > 1 else None
-        )
+            # Extract user info with fallback logic
+            name = payload.get("name", "")  # Full name
+            given_name = payload.get("given_name") or (name.split(" ")[0] if name else None)
+            family_name = payload.get("family_name") or (
+                name.split(" ")[1] if len(name.split(" ")) > 1 else None
+            )
 
-        user_info = {
-            "given_name": given_name,
-            "family_name": family_name,
-            "email": payload.get("email"),
-        }
-        print("Extracted User Info for Mobile:", user_info)
+            user_info = {
+                "given_name": given_name,
+                "family_name": family_name,
+                "email": payload.get("email"),
+            }
+            print("Extracted User Info for Mobile:", user_info)
 
-        return user_info
-    except (InvalidTokenError, Exception) as e:
-        print(f"Token validation error: {e}")
-        return None
+            return user_info
+        except (InvalidTokenError, Exception) as e:
+            print(f"Token validation error: {e}")
+            return None
 
 
     def get(self, request, *args, **kwargs):
