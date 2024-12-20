@@ -18,8 +18,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const LoginPage: React.FC = () => {
   const { isMobile } = useDevice(); 
   const [showMobileView, setShowMobileView] = useState(false); // For mobile WebView
-  const [authUrl, setAuthUrl] = useState<string>(''); // OAuth URL
-  const navigation = useNavigation(); // Access navigation
+  const [authUrl, setAuthUrl] = useState<string>(''); 
+  const navigation = useNavigation();
 
   const handleLogin = async () => {
     try {
@@ -39,14 +39,16 @@ const LoginPage: React.FC = () => {
     if (url.includes('/success') || url.includes('/Welcome')) {
       console.log('Login Success: Navigating to Welcome');
   
-      // Extract access_token from URL if present
+      // Extract access_token & id_token
       const urlParams = new URLSearchParams(new URL(url).search);
       const accessToken = urlParams.get('access_token');
+      const idToken = urlParams.get('id_token')
   
-      if (accessToken) {
+      if (accessToken && idToken) {
         console.log('Access Token Extracted:', accessToken);
         try {
-          await AsyncStorage.setItem('access_token', accessToken); // Store token securely
+          await AsyncStorage.setItem('access_token', accessToken);
+          await AsyncStorage.setItem('id_token', idToken);
         } catch (error) {
           console.error('Error storing access token:', error);
         }
