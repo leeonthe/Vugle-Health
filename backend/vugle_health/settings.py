@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-*kz-b==ksj5f4%y4*9p9oh3gk^^e8pd(v*)@&6q#f!n)@d_=f1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -41,11 +41,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',  
     'vugle_health',    # App name
-    # 'corsheaders',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
-    # 'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -56,13 +56,46 @@ MIDDLEWARE = [
 
 ]
 
+# Use database-backed sessions
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
-SESSION_COOKIE_SECURE = False  # For local dev (set True in production)
-SESSION_COOKIE_SAMESITE = 'None'  # Prevent SameSite cookie restrictions
-CSRF_COOKIE_SAMESITE = 'None'  # For CSRF cookies during OAuth
-CSRF_COOKIE_SECURE = False
+# Set secure cookies for mobile and cross-origin use
+SESSION_COOKIE_NAME = 'sessionid'
+SESSION_COOKIE_SAMESITE = 'None'  # Required for cross-origin cookies
+SESSION_COOKIE_SECURE = False    # Set True in production with HTTPS
 
+# SESSION_COOKIE_SECURE = False  # For local dev (set True in production)
+# SESSION_COOKIE_SAMESITE = 'None'  # Prevent SameSite cookie restrictions
+# CSRF_COOKIE_SAMESITE = 'None'  # For CSRF cookies during OAuth
+# CSRF_COOKIE_SECURE = False
 
+MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:19006',  # React Native Expo (mobile)
+    'http://localhost:8081',  # Web app frontend
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:19006',  # React Native Expo (mobile)
+    'http://localhost:8081',  # Web app frontend
+]
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'DELETE',
+    'OPTIONS',
+]
+
+CORS_ALLOW_HEADERS = [
+    'Authorization',
+    'Content-Type',
+    'X-CSRFToken',
+]
 
 ROOT_URLCONF = 'vugle_health.urls'
 

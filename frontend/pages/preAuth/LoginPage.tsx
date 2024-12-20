@@ -12,9 +12,11 @@ import {OAuthHandler } from '../../utils/OAuthHandler'
 import { useDevice } from '../../hooks/useDevice';
 import { WebView } from 'react-native-webview';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const LoginPage: React.FC = () => {
-  const { isMobile } = useDevice(); // Determine platform using useDevice
+  const { isMobile } = useDevice(); 
   const [showMobileView, setShowMobileView] = useState(false); // For mobile WebView
   const [authUrl, setAuthUrl] = useState<string>(''); // OAuth URL
   const navigation = useNavigation(); // Access navigation
@@ -29,15 +31,34 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  const handleMobileViewNavigation = (navState: any) => {
+  const handleMobileViewNavigation = async (navState: any) => {
     const { url } = navState;
+  
     // console.log('WebView State Change:', url);
   
     if (url.includes('/success') || url.includes('/Welcome')) {
       console.log('Login Success: Navigating to Welcome');
+  
+      // Extract access_token from URL if present
+      const urlParams = new URLSearchParams(new URL(url).search);
+      const accessToken = urlParams.get('access_token');
+  
+      if (accessToken) {
+        console.log('Access Token Extracted:', accessToken);
+        try {
+          await AsyncStorage.setItem('access_token', accessToken); // Store token securely
+        } catch (error) {
+          console.error('Error storing access token:', error);
+        }
+      } else {
+        console.warn('Access Token Not Found in URL');
+      }
+  
       navigation.navigate('Welcome'); // Navigate to WelcomePage
     }
   };
+
+  
 
   if (showMobileView) {
     return (

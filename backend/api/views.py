@@ -3,6 +3,15 @@ from urllib.parse import urlencode
 from django.http import JsonResponse
 from django.conf import settings
 from decouple import config
+from jwt.exceptions import InvalidTokenError
+
+from django.views import View
+from django.http import JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.sessions.models import Session
+
+
 import requests
 import base64
 import os
@@ -10,7 +19,6 @@ import random
 import string
 import hashlib
 import jwt
-from jwt.exceptions import InvalidTokenError
 
 class OAuthHandler:
     def __init__(self):
@@ -64,7 +72,9 @@ class OAuthHandler:
             'state': state,
             'nonce': nonce,
         }
-        print("OAUTH URL: ")
+        oauth_url = f"{self.authorization_url}?{urlencode(params)}"
+
+        print(f"Generated OAuth Request URL: {oauth_url}")  # Print the OAuth URL
         return redirect(f"{self.authorization_url}?{urlencode(params)}")
 
     def oauth_callback(self, request):
@@ -114,6 +124,7 @@ class OAuthHandler:
         # Validate the ID token
         try:
             signing_key = self.get_signing_key(id_token)
+
             if not signing_key:
                 print("Signing key fetch failed.")
                 return redirect('/error')
@@ -126,6 +137,13 @@ class OAuthHandler:
                 options={"require": ["exp", "nonce"]},
             )
 
+            print("Decoded ID Token Payload:", payload)
+
+            
+            # Extract name components
+            full_name = payload.get("name", "")
+            given_name, family_name = (full_name.split(" ", 1) + [None])[:2]  # Split into first and last names
+
             # Validate the nonce
             if payload.get('nonce') != saved_nonce:
                 print("Nonce validation failed.")
@@ -133,9 +151,8 @@ class OAuthHandler:
 
             # Store user info in session
             request.session['user_info'] = {
-                "given_name": payload.get("given_name"),
-                "family_name": payload.get("family_name"),
-                "email": payload.get("email"),
+                "given_name": given_name,
+                "family_name": family_name,
             }
 
             print("User info stored in session:", request.session['user_info'])
@@ -144,15 +161,6 @@ class OAuthHandler:
         except InvalidTokenError as e:
             print(f"Token validation error: {e}")
             return redirect('/error')
-
-        # request.session['access_token'] = token_data.get('access_token')
-        # request.session['refresh_token'] = token_data.get('refresh_token')
-
-
-        # response_data = {
-        #     'success': True,
-        #     'redirect_url': '/success',  # Or '/postAuth/WelcomePage'
-        # }
         
         if platform == 'web':
         # Redirect web users directly
@@ -162,7 +170,10 @@ class OAuthHandler:
             # For mobile apps, return JSON response
             # For now, return the url instead. 
             print("APP CALLED") 
-            return redirect('http://localhost:8081/Welcome')
+            access_token = token_data.get('access_token')
+            return redirect(f'http://localhost:8081/Welcome?access_token={access_token}')
+
+            # return redirect('http://localhost:8081/Welcome')
 
             # return JsonResponse(response_data)
        
@@ -175,3 +186,88 @@ def oauth_login(request):
 def oauth_callback(request):
     handler = OAuthHandler()
     return handler.oauth_callback(request)
+
+
+@method_decorator(csrf_exempt, name='dispatch')  # Exempt CSRF for mobile clients
+class UserInfoView(View):
+    """
+    API endpoint to fetch authenticated user's profile info for both web and mobile views.
+    """
+
+    def validate_access_token(self, token):
+    """Validate the access token for mobile clients."""
+    keys_url = config('VA_KEYS_URL')
+    try:
+        jwk_client = jwt.PyJWKClient(keys_url)
+        signing_key = jwk_client.get_signing_key_from_jwt(token)
+
+        # Decode token without verifying signature to inspect its structure
+        unverified_payload = jwt.decode(token, options={"verify_signature": False})
+        print("Unverified Token Payload:", unverified_payload)
+
+        # Dynamically extract the audience from the unverified payload
+        expected_audience = unverified_payload.get("aud")
+
+        # Decode and validate the token
+        payload = jwt.decode(
+            token,
+            signing_key.key,
+            algorithms=["RS256"],
+            audience=expected_audience,
+        )
+        print("Decoded Payload:", payload)
+
+        # Extract user info with fallback logic
+        name = payload.get("name", "")  # Full name
+        given_name = payload.get("given_name") or (name.split(" ")[0] if name else None)
+        family_name = payload.get("family_name") or (
+            name.split(" ")[1] if len(name.split(" ")) > 1 else None
+        )
+
+        user_info = {
+            "given_name": given_name,
+            "family_name": family_name,
+            "email": payload.get("email"),
+        }
+        print("Extracted User Info for Mobile:", user_info)
+
+        return user_info
+    except (InvalidTokenError, Exception) as e:
+        print(f"Token validation error: {e}")
+        return None
+
+
+    def get(self, request, *args, **kwargs):
+        """
+        Handle GET requests to retrieve user information for both web and mobile clients.
+        """
+        # Check for token in the Authorization header (mobile clients)
+        auth_header = request.headers.get('Authorization')
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]
+            payload = self.validate_access_token(token)
+            if payload:
+                token = auth_header.split(' ')[1]
+                user_info = self.validate_access_token(token)
+                if user_info:
+                    return JsonResponse({"user_info": user_info})
+                else:
+                    return JsonResponse({"error": "Invalid or expired token"}, status=401)
+
+                # user_info = {
+                #     "given_name": payload.get("given_name"),
+                #     "family_name": payload.get("family_name"),
+                # }
+                # print("Extracted User Info for Mobile:", user_info)
+
+                # return JsonResponse({"user_info": user_info})
+            else:
+                return JsonResponse({"error": "Invalid or expired token"}, status=401)
+
+        # For web clients, check session data
+        user_info = request.session.get('user_info')
+        if not user_info:
+            return JsonResponse({"error": "User not authenticated"}, status=401)
+
+        # Return user info from the session
+        return JsonResponse({"user_info": user_info})
