@@ -1,4 +1,4 @@
-export class APIHandler {
+export class OAuthHandler {
   static backendUrl = 'http://localhost:8000';
 
   static async initiateLogin(

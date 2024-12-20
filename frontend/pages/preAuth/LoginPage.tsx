@@ -8,7 +8,7 @@ import {
   
 } from 'react-native';
 import ConnectRecord from '../../assets/images/preAuth/loginPage/connect_record.svg';
-import {APIHandler } from '../../utils/APIHandler'
+import {OAuthHandler } from '../../utils/OAuthHandler'
 import { useDevice } from '../../hooks/useDevice';
 import { WebView } from 'react-native-webview';
 import { useNavigation } from '@react-navigation/native';
@@ -23,7 +23,7 @@ const LoginPage: React.FC = () => {
     try {
       const platform = isMobile ? 'mobile' : 'web';
       console.log('Platform:', platform);
-      await APIHandler.initiateLogin(platform, setShowMobileView, setAuthUrl);
+      await OAuthHandler.initiateLogin(platform, setShowMobileView, setAuthUrl);
     } catch (error) {
       console.error('Error initiating login:', error);
     }
