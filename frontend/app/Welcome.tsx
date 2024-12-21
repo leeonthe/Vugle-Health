@@ -6,6 +6,8 @@ import { useUserFirstName } from '../utils/useUserFirstName';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'; 
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 
 import DesktopView from '../components/deviceLayout/DesktopView'; 
@@ -17,6 +19,7 @@ import MedicalBook from '../assets/images/postAuth/WelcomePage/Medical_Book.svg'
 import ServiceTreatmentRecords from '../assets/images/postAuth/WelcomePage/Service_treatment.svg';
 import BenefitInfo from '../assets/images/postAuth/WelcomePage/Benefits_info.svg';
 import Lock from '../assets/images/postAuth/WelcomePage/lock.svg';
+import HomePage from '@/pages/postAuth/HomePage';
 type RootStackParamList = {
   HomePage: undefined;
 };
@@ -28,6 +31,7 @@ interface UserStartScreenProps {
     params?: Record<string, unknown>;
   };
 }
+const Stack = createNativeStackNavigator();
 
 const queryClient = new QueryClient();
 
@@ -212,15 +216,35 @@ const Welcome: React.FC = () => {
   const { isDesktop } = useDevice(); 
 
   return (
+    // <QueryClientProvider client={queryClient}>
+    //   {isDesktop ? (
+    //     <DesktopView>
+    //         <WelcomePage />
+    //     </DesktopView>
+    //   ) : (
+    //     <WelcomePage />
+        
+    //   )}
+    // </QueryClientProvider>
     <QueryClientProvider client={queryClient}>
       {isDesktop ? (
         <DesktopView>
-          <WelcomePage />
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="WelcomePage" component={WelcomePage} />
+            <Stack.Screen name="HomePage" component={HomePage} />
+          </Stack.Navigator>
         </DesktopView>
       ) : (
-        <WelcomePage />
+        <Stack.Navigator
+          initialRouteName="WelcomePage"
+          screenOptions={{ headerShown: false }}
+        >
+          <Stack.Screen name="WelcomePage" component={WelcomePage} />
+          <Stack.Screen name="HomePage" component={HomePage} />
+        </Stack.Navigator>
       )}
     </QueryClientProvider>
+
   );
 };
 
