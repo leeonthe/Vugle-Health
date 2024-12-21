@@ -1,5 +1,5 @@
 import React from 'react';
-import { CSSProperties } from 'react';
+import styles from '@/styles/postAuthStyles/HomePageStyles';
 
 import {
 
@@ -8,10 +8,9 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+
 } from 'react-native';
-import styles from '@/styles/postAuthStyles/HomePageStyles';
 import { useNavigation } from '@react-navigation/native';
-import Svg, { Rect } from 'react-native-svg';
 
 
 // SVG for home 

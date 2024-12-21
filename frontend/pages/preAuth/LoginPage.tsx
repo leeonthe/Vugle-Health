@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import ConnectRecord from '../../assets/images/preAuth/loginPage/connect_record.svg';
 import {OAuthHandler } from '../../utils/OAuthHandler'
-import { useDevice } from '../../hooks/useDevice';
+import { useDevice } from '../../utils/hooks/useDevice';
 import { WebView } from 'react-native-webview';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';

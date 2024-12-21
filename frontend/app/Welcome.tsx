@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useDevice } from '../hooks/useDevice'; 
+import { useDevice } from '../utils/hooks/useDevice'; 
 import { useNavigation } from '@react-navigation/native';
-import { useUserFirstName } from '../utils/useUserFirstName';
+import { useUserFirstName } from '../utils/hooks/useUserFirstName';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'; 
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
