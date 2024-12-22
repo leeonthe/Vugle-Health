@@ -1,16 +1,18 @@
 import React from 'react';
+import DesktopView from '../components/deviceLayout/DesktopView'; 
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useDevice } from '../utils/hooks/useDevice'; 
-import { useNavigation } from '@react-navigation/native';
-import { useUserFirstName } from '../utils/hooks/useUserFirstName';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'; 
 
+import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+// hooks
+import { useDevice } from '../utils/hooks/useDevice'; 
+import { useUserFirstName } from '../utils/hooks/useUserFirstName';
+import { useDisabilityRating } from '../utils/hooks/useDisabilityRating';
 
-import DesktopView from '../components/deviceLayout/DesktopView'; 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'; 
+
 
 // SVG
 import DischargeStatus from '../assets/images/postAuth/WelcomePage/Discharge_status.svg';
@@ -20,6 +22,8 @@ import ServiceTreatmentRecords from '../assets/images/postAuth/WelcomePage/Servi
 import BenefitInfo from '../assets/images/postAuth/WelcomePage/Benefits_info.svg';
 import Lock from '../assets/images/postAuth/WelcomePage/lock.svg';
 import HomePage from '@/pages/postAuth/HomePage';
+
+
 type RootStackParamList = {
   HomePage: undefined;
 };
@@ -31,27 +35,58 @@ interface UserStartScreenProps {
     params?: Record<string, unknown>;
   };
 }
-const Stack = createNativeStackNavigator();
 
+const Stack = createNativeStackNavigator();
 const queryClient = new QueryClient();
 
 const WelcomePage: React.FC<UserStartScreenProps> = ({route}) => {
 
   const navigation = useNavigation<NavigationProp>();
-  const { data, isLoading, isError } = useUserFirstName();
-  
-  if (isLoading) {
+  const { data: userData, isLoading: isUserLoading, isError: isUserError } = useUserFirstName();
+  const { data: disabilityData, isLoading: isDisabilityLoading, isError: isDisabilityError } = useDisabilityRating();
+
+  if (isUserLoading || isDisabilityLoading) {
     return <Text style={styles.loadingText}>Loading...</Text>;
   }
 
-  if (isError) {
-    return <Text style={styles.errorText}>Failed to load user information.</Text>;
+  if (isUserError || isDisabilityError) {
+    return <Text style={styles.errorText}>Failed to load information.</Text>;
   }
 
 
+  const disabilityAttributes = disabilityData?.disability_rating?.data?.attributes;
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Welcome {data?.given_name || 'Guest'}</Text>
+      {/* TESTING DISABILITY RATING */}
+
+      {/* Display Disability Rating Data */}
+      {disabilityAttributes ? (
+      <View style={styles.disabilityContainer}>
+        <Text>Combined Disability Rating: {disabilityAttributes.combined_disability_rating}</Text>
+        <Text>Effective Date: {disabilityAttributes.combined_effective_date}</Text>
+        {disabilityAttributes.individual_ratings.map((rating, index) => (
+          <View key={index}>
+            <Text>Rating {index + 1}:</Text>
+            <Text>- Decision: {rating.decision}</Text>
+            <Text>- Percentage: {rating.rating_percentage}%</Text>
+            <Text>- Diagnostic Name: {rating.diagnostic_type_name}</Text>
+          </View>
+        ))}
+      </View>
+    ) : (
+      <Text style={styles.errorText}>Disability data not available.</Text>
+    )}
+
+
+
+
+
+
+
+
+
+      <Text style={styles.title}>Welcome {userData?.given_name || 'Guest'}</Text>
       <Text style={styles.subtitle}>We thank you for your service.</Text>
 
       <View style={styles.listContainer}>
@@ -208,7 +243,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
-  
+  disabilityContainer: {
+    alignSelf: 'flex-start',
+    marginBottom: 20,
+  },
 });
 
 const Welcome: React.FC = () => {
@@ -216,16 +254,6 @@ const Welcome: React.FC = () => {
   const { isDesktop } = useDevice(); 
 
   return (
-    // <QueryClientProvider client={queryClient}>
-    //   {isDesktop ? (
-    //     <DesktopView>
-    //         <WelcomePage />
-    //     </DesktopView>
-    //   ) : (
-    //     <WelcomePage />
-        
-    //   )}
-    // </QueryClientProvider>
     <QueryClientProvider client={queryClient}>
       {isDesktop ? (
         <DesktopView>

@@ -31,34 +31,62 @@ const LoginPage: React.FC = () => {
     }
   };
 
+
+
+  
+  let hasNavigated = false; // Handling duplicate navigation
+
+
   const handleMobileViewNavigation = async (navState: any) => {
     const { url } = navState;
-  
-    // console.log('WebView State Change:', url);
-  
-    if (url.includes('/success') || url.includes('/Welcome')) {
-      console.log('Login Success: Navigating to Welcome');
-  
-      // Extract access_token & id_token
-      const urlParams = new URLSearchParams(new URL(url).search);
-      const accessToken = urlParams.get('access_token');
-      const idToken = urlParams.get('id_token')
-  
-      if (accessToken && idToken) {
+
+    // Only process URLs that indicate a successful login
+    if (!url.includes('/success') && !url.includes('/Welcome')) {
+      return;
+    }
+
+    if (hasNavigated) {
+      console.log('Navigation already handled, skipping...');
+      return;
+    }
+
+    console.log('Processing navigation URL:', url);
+
+    const urlParams = new URLSearchParams(new URL(url).search);
+    const accessToken = urlParams.get('access_token');
+    const idToken = urlParams.get('id_token');
+
+    console.log('ACCESS TOKEN GOT IN LOGINPAGE:', accessToken);
+    console.log('ID TOKEN GOT IN LOGINPAGE:', idToken);
+
+    if (accessToken && idToken) {
+      try {
+        hasNavigated = true; // Prevent further processing
         console.log('Access Token Extracted:', accessToken);
-        try {
-          await AsyncStorage.setItem('access_token', accessToken);
-          await AsyncStorage.setItem('id_token', idToken);
-        } catch (error) {
-          console.error('Error storing access token:', error);
-        }
-      } else {
-        console.warn('Access Token Not Found in URL');
+
+        // Save tokens to AsyncStorage
+        await AsyncStorage.setItem('access_token', accessToken);
+        await AsyncStorage.setItem('id_token', idToken);
+
+        // Confirm tokens are stored
+        const storedAccessToken = await AsyncStorage.getItem('access_token');
+        const storedIdToken = await AsyncStorage.getItem('id_token');
+        console.log('Stored Access Token:', storedAccessToken);
+        console.log('Stored ID Token:', storedIdToken);
+
+        // Navigate to Welcome page
+        navigation.navigate('Welcome');
+      } catch (error) {
+        console.error('Error storing tokens:', error);
+        hasNavigated = false; // Reset navigation state on error
       }
-  
-      navigation.navigate('Welcome'); // Navigate to WelcomePage
+    } else {
+      console.warn('Access Token or ID Token not found in URL');
     }
   };
+
+  
+  
 
   
 

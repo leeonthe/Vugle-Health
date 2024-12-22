@@ -121,7 +121,8 @@ class OAuthHandler:
         token_data = token_response.json()
         id_token = token_data.get('id_token')
         access_token = token_data.get('access_token')
-
+        # TODO: Store access_token in session if needed -> This is for disability_rating fetching.
+        request.session['access_token'] = access_token
         # Validate the ID token
         try:
             signing_key = self.get_signing_key(id_token)
@@ -168,14 +169,8 @@ class OAuthHandler:
             print("WEB CALLED")
             return redirect('http://localhost:8081/Welcome')
         else:
-            # For mobile apps, return JSON response
-            # For now, return the url instead. 
             print("APP CALLED") 
             return redirect(f'http://localhost:8081/Welcome?access_token={access_token}&id_token={id_token}')
-
-            # return redirect('http://localhost:8081/Welcome')
-
-            # return JsonResponse(response_data)
        
 
 
@@ -258,3 +253,41 @@ class UserInfoView(View):
             print(f"Token validation error: {e}")
             return None
 
+
+@method_decorator(csrf_exempt, name='dispatch')
+class DisabilityRatingView(View):
+    """
+    API endpoint to fetch a Veteran's disability rating.
+    Handles both web and mobile clients.
+    """
+
+    def get(self, request, *args, **kwargs):
+        # Check for token in Authorization header (mobile clients)
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            access_token = auth_header.split(" ")[1]
+        else:
+            # Check session for web clients
+            access_token = request.session.get("access_token")
+
+        if not access_token:
+            return JsonResponse({"error": "Access token missing or invalid."}, status=401)
+
+        api_url = "https://sandbox-api.va.gov/services/veteran_verification/v2/disability_rating"
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "accept": "application/json"
+        }
+
+        try:
+            response = requests.get(api_url, headers=headers)
+
+            if response.status_code == 200:
+                data = response.json()
+                print("DISABILITY RATING DATA: ", data)
+                return JsonResponse({"disability_rating": data})
+            else:
+                return JsonResponse({"error": "Failed to fetch disability rating.", "details": response.text}, status=response.status_code)
+
+        except requests.RequestException as e:
+            return JsonResponse({"error": "An error occurred while fetching disability rating.", "details": str(e)}, status=500)
