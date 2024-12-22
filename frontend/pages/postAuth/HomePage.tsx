@@ -12,6 +12,9 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+// hooks
+import { useDisabilityRating } from '../../utils/hooks/useDisabilityRating';
+
 
 // SVG for home 
 import DisabilityIcon from '../../assets/images/postAuth/homePage/disability_icon.svg';
@@ -39,33 +42,15 @@ interface EligibleLetters {
 }
 
 function HomePage() {
-//   const { userInfo, eligibleLetters, statusInfo, loading, error } = useVeteranData();
+  const { data: disabilityData, isLoading: isDisabilityLoading, isError: isDisabilityError } = useDisabilityRating();
+
   const navigation = useNavigation();
-  
-  let combinedDisabilityRating: string = 'N/A';
+  const combinedDisabilityRating = disabilityData?.disability_rating?.data?.attributes.combined_disability_rating;
+
   let veteranStatus: string = 'N/A';
   let monthlyCompensation: string = 'NULL';
 
   const billImagePath = '../../assets/postAuth/homePage/giBill.png'
-
-//   if (userInfo?.disabilityRating) {
-//     const parsedDisabilityRating = JSON.parse(JSON.stringify(userInfo.disabilityRating));
-//     if (parsedDisabilityRating.data && parsedDisabilityRating.data.attributes) {
-//       combinedDisabilityRating = parsedDisabilityRating.data.attributes.combined_disability_rating;
-//       veteranStatus = parsedDisabilityRating.data.id; // THIS IS ICN VALUE.
-//     }
-//   }
-
-//   if (eligibleLetters?.benefitInformation) {
-//     monthlyCompensation = `${eligibleLetters.benefitInformation.monthlyAwardAmount.value}`;
-//   }
-
-//   if (userInfo?.status) {
-//     const parsedStatus = JSON.parse(JSON.stringify(userInfo.status));
-//     if (parsedStatus.data && parsedStatus.data.attributes) {
-//       veteranStatus = parsedStatus.data.attributes.veteran_status;
-//     }
-//   }
 
   return (
     <View style={styles.container}>
@@ -133,7 +118,9 @@ function HomePage() {
               <DisabilityIcon style={styles.infoIcon} />
               <View style={styles.infoTextContainer}>
                 <Text style={styles.infoTitle}>Disability rating</Text>
-                <Text style={styles.infoValue}>{combinedDisabilityRating}%</Text>
+                <Text style={styles.infoValue}>
+                  {combinedDisabilityRating !== undefined ? `${combinedDisabilityRating}%` : 'NA%'}
+                </Text>
               </View>
             </View>
             <TouchableOpacity
@@ -143,6 +130,7 @@ function HomePage() {
               <Text style={styles.viewText}>View</Text>
             </TouchableOpacity>
           </View>
+          
           <View style={styles.infoItem}>
             <View style={styles.infoLeft}>
               <CompensationIcon style={styles.infoIcon} />
