@@ -1,0 +1,80 @@
+{
+    "chat_bubbles": [
+      {
+        "container": [
+          {
+            "type": "image",
+            "content": "app_logo",
+            "style": {
+              "width": 24,
+              "height": 24
+            }
+          }
+        ]
+      },
+      {
+        "container": [
+          {
+            "type": "text",
+            "content": "Nice to meet you, {user_name}. 😊",
+            "style": {
+              "color": "#323D4C",
+              "fontSize": 16,
+              "fontFamily": "SF Pro",
+              "fontWeight": "400",
+              "lineHeight": 28,
+              "wordWrap": "break-word",
+              "marginBottom": 8
+            }
+          }
+        ]
+      },
+      {
+        "container": [
+          {
+            "type": "text",
+            "content": "Please upload your DD214.",
+            "style": {
+              "color": "#323D4C",
+              "fontSize": 16,
+              "fontFamily": "SF Pro",
+              "fontWeight": "bold",
+              "lineHeight": 28,
+              "wordWrap": "break-word",
+              "marginBottom": 16
+            }
+          },
+          {
+            "type": "text",
+            "content": "Before we begin, we just need one more document from you to evaluate the best approach for your application!",
+            "style": {
+              "color": "#323D4C",
+              "fontSize": 16,
+              "fontFamily": "SF Pro",
+              "fontWeight": "400",
+              "lineHeight": 28,
+              "wordWrap": "break-word",
+              "marginBottom": 16
+            }
+          },
+          {
+            "type": "link",
+            "content": "I don't have it right now",
+            "url": "https://example.com/more-info",
+            "style": {
+              "color": "#3182F6",
+              "textDecorationLine": "underline",
+              "marginBottom": 0
+            }
+          }
+        ]
+      }
+    ],
+    "options": [
+      {
+        "text": "Upload DD214",
+        "next": "upload_dd214"
+      }
+    ]
+  }
+  

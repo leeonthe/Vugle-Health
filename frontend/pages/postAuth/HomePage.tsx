@@ -106,7 +106,7 @@ function HomePage() {
           </View>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate('ConsultPageScreen')}
+            onPress={() => navigation.navigate('DexStartPage')}
           >
             <Text style={styles.buttonText}>How much I can earn?</Text>
           </TouchableOpacity>

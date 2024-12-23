@@ -28,16 +28,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5', // Light gray background for the desktop container
+    backgroundColor: '#f5f5f5',
   },
   simulator: {
-    width: 393, // Fixed width (iPhone 15 Pro size)
-    height: 852, // Fixed height
+    width: 393, 
+    height: 852, 
     borderWidth: 2,
-    borderColor: '#ccc', // Light border to mimic an iPhone bezel
+    borderColor: '#ccc', 
     borderRadius: 20,
-    backgroundColor: '#fff', // White background inside the "simulator"
-    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)', // Subtle shadow for realism
+    backgroundColor: '#fff', 
+    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)', 
     overflow: 'hidden',
   },
 });

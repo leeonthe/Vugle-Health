@@ -6,8 +6,8 @@ import OnBoardingPage from '../pages/preAuth/OnBoardingPage';
 import LoginPage from '../pages/preAuth/LoginPage';
 import Welcome from '../app/Welcome'; 
 import HomePage from '../pages/postAuth/HomePage'
-// import ChatbotPage from '../pages/chatbot/ChatbotPage';
-// import LobbyPage from '../pages/postAuth/LobbyPage';
+
+import DexStartPage from '../pages/postAuth/DexStartPage'
 
 const Stack = createNativeStackNavigator();
 
@@ -22,7 +22,7 @@ const Router: React.FC = () => {
       {/* PostAuth Pages */}
       <Stack.Screen name="Welcome" component={Welcome} options={{ headerShown: false }} /> 
       <Stack.Screen name="HomePage" component={HomePage} options={{headerShown: false}} />
-      {/* <Stack.Screen name="Chatbot" component={ChatbotPage} /> */}
+      <Stack.Screen name="DexStartPage" component={DexStartPage} options={{headerShown: false}} />
     </Stack.Navigator>
   );
 };

@@ -26,6 +26,7 @@ import ServiceTreatmentRecords from '../assets/images/postAuth/WelcomePage/Servi
 import BenefitInfo from '../assets/images/postAuth/WelcomePage/Benefits_info.svg';
 import Lock from '../assets/images/postAuth/WelcomePage/lock.svg';
 import HomePage from '@/pages/postAuth/HomePage';
+import DexStartPage from '@/pages/postAuth/DexStartPage';
 
 
 type RootStackParamList = {
@@ -79,6 +80,7 @@ const WelcomePage: React.FC<UserStartScreenProps> = ({route}) => {
   }, [isDesktop]);
 
   
+  
   const navigation = useNavigation<NavigationProp>();
   const { data: userData, isLoading: isUserLoading, isError: isUserError } = useUserFirstName();
   
@@ -87,7 +89,21 @@ const WelcomePage: React.FC<UserStartScreenProps> = ({route}) => {
   const icn = disabilityData?.disability_rating?.data?.id; // ICN is taken from the disability rating data
   const { data: eligibleLettersData, isLoading: isEligibleLoading, isError: isEligibleError } = useEligibleLetter(icn || '');
 
+  // Store user first_name
+  useEffect(() => {
+    const storeGivenName = async () => {
+      if (userData?.given_name) {
+        try {
+          await AsyncStorage.setItem('given_name', userData.given_name);
+          console.log('Stored given_name in AsyncStorage:', userData.given_name);
+        } catch (error) {
+          console.error('Error storing given_name in AsyncStorage:', error);
+        }
+      }
+    };
 
+    storeGivenName();
+  }, [userData]);
 
 
   if (isUserLoading || isDisabilityLoading || isEligibleLoading) {
@@ -347,6 +363,7 @@ const Welcome: React.FC = () => {
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="WelcomePage" component={WelcomePage} />
             <Stack.Screen name="HomePage" component={HomePage} />
+            <Stack.Screen name="DexStartPage" component={DexStartPage}/>
           </Stack.Navigator>
         </DesktopView>
       ) : (
