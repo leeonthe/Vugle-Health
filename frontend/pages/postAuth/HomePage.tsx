@@ -14,6 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 
 // hooks
 import { useDisabilityRating } from '../../utils/hooks/useDisabilityRating';
+import { useEligibleLetter } from '../../utils/hooks/useEligibleLetter';
 
 
 // SVG for home 
@@ -30,15 +31,25 @@ import Loan from '../../assets/images/postAuth/homePage/loan-icon.svg';
 
 
 function HomePage() {
-  const { data: disabilityData, isLoading: isDisabilityLoading, isError: isDisabilityError } = useDisabilityRating();
-
   const navigation = useNavigation();
-  const combinedDisabilityRating = disabilityData?.disability_rating?.data?.attributes.combined_disability_rating;
 
-  let veteranStatus: string = 'N/A';
-  let monthlyCompensation: string = 'NULL';
+  const { data: disabilityData, isLoading: isDisabilityLoading, isError: isDisabilityError } = useDisabilityRating();
+  const icn = disabilityData?.disability_rating?.data?.id;
+  const { data: eligibleLettersData, isLoading: isEligibleLoading } = useEligibleLetter(icn || '');
+
+  const combinedDisabilityRating = disabilityData?.disability_rating?.data?.attributes.combined_disability_rating;
+  const monthlyAwardAmount = eligibleLettersData?.benefitInformation?.monthlyAwardAmount || { value: 0, currency: 'USD' };
+
+  const formattedAmount = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: monthlyAwardAmount.currency,
+  }).format(monthlyAwardAmount.value);
 
   const billImagePath = '../../assets/postAuth/homePage/giBill.png'
+
+  if (isDisabilityLoading || isEligibleLoading) {
+    return <Text style={styles.loadingText}>Loading...</Text>;
+  }
 
   return (
     <View style={styles.container}>
@@ -125,7 +136,8 @@ function HomePage() {
               <View style={styles.infoTextContainer}>
                 <Text style={styles.infoTitle}>Monthly compensation</Text>
                 <Text style={styles.infoValue}>
-                  {monthlyCompensation !== 'NULL' ? `$${monthlyCompensation}` : 'NULL'}
+                  {/* {`$${monthlyAwardAmount.value.toFixed(2)} ${monthlyAwardAmount.currency}`} */}
+                  {formattedAmount}
                 </Text>
               </View>
             </View>

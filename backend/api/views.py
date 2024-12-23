@@ -331,6 +331,7 @@ class EligibleLettersView(View):
 
             if response.status_code == 200:
                 data = response.json()
+                print("ELIGIBLE LETTER DATA", data)
                 return JsonResponse(data, status=200)
             else:
                 return JsonResponse({"error": "Failed to fetch eligible letters", "details": response.text}, status=response.status_code)

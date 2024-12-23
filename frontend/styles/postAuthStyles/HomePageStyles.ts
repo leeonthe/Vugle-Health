@@ -496,6 +496,11 @@ const styles = {
       lineHeight: 22,
       wordWrap: 'break-word',
     },
+
+    loadingText: {
+      fontSize: 16,
+      textAlign: 'center',
+    },
   };
   
 export default styles
