@@ -11,6 +11,10 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sessions.models import Session
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
 import requests
 import base64
 import os
@@ -397,3 +401,70 @@ class EligibleLettersView(View):
             print("Access Token Response:", response.text)
             print("Access Token Error:", response.json())
             return None
+
+
+PROMPTS_DIR = os.path.join(os.path.dirname(__file__), "prompts")
+
+class ChatPromptView(APIView):
+    def get(self, request, file_name):
+        """
+        GET method to fetch a specific JSON prompt file.
+        :param file_name: Path to the JSON file, including folder structure (e.g., "start/start").
+        """
+        try:
+            folder_name = file_name
+            nested_file_path = os.path.join(folder_name, file_name + ".json")
+            file_path = os.path.join(PROMPTS_DIR, nested_file_path)
+
+            print(f"Resolved file path: {file_path}")  # Debugging log
+
+            if not os.path.exists(file_path):
+                return Response({"error": f"File {file_name} not found in folder {folder_name}"}, status=status.HTTP_404_NOT_FOUND)
+            
+            # Load the JSON file
+            with open(file_path, "r") as json_file:
+                data = json.load(json_file)
+            return Response(data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def post(self, request):
+        """
+        POST method to process user selections and return the next prompt.
+        :param request: Request containing user selection and current file name.
+        """
+        try:
+            current_file = request.data.get("current_file")  # e.g., "start/start"
+            user_selection = request.data.get("user_selection")
+
+            # Resolve the current file path
+            current_file_path = os.path.join(PROMPTS_DIR, current_file.replace("/", os.sep) + ".json")
+            if not os.path.exists(current_file_path):
+                return Response({"error": "Current file not found"}, status=status.HTTP_404_NOT_FOUND)
+            
+            # Load the current JSON file
+            with open(current_file_path, "r") as json_file:
+                data = json.load(json_file)
+
+            # Find the next prompt file based on the user's selection
+            next_prompt_file = None
+            for option in data.get("options", []):
+                if option["text"] == user_selection:
+                    next_prompt_file = option["next"]
+                    break
+            
+            if not next_prompt_file:
+                return Response({"error": "Next prompt not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            # Resolve the next file path
+            next_file_path = os.path.join(PROMPTS_DIR, next_prompt_file.replace("/", os.sep) + ".json")
+            if not os.path.exists(next_file_path):
+                return Response({"error": "Next file not found"}, status=status.HTTP_404_NOT_FOUND)
+            
+            with open(next_file_path, "r") as next_json_file:
+                next_data = json.load(next_json_file)
+            return Response(next_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

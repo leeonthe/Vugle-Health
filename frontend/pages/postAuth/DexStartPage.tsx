@@ -40,8 +40,8 @@ const DexStartPage: React.FC = () => {
     navigation.goBack();
   };
 
-  const navigateToDexConsultPage = () => {
-    navigation.navigate('DexConsultPage'); // Ensure this route exists
+  const navigateToDex = () => {
+    navigation.navigate('DexPage');
   };
 
   return (
@@ -108,7 +108,7 @@ const DexStartPage: React.FC = () => {
         >
           <TouchableOpacity
             style={styles.button}
-            onPress={navigateToDexConsultPage}
+            onPress={navigateToDex}
           >
             <Text style={styles.buttonText}>Sounds good!</Text>
           </TouchableOpacity>

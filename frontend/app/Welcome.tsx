@@ -27,6 +27,7 @@ import BenefitInfo from '../assets/images/postAuth/WelcomePage/Benefits_info.svg
 import Lock from '../assets/images/postAuth/WelcomePage/lock.svg';
 import HomePage from '@/pages/postAuth/HomePage';
 import DexStartPage from '@/pages/postAuth/DexStartPage';
+import DexPage from '@/pages/postAuth/DexPage';
 
 
 type RootStackParamList = {
@@ -364,6 +365,8 @@ const Welcome: React.FC = () => {
             <Stack.Screen name="WelcomePage" component={WelcomePage} />
             <Stack.Screen name="HomePage" component={HomePage} />
             <Stack.Screen name="DexStartPage" component={DexStartPage}/>
+            <Stack.Screen name="DexPage" component={DexPage}/>
+
           </Stack.Navigator>
         </DesktopView>
       ) : (
@@ -373,6 +376,7 @@ const Welcome: React.FC = () => {
         >
           <Stack.Screen name="WelcomePage" component={WelcomePage} />
           <Stack.Screen name="HomePage" component={HomePage} />
+          <Stack.Screen name="DexPage" component={DexPage}/>
         </Stack.Navigator>
       )}
     </QueryClientProvider>
