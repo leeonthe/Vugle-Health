@@ -11,7 +11,6 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sessions.models import Session
 
-
 import requests
 import base64
 import os
@@ -19,7 +18,10 @@ import random
 import string
 import hashlib
 import jwt
-
+import json
+import time
+import uuid
+# 
 class OAuthHandler:
     def __init__(self):
         self.client_id = config('VA_CLIENT_ID')
@@ -167,7 +169,9 @@ class OAuthHandler:
         if platform == 'web':
         # Redirect web users directly
             print("WEB CALLED")
-            return redirect('http://localhost:8081/Welcome')
+            # return redirect('http://localhost:8081/Welcome')
+            return redirect(f'http://localhost:8081/Welcome?access_token={access_token}&id_token={id_token}')
+
         else:
             print("APP CALLED") 
             return redirect(f'http://localhost:8081/Welcome?access_token={access_token}&id_token={id_token}')
@@ -273,7 +277,8 @@ class DisabilityRatingView(View):
         if not access_token:
             return JsonResponse({"error": "Access token missing or invalid."}, status=401)
 
-        api_url = "https://sandbox-api.va.gov/services/veteran_verification/v2/disability_rating"
+        # api_url = "https://sandbox-api.va.gov/services/veteran_verification/v2/disability_rating"
+        api_url = config('VA_DISABILITY_RATING_API_URL')
         headers = {
             "Authorization": f"Bearer {access_token}",
             "accept": "application/json"
@@ -291,3 +296,103 @@ class DisabilityRatingView(View):
 
         except requests.RequestException as e:
             return JsonResponse({"error": "An error occurred while fetching disability rating.", "details": str(e)}, status=500)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class EligibleLettersView(View):
+    # Sandbox token URL
+    ELIGIBLE_LETTER_TOKEN_URL = config('VA_ELIGIBLE_LETTER_TOKEN_URL')
+    AUDIENCE_URL = config('VA_AUDIENCE_URL')
+    # LETTERS_URL = "https://sandbox-api.va.gov/services/va-letter-generator/v1/eligible-letters"
+    LETTERS_URL = config('VA_ELIGIBLE_LETTER_API_URL')
+    print("ELIGIBLE_LETTER_TOKEN_URL IS ", ELIGIBLE_LETTER_TOKEN_URL)
+    print("AUDIENCE_URL IS ", AUDIENCE_URL)
+    def get(self, request):
+        icn = request.GET.get("icn", None)
+        if not icn:
+            return JsonResponse({"error": "ICN is required"}, status=400)
+
+        try:
+            print("TRY CALLED: ")
+            # Step 1: Generate JWT client assertion
+            jwt_token = self._generate_jwt()
+            print("GENERATED JWT TOKEN FROM _generate_jwt: ", jwt_token)
+            # Step 2: Retrieve access token
+            access_token = self._get_access_token(jwt_token)
+            if not access_token:
+                return JsonResponse({"error": "Failed to retrieve access token"}, status=401)
+
+            # Step 3: Fetch eligible letters
+            headers = {
+                "Authorization": f"Bearer {access_token}",
+                "Accept": "application/json",
+            }
+            response = requests.get(f"{self.LETTERS_URL}?icn={icn}", headers=headers)
+
+            if response.status_code == 200:
+                data = response.json()
+                return JsonResponse(data, status=200)
+            else:
+                return JsonResponse({"error": "Failed to fetch eligible letters", "details": response.text}, status=response.status_code)
+
+        except Exception as e:
+            return JsonResponse({"error": "Server error", "details": str(e)}, status=500)
+
+            # return JsonResponse({"error": str(e)}, status=500)
+
+    def _generate_jwt(self):
+        private_key_path = config("PRIVATE_KEY_PATH")
+        print("PRIVATE.PEM: ", private_key_path)
+        # private_key_path = Path(__file__).resolve().parent.parent.parent / 'private.pem'
+        client_id = config("VA_JWT_CLIENT_ID")
+        audience = self.AUDIENCE_URL
+        print("AUDIENCE: ", audience)
+        # Load the private key
+        with open(private_key_path, 'r') as key_file:
+            private_key = key_file.read()
+
+        iat = int(time.time())
+        exp = iat + 300
+
+        # JWT claims
+        claims = {
+            "aud": audience,
+            "iss": client_id,
+            "sub": client_id,
+            "iat": iat,
+            "exp": exp,  # Token expires in 5 minutes
+            "jti": str(uuid.uuid4()),
+        }
+
+        # Generate and sign the JWT
+        signed_jwt = jwt.encode(claims, private_key, algorithm="RS256")
+        print("Generated JWT: ", signed_jwt)
+
+        # TODO: Decode jwt token?
+        return signed_jwt
+
+    def _get_access_token(self, jwt_token):
+        # Data for the token request
+        payload = {
+            "grant_type": "client_credentials",
+            "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+            "client_assertion": jwt_token,
+            "scope": "letters.read",
+        }
+
+        # Headers for the token request
+        headers = {
+            "Accept": "application/json",
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
+
+        # Make the POST request to get the access token
+        response = requests.post(self.ELIGIBLE_LETTER_TOKEN_URL, data=payload, headers=headers)
+
+        if response.status_code == 200:
+            token_data = response.json()
+            return token_data.get("access_token")
+        else:
+            print("Access Token Response:", response.text)
+            print("Access Token Error:", response.json())
+            return None

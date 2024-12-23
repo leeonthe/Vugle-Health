@@ -11,3 +11,7 @@ venv/
 .DS_Store
 
 __pycache__/
+
+# Keys
+*.pem
+*.jwk

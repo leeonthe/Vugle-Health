@@ -5,11 +5,13 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NavigationContainer } from '@react-navigation/native';
 
 // hooks
 import { useDevice } from '../utils/hooks/useDevice'; 
 import { useUserFirstName } from '../utils/hooks/useUserFirstName';
 import { useDisabilityRating } from '../utils/hooks/useDisabilityRating';
+import { useEligibleLetter } from '../utils/hooks/useEligibleLetter';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'; 
 
@@ -40,25 +42,58 @@ const Stack = createNativeStackNavigator();
 const queryClient = new QueryClient();
 
 const WelcomePage: React.FC<UserStartScreenProps> = ({route}) => {
+  
 
   const navigation = useNavigation<NavigationProp>();
   const { data: userData, isLoading: isUserLoading, isError: isUserError } = useUserFirstName();
+  
+  // TESTING PURPOSE
   const { data: disabilityData, isLoading: isDisabilityLoading, isError: isDisabilityError } = useDisabilityRating();
+  const icn = disabilityData?.disability_rating?.data?.id; // ICN is taken from the disability rating data
+  const { data: eligibleLettersData, isLoading: isEligibleLoading, isError: isEligibleError } = useEligibleLetter(icn || '');
 
-  if (isUserLoading || isDisabilityLoading) {
+
+
+
+  if (isUserLoading || isDisabilityLoading || isEligibleLoading) {
     return <Text style={styles.loadingText}>Loading...</Text>;
   }
 
-  if (isUserError || isDisabilityError) {
+  if (isUserError || isDisabilityError || isEligibleError) {
     return <Text style={styles.errorText}>Failed to load information.</Text>;
   }
+
 
 
   const disabilityAttributes = disabilityData?.disability_rating?.data?.attributes;
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* TESTING DISABILITY RATING */}
+
+
+
+      {/* TESTING DATA FETCHING */}
+
+      {/* Display Eligible Letters */}
+      {eligibleLettersData ? (
+        <View style={styles.eligibleLettersContainer}>
+          <Text style={styles.sectionTitle}>Eligible Letters:</Text>
+          {eligibleLettersData.letters.map((letter, index) => (
+            <View key={index}>
+              <Text>- Name: {letter.letterName}</Text>
+              <Text>- Type: {letter.letterType}</Text>
+            </View>
+          ))}
+        </View>
+      ) : (
+        <Text style={styles.errorText}>Eligible letters data not available.</Text>
+      )}
+
+
+
+
+
+
 
       {/* Display Disability Rating Data */}
       {disabilityAttributes ? (
@@ -243,18 +278,73 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
+
+  //TESTING STYLING
   disabilityContainer: {
     alignSelf: 'flex-start',
     marginBottom: 20,
   },
+  eligibleLettersContainer: {
+    marginBottom: 20,
+    padding: 10,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 5,
+  },
+
 });
 
 const Welcome: React.FC = () => {
 
   const { isDesktop } = useDevice(); 
-
+  const linking = {
+    prefixes: ['http://localhost:8081'], // Base URL
+    config: {
+      screens: {
+        WelcomePage: 'Welcome', // Map WelcomePage to /Welcome
+        HomePage: 'HomePage', // Map HomePage to /HomePage
+      },
+    },
+  };
   return (
-    <QueryClientProvider client={queryClient}>
+    // <QueryClientProvider client={queryClient}>
+    //   {isDesktop ? (
+    //     <DesktopView>
+    //       <Stack.Navigator screenOptions={{ headerShown: false }} >
+    //         <Stack.Screen name="WelcomePage" component={WelcomePage} options={{ path: "Welcome/" }}/>
+    //         <Stack.Screen name="HomePage" component={HomePage} />
+    //       </Stack.Navigator>
+    //     </DesktopView>
+    //   ) : (
+    //     <Stack.Navigator
+    //       initialRouteName="WelcomePage"
+    //       screenOptions={{ headerShown: false }}
+    //     >
+    //       <Stack.Screen name="WelcomePage" component={WelcomePage} />
+    //       <Stack.Screen name="HomePage" component={HomePage} />
+    //     </Stack.Navigator>
+    //   )}
+    // </QueryClientProvider>
+  //   <QueryClientProvider client={queryClient}>
+  //   {/* <NavigationContainer linking={linking}> */}
+  //     {isDesktop ? (
+  //       <DesktopView>
+  //         <Stack.Navigator screenOptions={{ headerShown: false }}>
+  //           <Stack.Screen name="WelcomePage" component={WelcomePage} />
+  //           <Stack.Screen name="HomePage" component={HomePage} />
+  //         </Stack.Navigator>
+  //       </DesktopView>
+  //     ) : (
+  //       <Stack.Navigator
+  //         initialRouteName="WelcomePage"
+  //         screenOptions={{ headerShown: false }}
+  //       >
+  //         <Stack.Screen name="WelcomePage" component={WelcomePage} />
+  //         <Stack.Screen name="HomePage" component={HomePage} />
+  //       </Stack.Navigator>
+  //     )}
+  //   {/* </NavigationContainer> */}
+  // </QueryClientProvider>
+  <QueryClientProvider client={queryClient}>
       {isDesktop ? (
         <DesktopView>
           <Stack.Navigator screenOptions={{ headerShown: false }}>

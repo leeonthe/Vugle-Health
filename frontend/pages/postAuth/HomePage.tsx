@@ -28,18 +28,6 @@ import Explore from '../../assets/images/postAuth/homePage/explore_icon.svg';
 import Consult from '../../assets/images/postAuth/homePage/consult-icon.svg';
 import Loan from '../../assets/images/postAuth/homePage/loan-icon.svg';
 
-interface UserInfo {
-  disabilityRating?: any;
-  status?: any;
-}
-
-interface EligibleLetters {
-  benefitInformation?: {
-    monthlyAwardAmount: {
-      value: string;
-    };
-  };
-}
 
 function HomePage() {
   const { data: disabilityData, isLoading: isDisabilityLoading, isError: isDisabilityError } = useDisabilityRating();
