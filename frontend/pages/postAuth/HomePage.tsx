@@ -40,6 +40,7 @@ function HomePage() {
   const combinedDisabilityRating = disabilityData?.disability_rating?.data?.attributes.combined_disability_rating;
   const monthlyAwardAmount = eligibleLettersData?.benefitInformation?.monthlyAwardAmount || { value: 0, currency: 'USD' };
 
+  // Display currency symbols based on the currency code
   const formattedAmount = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: monthlyAwardAmount.currency,
