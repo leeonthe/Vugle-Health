@@ -1,6 +1,8 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import DesktopView from '../components/deviceLayout/DesktopView'; 
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -42,8 +44,41 @@ const Stack = createNativeStackNavigator();
 const queryClient = new QueryClient();
 
 const WelcomePage: React.FC<UserStartScreenProps> = ({route}) => {
-  
+  const { isDesktop } = useDevice();
 
+  useEffect(() => {
+    const handleWebTokens = async () => {
+      // Only handle this for web users
+      if (isDesktop) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const accessToken = urlParams.get('access_token');
+        const idToken = urlParams.get('id_token');
+
+        if (accessToken && idToken) {
+          try {
+            // Store tokens in AsyncStorage
+            await AsyncStorage.setItem('access_token', accessToken);
+            await AsyncStorage.setItem('id_token', idToken);
+
+            console.log('Tokens stored in AsyncStorage for web users.');
+
+            // Clean the URL after processing tokens
+            const currentPath = window.location.pathname;
+            const cleanUrl = `${window.location.origin}${currentPath}`;
+            window.history.replaceState({}, document.title, cleanUrl);
+          } catch (error) {
+            console.error('Error storing tokens for web users:', error);
+          }
+        } else {
+          console.warn('Access Token or ID Token not found in the URL for web.');
+        }
+      }
+    };
+
+    handleWebTokens();
+  }, [isDesktop]);
+
+  
   const navigation = useNavigation<NavigationProp>();
   const { data: userData, isLoading: isUserLoading, isError: isUserError } = useUserFirstName();
   
@@ -306,44 +341,6 @@ const Welcome: React.FC = () => {
     },
   };
   return (
-    // <QueryClientProvider client={queryClient}>
-    //   {isDesktop ? (
-    //     <DesktopView>
-    //       <Stack.Navigator screenOptions={{ headerShown: false }} >
-    //         <Stack.Screen name="WelcomePage" component={WelcomePage} options={{ path: "Welcome/" }}/>
-    //         <Stack.Screen name="HomePage" component={HomePage} />
-    //       </Stack.Navigator>
-    //     </DesktopView>
-    //   ) : (
-    //     <Stack.Navigator
-    //       initialRouteName="WelcomePage"
-    //       screenOptions={{ headerShown: false }}
-    //     >
-    //       <Stack.Screen name="WelcomePage" component={WelcomePage} />
-    //       <Stack.Screen name="HomePage" component={HomePage} />
-    //     </Stack.Navigator>
-    //   )}
-    // </QueryClientProvider>
-  //   <QueryClientProvider client={queryClient}>
-  //   {/* <NavigationContainer linking={linking}> */}
-  //     {isDesktop ? (
-  //       <DesktopView>
-  //         <Stack.Navigator screenOptions={{ headerShown: false }}>
-  //           <Stack.Screen name="WelcomePage" component={WelcomePage} />
-  //           <Stack.Screen name="HomePage" component={HomePage} />
-  //         </Stack.Navigator>
-  //       </DesktopView>
-  //     ) : (
-  //       <Stack.Navigator
-  //         initialRouteName="WelcomePage"
-  //         screenOptions={{ headerShown: false }}
-  //       >
-  //         <Stack.Screen name="WelcomePage" component={WelcomePage} />
-  //         <Stack.Screen name="HomePage" component={HomePage} />
-  //       </Stack.Navigator>
-  //     )}
-  //   {/* </NavigationContainer> */}
-  // </QueryClientProvider>
   <QueryClientProvider client={queryClient}>
       {isDesktop ? (
         <DesktopView>
