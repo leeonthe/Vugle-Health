@@ -266,7 +266,7 @@ function HomePage() {
 
         <TouchableOpacity
           style={styles.navItem}
-          onPress={() => navigation.navigate('DexPage')}
+          onPress={() => navigation.navigate('DexStartPage')}
         >
           <Consult style={styles.navIcon} />
           <Text style={styles.navTextInactive}>Consult</Text>

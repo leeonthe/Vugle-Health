@@ -15,6 +15,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from base64 import b64encode
+
+
 import requests
 import base64
 import os
@@ -305,24 +308,24 @@ class DisabilityRatingView(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class EligibleLettersView(View):
     # Sandbox token URL
-    ELIGIBLE_LETTER_TOKEN_URL = config('VA_ELIGIBLE_LETTER_TOKEN_URL')
-    AUDIENCE_URL = config('VA_AUDIENCE_URL')
-    # LETTERS_URL = "https://sandbox-api.va.gov/services/va-letter-generator/v1/eligible-letters"
+    ELIGIBLE_LETTER_TOKEN_URL = config('ELA_ELIGIBLE_LETTER_TOKEN_URL')
+    ELA_AUDIENCE_URL = config('ELA_AUDIENCE_URL')
     LETTERS_URL = config('VA_ELIGIBLE_LETTER_API_URL')
+
     print("ELIGIBLE_LETTER_TOKEN_URL IS ", ELIGIBLE_LETTER_TOKEN_URL)
-    print("AUDIENCE_URL IS ", AUDIENCE_URL)
+    print("ELA_AUDIENCE_URL IS ", ELA_AUDIENCE_URL)
     def get(self, request):
-        icn = request.GET.get("icn", None)
-        if not icn:
+        ELA_icn = request.GET.get("icn", None)
+        if not ELA_icn:
             return JsonResponse({"error": "ICN is required"}, status=400)
 
         try:
             print("TRY CALLED: ")
             # Step 1: Generate JWT client assertion
-            jwt_token = self._generate_jwt()
-            print("GENERATED JWT TOKEN FROM _generate_jwt: ", jwt_token)
+            jwt_token = self._ela_generate_jwt()
+            print("GENERATED JWT TOKEN FROM _ela_generate_jwt: ", jwt_token)
             # Step 2: Retrieve access token
-            access_token = self._get_access_token(jwt_token)
+            access_token = self._get_ela_access_token(jwt_token)
             if not access_token:
                 return JsonResponse({"error": "Failed to retrieve access token"}, status=401)
 
@@ -331,7 +334,7 @@ class EligibleLettersView(View):
                 "Authorization": f"Bearer {access_token}",
                 "Accept": "application/json",
             }
-            response = requests.get(f"{self.LETTERS_URL}?icn={icn}", headers=headers)
+            response = requests.get(f"{self.LETTERS_URL}?icn={ELA_icn}", headers=headers)
 
             if response.status_code == 200:
                 data = response.json()
@@ -345,12 +348,12 @@ class EligibleLettersView(View):
 
             # return JsonResponse({"error": str(e)}, status=500)
 
-    def _generate_jwt(self):
-        private_key_path = config("PRIVATE_KEY_PATH")
+    def _ela_generate_jwt(self):
+        private_key_path = config("ELA_PRIVATE_KEY_PATH")
         print("PRIVATE.PEM: ", private_key_path)
         # private_key_path = Path(__file__).resolve().parent.parent.parent / 'private.pem'
-        client_id = config("VA_JWT_CLIENT_ID")
-        audience = self.AUDIENCE_URL
+        client_id = config("ELA_JWT_CLIENT_ID")
+        audience = self.ELA_AUDIENCE_URL
         print("AUDIENCE: ", audience)
         # Load the private key
         with open(private_key_path, 'r') as key_file:
@@ -376,7 +379,7 @@ class EligibleLettersView(View):
         # TODO: Decode jwt token?
         return signed_jwt
 
-    def _get_access_token(self, jwt_token):
+    def _get_ela_access_token(self, jwt_token):
         # Data for the token request
         payload = {
             "grant_type": "client_credentials",
@@ -401,6 +404,101 @@ class EligibleLettersView(View):
             print("Access Token Response:", response.text)
             print("Access Token Error:", response.json())
             return None
+
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class PatientHealthView(View):
+    PATIENT_HEALTH_TOKEN_URL = config('PHA_ELIGIBLE_LETTER_TOKEN_URL')
+    PHA_AUDIENCE_URL = config('PHA_AUDIENCE_URL')
+    PATIENT_HEALTH_API_URL = config('VA_PATIENT_HEALTH_API_URL')
+
+    def get(self, request):
+        PHA_icn = request.GET.get("patient", None)
+        if not PHA_icn:
+            return JsonResponse({"error": "ICN is required"}, status=400)
+
+        try:
+            jwt_token = self._pha_generate_jwt()
+            access_token = self._get_pha_access_token(jwt_token, PHA_icn)
+            if not access_token:
+                return JsonResponse({"error": "Failed to retrieve access token"}, status=401)
+
+            headers = {
+                "Authorization": f"Bearer {access_token}",
+                "Accept": "accept: application/fhir+json",
+            }
+            response = requests.get(f"{self.PATIENT_HEALTH_API_URL}Patient?_id={PHA_icn}", headers=headers)
+
+            if response.status_code == 200:
+                data = response.json()
+                print("PATIENT MEDICAL CONDITION DATA", data)
+                return JsonResponse(data, status=200)
+            else:
+                return JsonResponse({"error": "Failed to fetch eligible letters", "details": response.text}, status=response.status_code)
+
+        except Exception as e:
+            return JsonResponse({"error": "Server error", "details": str(e)}, status=500)
+
+    def _pha_generate_jwt(self):
+        private_key_path = config("PHA_PRIVATE_KEY_PATH")
+        if not os.path.exists(private_key_path):
+            raise FileNotFoundError(f"Private key file not found at {private_key_path}")
+        client_id = config("PHA_JWT_CLIENT_ID")
+        audience = self.PHA_AUDIENCE_URL
+        # Load the private key
+        with open(private_key_path, 'r') as key_file:
+            private_key = key_file.read()
+
+        iat = int(time.time())
+        exp = iat + 300
+
+        # JWT claims
+        claims = {
+            "aud": audience,
+            "iss": client_id,
+            "sub": client_id,
+            "iat": iat,
+            "exp": exp,  # Token expires in 5 minutes
+            "jti": str(uuid.uuid4()),
+        }
+
+        signed_jwt = jwt.encode(claims, private_key, algorithm="RS256")
+        return signed_jwt
+
+    def _get_pha_access_token(self, jwt_token, icn):
+        # The launch parameter limits the scope of an access token by indicating that the token is for a specific patient or encounter.
+        # launch must be a Base64-encoded JSON object containing the patient's ICN, formatted as follows: {"patient":"1000720100V271387"}
+        # After Base64 encoding, the object will look like this: eyJwYXRpZW50IjoiMTAwMDcyMDEwMFYyNzEzODcifQ==
+        launch_payload = json.dumps({"patient": icn})
+        launch_encoded = b64encode(launch_payload.encode('utf-8')).decode('utf-8')
+        payload = {
+            "grant_type": "client_credentials",
+            "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+            "client_assertion": jwt_token,
+            "scope": "launch system/AllergyIntolerance.read system/Appointment.read system/Condition.read system/DiagnosticReport.read system/Immunization.read system/Location.read system/Medication.read system/MedicationOrder.read system/Observation.read system/Organization.read system/Patient.read",
+            "launch": launch_encoded,
+        }
+
+        headers = {
+            "Accept": "application/fhir+json",
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
+
+        # Make the POST request to get the access token
+        response = requests.post(self.PATIENT_HEALTH_TOKEN_URL, data=payload, headers=headers)
+
+        if response.status_code == 200:
+            token_data = response.json()
+            return token_data.get("access_token")
+        else:
+            print("Access Token Response:", response.text)
+            print("Access Token Error:", response.json())
+            return None
+
+
+
+
 
 
 PROMPTS_DIR = os.path.join(os.path.dirname(__file__), "prompts")

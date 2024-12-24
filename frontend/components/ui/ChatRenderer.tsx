@@ -1,8 +1,10 @@
 import React from "react";
 import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import * as Animatable from "react-native-animatable";
+import * as DocumentPicker from "expo-document-picker";
 import Logo from "../../assets/images/logo/dexLogo.svg";
 import { ChatBubble } from "../../utils/interfaces/promptTypes";
+import { useDevice } from "@/utils/hooks/useDevice";
 
 //ISSUE: issue where the styles.container is not applied to the entire screen and the ScrollView content seems divided into sections
 // This is bc container styling is only applied in const renderChatBubble. 
@@ -12,6 +14,39 @@ interface ChatProps extends ChatBubble {
 }
 
 const ChatRenderer: React.FC<ChatProps> = ({ chat_bubbles, options, onOptionSelect }) => {
+
+    const { isDesktop } = useDevice();
+
+    const handleFileUpload = async () => {
+        try {
+        if (isDesktop) {
+            // Web File Upload
+            const fileInput = document.createElement("input");
+            fileInput.type = "file";
+            fileInput.accept = ".pdf,.jpg,.png";
+            fileInput.onchange = (event) => {
+            const file = event.target.files[0];
+            console.log("File selected:", file); 
+            };
+            fileInput.click();
+        } else {
+            // Mobile File Upload
+            const res = await DocumentPicker.getDocumentAsync({
+            type: [
+                "application/pdf", 
+                "image/jpeg", 
+                "image/png", 
+            ],
+            });
+            if (res.type === "success") {
+            console.log("File selected:", res); 
+            }
+        }
+        } catch (err) {
+        console.error("File upload error:", err);
+        }
+    };
+
   const renderElement = (
     element: ChatBubble["chat_bubbles"][number]["container"][number],
     index: number
@@ -65,11 +100,17 @@ const ChatRenderer: React.FC<ChatProps> = ({ chat_bubbles, options, onOptionSele
         {bubbleIndex === chat_bubbles.length - 1 && options.length > 0 && (
           <View style={styles.optionsContainer}>
             {options.map((option, idx) => (
-              <TouchableOpacity
-                key={`option-${idx}`}
-                onPress={() => option.next && onOptionSelect(option.next)}
-                style={styles.optionButton}
-              >
+                <TouchableOpacity
+                  key={`option-${idx}`}
+                  onPress={() => {
+                    if (option.text === "Upload DD214") {
+                      handleFileUpload();
+                    } else {
+                      onOptionSelect(option.next);
+                    }
+                  }}
+                  style={styles.optionButton}
+                >
                 <Text style={styles.optionText}>{option.text}</Text>
               </TouchableOpacity>
             ))}
