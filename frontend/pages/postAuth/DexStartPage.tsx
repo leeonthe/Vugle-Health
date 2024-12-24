@@ -173,8 +173,8 @@ const styles = StyleSheet.create({
       alignItems: 'center',
     } as ViewStyle,
     logo: {
-      width: 12,
-      height: 12,
+      width: 24,
+      height: 24,
     } as ImageStyle,
     chatContainer: {
       flexDirection: 'column',

@@ -255,6 +255,7 @@ function HomePage() {
         </View>
       </ScrollView>
       <View style={styles.bottomNavigation}>
+
         <TouchableOpacity
           style={styles.navItem}
           onPress={() => navigation.navigate('HomePage')}
@@ -262,13 +263,15 @@ function HomePage() {
           <Home style={styles.navIcon} />
           <Text style={styles.navText}>Home</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.navItem}
-          onPress={() => navigation.navigate('ConsultPageScreen')}
+          onPress={() => navigation.navigate('DexPage')}
         >
           <Consult style={styles.navIcon} />
           <Text style={styles.navTextInactive}>Consult</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.navItem}
           onPress={() => navigation.navigate('ExplorePageScreen')}
@@ -284,6 +287,7 @@ function HomePage() {
           <Loan style={styles.navIcon} />
           <Text style={styles.navTextInactive}>Loan</Text>
         </TouchableOpacity>
+
       </View>
     </View>
   );
