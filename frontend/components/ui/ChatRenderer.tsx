@@ -4,6 +4,9 @@ import * as Animatable from "react-native-animatable";
 import Logo from "../../assets/images/logo/dexLogo.svg";
 import { ChatBubble } from "../../utils/interfaces/promptTypes";
 
+//ISSUE: issue where the styles.container is not applied to the entire screen and the ScrollView content seems divided into sections
+// This is bc container styling is only applied in const renderChatBubble. 
+
 interface ChatProps extends ChatBubble {
   onOptionSelect: (next: string) => void;
 }
@@ -44,39 +47,41 @@ const ChatRenderer: React.FC<ChatProps> = ({ chat_bubbles, options, onOptionSele
     bubble: ChatBubble["chat_bubbles"][number],
     bubbleIndex: number
   ) => (
-    <Animatable.View
-      key={`bubble-${bubbleIndex}`}
-      animation="fadeIn"
-      duration={1000}
-      delay={bubbleIndex * 1000}
-      style={
-        bubble.container.some((element) => element.type === "image")
-          ? styles.logoContainer
-          : styles.messageContainer
-      }
-    >
-      {bubble.container.map((element, index) => renderElement(element, index))}
+    <View style={styles.chatContainer}>
+      <Animatable.View
+        key={`bubble-${bubbleIndex}`}
+        animation="fadeIn"
+        duration={1000}
+        delay={bubbleIndex * 1000}
+        style={
+          bubble.container.some((element) => element.type === "image")
+            ? styles.logoContainer
+            : styles.messageContainer
+        }
+      >
+        {bubble.container.map((element, index) => renderElement(element, index))}
 
-      {/* Render options explicitly inside the last chat bubble */}
-      {bubbleIndex === chat_bubbles.length - 1 && options.length > 0 && (
-        <View style={styles.optionsContainer}>
-          {options.map((option, idx) => (
-            <TouchableOpacity
-              key={`option-${idx}`}
-              onPress={() => option.next && onOptionSelect(option.next)}
-              style={styles.optionButton}
-            >
-              <Text style={styles.optionText}>{option.text}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
-    </Animatable.View>
+        {/* Render options explicitly inside the last chat bubble */}
+        {bubbleIndex === chat_bubbles.length - 1 && options.length > 0 && (
+          <View style={styles.optionsContainer}>
+            {options.map((option, idx) => (
+              <TouchableOpacity
+                key={`option-${idx}`}
+                onPress={() => option.next && onOptionSelect(option.next)}
+                style={styles.optionButton}
+              >
+                <Text style={styles.optionText}>{option.text}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </Animatable.View>
+    </View>
   );
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.chatContainer}>{chat_bubbles.map(renderChatBubble)}</View>
+      {chat_bubbles.map(renderChatBubble)}
     </ScrollView>
   );
 };
@@ -84,7 +89,7 @@ const ChatRenderer: React.FC<ChatProps> = ({ chat_bubbles, options, onOptionSele
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: "white",
+    backgroundColor: "#ffffff",
     padding: 16,
   },
   chatContainer: {
