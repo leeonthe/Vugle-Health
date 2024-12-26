@@ -603,7 +603,7 @@ class ParsingDD214(APIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class StoreUserInputView(View):
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         try:
             data = request.POST or json.loads(request.body)
             typed_text = data.get('userInput', '').strip()
