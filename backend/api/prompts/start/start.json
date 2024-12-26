@@ -69,9 +69,100 @@
             }
           }
         ]
+      },
+      {
+        "container": [
+          {
+            "type": "group",
+            "content": [
+              {
+                "type": "text",
+                "content": "Retrieving STRs...",
+                "style": {
+                  "color": "#323D4C",
+                  "fontSize": 16,
+                  "fontFamily": "SF Pro",
+                  "fontWeight": "400",
+                  "lineHeight": 28,
+                  "marginBottom": 8
+                }
+              },
+              {
+                "type": "animation",
+                "content": "circle-loading",
+                "condition": "usePatientHealth.isLoading"
+              },
+              {
+                "type": "loadingImage",
+                "content": "green-check",
+                "condition": "usePatientHealth.isSuccess"
+              }
+            ]
+          },
+          {
+            "type": "group",
+            "content": [
+              {
+                "type": "text",
+                "content": "Retrieving Medical Records...",
+                "style": {
+                  "color": "#323D4C",
+                  "fontSize": 16,
+                  "fontFamily": "SF Pro",
+                  "fontWeight": "400",
+                  "lineHeight": 28,
+                  "marginBottom": 8
+                }
+              },
+              {
+                "type": "animation",
+                "content": "circle-loading",
+                "condition": "usePatientHealth.isLoading"
+              },
+              {
+                "type": "loadingImage",
+                "content": "green-check",
+                "condition": "usePatientHealth.isSuccess"
+              }
+            ]
+          },
+          {
+            "type": "group",
+            "content": [
+              {
+                "type": "text",
+                "content": "Retrieving Previous Claims...",
+                "style": {
+                  "color": "#323D4C",
+                  "fontSize": 16,
+                  "fontFamily": "SF Pro",
+                  "fontWeight": "400",
+                  "lineHeight": 28,
+                  "marginBottom": 8
+                }
+              },
+              {
+                "type": "animation",
+                "content": "circle-loading",
+                "condition": "usePatientHealth.isLoading"
+              },
+              {
+                "type": "loadingImage",
+                "content": "green-check",
+                "condition": "usePatientHealth.isSuccess"
+              }
+            ]
+          }
+        ]
       }
+
+      
     ],
-    "options": [],
-    "next": "loading_data.json"
+    "options": [
+      {
+        "text": "NONE",
+        "next": "upload_dd214"
+      }
+    ]
   }
   

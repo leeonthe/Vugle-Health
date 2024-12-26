@@ -45,7 +45,7 @@
     "options": [
       {
         "text": "Upload DD214",
-        "next": "upload_dd214"
+        "next": "choose_your_claim.json"
       }
     ]
   }

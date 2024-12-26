@@ -546,15 +546,21 @@ class ChatPromptView(APIView):
             with open(current_file_path, "r") as json_file:
                 data = json.load(json_file)
 
-            # Find the next prompt file based on the user's selection
-            next_prompt_file = None
-            for option in data.get("options", []):
-                if option["text"] == user_selection:
-                    next_prompt_file = option["next"]
-                    break
-            
-            if not next_prompt_file:
-                return Response({"error": "Next prompt not found"}, status=status.HTTP_404_NOT_FOUND)
+            # Handle automatic transitions (e.g., "NONE")
+            if not user_selection or user_selection == "NONE":
+                next_prompt_file = data.get("options", [{}])[0].get("next")
+                if not next_prompt_file:
+                    return Response({"error": "Next prompt not defined"}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                # Find the next prompt file based on the user's selection
+                next_prompt_file = None
+                for option in data.get("options", []):
+                    if option["text"] == user_selection:
+                        next_prompt_file = option["next"]
+                        break
+                
+                if not next_prompt_file:
+                    return Response({"error": "Next prompt not found"}, status=status.HTTP_404_NOT_FOUND)
 
             # Resolve the next file path
             next_file_path = os.path.join(PROMPTS_DIR, next_prompt_file.replace("/", os.sep) + ".json")
