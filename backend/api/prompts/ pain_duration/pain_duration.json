@@ -1,6 +1,6 @@
 {
-  "chat_bubbles_id": 5,
-  "options_id": 5,
+  "chat_bubbles_id": 7,
+  "options_id": 7,
   "chat_bubbles": [
     {
       "container": [
@@ -18,7 +18,7 @@
       "container": [
         {
           "type": "text",
-          "content": "Any other conditions?",
+          "content": "Basic assessment 📄",
           "style": {
             "color": "#323D4C",
             "fontSize": 16,
@@ -31,7 +31,7 @@
         },
         {
           "type": "text",
-          "content": "It’s okay if they are not severe. Any conditions or symptoms that are troubling you can help us improve your chance.",
+          "content": "Thanks {user_givenName}. Now we will ask a few questions that will help us understand your conditions better.",
           "style": {
             "color": "#323D4C",
             "fontSize": 16,
@@ -43,18 +43,29 @@
           }
         }
       ]
+    },
+    {
+      "container": [
+        {
+            "type": "text",
+            "content": "How long has your knee pain been troubling you?",
+            "style": {
+              "color": "#323D4C",
+              "fontSize": 16,
+              "fontFamily": "SF Pro",
+              "fontWeight": "bold",
+              "lineHeight": 28,
+              "wordWrap": "break-word",
+              "marginBottom": 16
+            }
+          }
+      ]
     }
   ],
   "options": [
     {
-      "text": "Add more",
-      "next": "add_more"
-    },
-    {
-      "text": "Not that I can think of",
-      "next": "potential_conditions"
+      "text": "TYPE",
+      "next": "pain_severity"
     }
   ]
 }
-
-
