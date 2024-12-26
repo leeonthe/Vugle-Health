@@ -33,7 +33,7 @@ const ChatRenderer: React.FC<ChatProps & { isHealthLoading: boolean; isHealthSuc
         const timer = setTimeout(() => {
           setShouldTransition(true);
         }, 3000);
-        return () => clearTimeout(timer); // Clean up timer on unmount
+        return () => clearTimeout(timer); 
       }
     }, [isHealthSuccess]);
     
@@ -117,6 +117,8 @@ const ChatRenderer: React.FC<ChatProps & { isHealthLoading: boolean; isHealthSuc
   };
 
   const renderChatBubble = (bubble: ChatBubble["chat_bubbles"][number], bubbleIndex: number) => {
+    console.log("Rendering Chat Bubble:", bubble);
+  console.log("Bubble Index:", bubbleIndex);
     const isLastBubble = bubbleIndex === chat_bubbles.length - 1;
   
     return (
@@ -185,9 +187,10 @@ const ChatRenderer: React.FC<ChatProps & { isHealthLoading: boolean; isHealthSuc
 
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View>
+
       {chat_bubbles.map(renderChatBubble)}
-    </ScrollView>
+    </View>
   );
 };
 
@@ -196,6 +199,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: "#ffffff",
     padding: 16,
+    overflow: "scroll", 
   },
   chatContainer: {
     flexDirection: "column",

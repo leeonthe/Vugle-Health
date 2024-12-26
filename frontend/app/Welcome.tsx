@@ -12,8 +12,7 @@ import { NavigationContainer } from '@react-navigation/native';
 // hooks
 import { useDevice } from '../utils/hooks/useDevice'; 
 import { useUserFirstName } from '../utils/hooks/useUserFirstName';
-import { useDisabilityRating } from '../utils/hooks/useDisabilityRating';
-import { useEligibleLetter } from '../utils/hooks/useEligibleLetter';
+
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'; 
 
@@ -85,11 +84,6 @@ const WelcomePage: React.FC<UserStartScreenProps> = ({route}) => {
   const navigation = useNavigation<NavigationProp>();
   const { data: userData, isLoading: isUserLoading, isError: isUserError } = useUserFirstName();
   
-  // TESTING PURPOSE
-  const { data: disabilityData, isLoading: isDisabilityLoading, isError: isDisabilityError } = useDisabilityRating();
-  const icn = disabilityData?.disability_rating?.data?.id; // ICN is taken from the disability rating data
-  const { data: eligibleLettersData, isLoading: isEligibleLoading, isError: isEligibleError } = useEligibleLetter(icn || '');
-
   // Store user first_name
   useEffect(() => {
     const storeGivenName = async () => {
@@ -107,17 +101,17 @@ const WelcomePage: React.FC<UserStartScreenProps> = ({route}) => {
   }, [userData]);
 
 
-  if (isUserLoading || isDisabilityLoading || isEligibleLoading) {
+  if (isUserLoading ) {
     return <Text style={styles.loadingText}>Loading...</Text>;
   }
 
-  if (isUserError || isDisabilityError || isEligibleError) {
+  if (isUserError ) {
     return <Text style={styles.errorText}>Failed to load information.</Text>;
   }
 
 
 
-  const disabilityAttributes = disabilityData?.disability_rating?.data?.attributes;
+  // const disabilityAttributes = disabilityData?.disability_rating?.data?.attributes;
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -127,43 +121,7 @@ const WelcomePage: React.FC<UserStartScreenProps> = ({route}) => {
       {/* TESTING DATA FETCHING */}
 
       {/* Display Eligible Letters */}
-      {eligibleLettersData ? (
-        <View style={styles.eligibleLettersContainer}>
-          <Text style={styles.sectionTitle}>Eligible Letters:</Text>
-          {eligibleLettersData.letters.map((letter, index) => (
-            <View key={index}>
-              <Text>- Name: {letter.letterName}</Text>
-              <Text>- Type: {letter.letterType}</Text>
-            </View>
-          ))}
-        </View>
-      ) : (
-        <Text style={styles.errorText}>Eligible letters data not available.</Text>
-      )}
-
-
-
-
-
-
-
-      {/* Display Disability Rating Data */}
-      {disabilityAttributes ? (
-      <View style={styles.disabilityContainer}>
-        <Text>Combined Disability Rating: {disabilityAttributes.combined_disability_rating}</Text>
-        <Text>Effective Date: {disabilityAttributes.combined_effective_date}</Text>
-        {disabilityAttributes.individual_ratings.map((rating, index) => (
-          <View key={index}>
-            <Text>Rating {index + 1}:</Text>
-            <Text>- Decision: {rating.decision}</Text>
-            <Text>- Percentage: {rating.rating_percentage}%</Text>
-            <Text>- Diagnostic Name: {rating.diagnostic_type_name}</Text>
-          </View>
-        ))}
-      </View>
-    ) : (
-      <Text style={styles.errorText}>Disability data not available.</Text>
-    )}
+    
 
 
 
@@ -377,6 +335,7 @@ const Welcome: React.FC = () => {
           <Stack.Screen name="WelcomePage" component={WelcomePage} />
           <Stack.Screen name="HomePage" component={HomePage} />
           <Stack.Screen name="DexPage" component={DexPage}/>
+
         </Stack.Navigator>
       )}
     </QueryClientProvider>
