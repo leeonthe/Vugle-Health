@@ -82,7 +82,10 @@ def analyze_document(file_path, processor_name):
         raise
 
 
-def parse_dd214_text(extracted_text):
+# TESTING
+# def parse_dd214_text(extracted_text):
+
+def parse_dd214_text(file_path, processor_name):
     """
     Parses the extracted text of DD214 to retrieve specific sections and store them in a structured format.
 
@@ -92,6 +95,9 @@ def parse_dd214_text(extracted_text):
     Returns:
         dict: Parsed data for the required fields.
     """
+
+    extracted_text = analyze_document(file_path, processor_name)
+
     parsed_data = {
         "Department, Component, and Branch": "Not Found",
         "Grade, Rate, or Rank": "Not Found",
@@ -175,156 +181,156 @@ def parse_dd214_text(extracted_text):
 
 
 # TESTING 
-if __name__ == "__main__":
-    extracted_text = """
-    CAUTION: NOT TO BE USED FOR
-    IDENTIFICATION PURPOSES
-    1. NAME (Last, First, Middle)
-    THIS IS AN IMPORTANT RECORD.
-    SAFEGUARD IT.
-    ANY ALTERATIONS IN SHADED AREAS
-    RENDER FORM VOID
-    CERTIFICATE OF RELEASE OR DISCHARGE FROM ACTIVE DUTY
-    This Report Contains Information Subject to the Privacy Act of 1974, As Amended.
-    2. DEPARTMENT, COMPONENT AND BRANCH
-    AIR FORCE--REGAF
-    3. SOCIAL SECURITY NUMBER
-    4a. GRADE, RATE OR RANK
-    CAPT
-    b. PAY GRADE
-    03
-    5. DATE OF BIRTH (YYYYMMDD)
-    6. RESERVE OBLIGATION TERMINATION DATE
-    (YYYYMMDD) 20150529
-    b. HOME OF RECORD AT TIME OF ENTRY (City and state, or complete address if known)
-    7a. PLACE OF ENTRY INTO ACTIVE DUTY
-    COLORADO SPRINGS CO
-    8a. LAST DUTY ASSIGNMENT AND MAJOR COMMAND
-    OL PZA AF LIFE CYCLE MGT CE (MTC)
-    9. COMMAND TO WHICH TRANSFERRED
-    USAFR
-    11. PRIMARY SPECIALTY (List number, title and years and months inspecialty. List additional specialty numbers and titles involving
-    periods of one or more years.)
-    64P3, CONTRACTING, 5 YEARS AND 4 MONTHS
-    b. STATION WHERE SEPARATED
-    JBSA RANDOLPH AFB TX
-    12. RECORD OF SERVICE
-    a. DATE ENTERED AD THIS PERIOD
-    b. SEPARATION DATE THIS PERIOD
-    10. SGLI COVERAGE
-    AMOUNT: $400,000
-    YEAR(S) MONTHS(S)
-    2007
-    NONE
-    DAY(S)
-    MAY
-    30
-    2012
-    OCT
-    26
-    c. NET ACTIVE SERVICE THIS PERIOD
-    d. TOTAL PRIOR ACTIVE SERVICE
-    05
-    04
-    27
-    00
-    00
-    00
-    e. TOTAL PRIOR INACTIVE SERVICE
-    03
-    11
-    04
-    f. FOREIGN SERVICE
-    00
-    06
-    19
-    g. SEA SERVICE
-    00
-    00
-    00
-    h. INITIAL ENTRY TRAINING
-    2007
-    MAY
-    30
-    i. EFFECTIVE DATE OF PAY GRADE
-    2011
-    MAY
-    30
-    13. DECORATIONS, MEDALS, BADGES, CITATIONS AND CAMPAIGN
-    RIBBONS AWARDED OR AUTHORIZED (All periods of service)
-    Defense Meritorious Service Medal, Air Force Commendation Medal with
-    1 oak leaf cluster, Air Force Achievement Medal with 1 oak leaf cluster,
-    Joint Meritorious Unit Award, AF Outstanding Unit Award, AF
-    Organizational Excellence Award with 1 oak leaf cluster, National
-    Defense Service Medal, Afghanistan Campaign Medal,//SEE REMARKS//
-    14. MILITARY EDUCATION (Course title, number of weeks, and month and
-    year completed)
-    PDÉ - SQUADRON OFFICER SCHOOL (SOS), MAY 2012; (JHE)
-    SHAPING SMART BUSINESS ARRANGEMENTS, JUL 2011; (J01)
-    FUNDAMENTALS OF SYSTEMS PLANNING RD&E, JUN 2011; (3NH)
-    COMBAT AIRMAN SKILLS TRAINING, MAY 2011; (JHS) COST ANALYSIS
-    AND NEGOTIATION TECHNIQUES, MAR 2010; (JHR) LEGAL
-    CONSIDERATIONS IN CONTRACTING, AUG 2009; //SEE REMARKS//
-    15a. COMMISSIONED THROUGH SERVICE ACADEMY
-    b. COMMISSIONED THROUGH ROTC SCHOLARSHIP (10 USC Sec. 2107b)
-    c. ENLISTED UNDER LOAN REPAYMENT PROGRAM (10 USC Chap. 109) (If yes, years of commitment:
-    16. DAYS ACCRUED LEAVE
-    YES
-    NO
-    YES
-    NO
-    )
-    YES
-    NO
-    PAID
-    0
-    17. MEMBER WAS PROVIDED COMPLETE DENTAL EXAMINATION AND ALL APPROPRIATE
-    DENTAL SERVICES AND TREATMENT WITHIN 90 DAYS PRIOR TO SEPARATION
-    YES
-    NO
-    18. REMARKS
-    ITEM 13: Global War on Terrorism Service Medal, Air Force Expeditionary Service Ribbon with Gold Border, AF Longevity Service with 1 oak leaf
-    cluster, AF Training Ribbon, NATO Medal (Wear first NATO medal awarded.). ITEM 14: (055) INTERMEDIATE SYSTEMS ACQUISITION, JUL 2009;
-    (JHP) BUSINESS DECISIONS FOR CONTRACTING, JUN 2009; (9A8) FUNDAMENTALS OF SYSTEMS ACQUISITION MGMT, JAN 2009; (07G)
-    THE SMALL BUSINESS PROGRAM - WEB, AUG 2008; BDE-AIR AND SPACE BASIC COURSE (ASBC), DEC 2007; (CWI) SIMPLIFIED
-    ACQUISITION PROCEDURES (SAP), OCT 2007; (BO1) MISSION SUPPORT PLANNING, OCT 2007; (GYO) MISSION FOCUSED CONTRACTING,
-    SEP 2007; (JHN) MISSION FOCUSED CONTRACTING COURSE, SEP 2007; (OLC) MISSION READY CONTRACTING OFFICER COURSE, SEP
-    2007. Member has completed first full term of service. Attended //See Continuation Page//
-    The information contained herein is subject to computer matching within the Department of Defense or with any other affected Federal or non-Federal agency for verification purposes and
-    to determine eligibility for, and/or continued compliance with, the requirements of a Federal benefit program.
-    19a. MAILING ADDRESS AFTER SEPARATION (Include ZIP Code)
-    b. NEAREST RELATIVE (Name and address - include ZIP Code)
-    b. DATE
-    (YYYYMMDD)
-    N/A
-    20. MEMBER REQUESTS COPY 6 BE SENT TO (Specify state/locality)
-    MA
-    OFFICE OF VETERANS AFFAIRS
-    a. MEMBER REQUESTS COPY 3 BE SENT TO THE CENTRAL OFFICE OF THE DEPARTMENT OF VETERANS AFFAIRS
-    (WASHINGTON, DC)
-    21.a. MEMBER SIGNATURE
-    MEMBER NOT AVAILABLE TO SIGN
-    YES
-    NO
-    YES
-    ☑ NO
-    22.a. OFFICIAL AUTHORIZED TO SIGN (Typed name, grade, title, signature)
-    CAC/PKI SIGNED BY
-    b. DATE
-    (YYYYMMDD)
-    20121026
-    DD FORM 214, AUG 2009
-    CONTRACTOR, USAF, Separation Documantation Technician Oct 26 2012
-    2:58:26:000PM
-    CAC Serial Number: 18173E IssuerCN: DOD CA-26
-    PREVIOUS EDITION IS OBSOLETE
-    MEMBER-1
-    """
+# if __name__ == "__main__":
+#     extracted_text = """
+#     CAUTION: NOT TO BE USED FOR
+#     IDENTIFICATION PURPOSES
+#     1. NAME (Last, First, Middle)
+#     THIS IS AN IMPORTANT RECORD.
+#     SAFEGUARD IT.
+#     ANY ALTERATIONS IN SHADED AREAS
+#     RENDER FORM VOID
+#     CERTIFICATE OF RELEASE OR DISCHARGE FROM ACTIVE DUTY
+#     This Report Contains Information Subject to the Privacy Act of 1974, As Amended.
+#     2. DEPARTMENT, COMPONENT AND BRANCH
+#     AIR FORCE--REGAF
+#     3. SOCIAL SECURITY NUMBER
+#     4a. GRADE, RATE OR RANK
+#     CAPT
+#     b. PAY GRADE
+#     03
+#     5. DATE OF BIRTH (YYYYMMDD)
+#     6. RESERVE OBLIGATION TERMINATION DATE
+#     (YYYYMMDD) 20150529
+#     b. HOME OF RECORD AT TIME OF ENTRY (City and state, or complete address if known)
+#     7a. PLACE OF ENTRY INTO ACTIVE DUTY
+#     COLORADO SPRINGS CO
+#     8a. LAST DUTY ASSIGNMENT AND MAJOR COMMAND
+#     OL PZA AF LIFE CYCLE MGT CE (MTC)
+#     9. COMMAND TO WHICH TRANSFERRED
+#     USAFR
+#     11. PRIMARY SPECIALTY (List number, title and years and months inspecialty. List additional specialty numbers and titles involving
+#     periods of one or more years.)
+#     64P3, CONTRACTING, 5 YEARS AND 4 MONTHS
+#     b. STATION WHERE SEPARATED
+#     JBSA RANDOLPH AFB TX
+#     12. RECORD OF SERVICE
+#     a. DATE ENTERED AD THIS PERIOD
+#     b. SEPARATION DATE THIS PERIOD
+#     10. SGLI COVERAGE
+#     AMOUNT: $400,000
+#     YEAR(S) MONTHS(S)
+#     2007
+#     NONE
+#     DAY(S)
+#     MAY
+#     30
+#     2012
+#     OCT
+#     26
+#     c. NET ACTIVE SERVICE THIS PERIOD
+#     d. TOTAL PRIOR ACTIVE SERVICE
+#     05
+#     04
+#     27
+#     00
+#     00
+#     00
+#     e. TOTAL PRIOR INACTIVE SERVICE
+#     03
+#     11
+#     04
+#     f. FOREIGN SERVICE
+#     00
+#     06
+#     19
+#     g. SEA SERVICE
+#     00
+#     00
+#     00
+#     h. INITIAL ENTRY TRAINING
+#     2007
+#     MAY
+#     30
+#     i. EFFECTIVE DATE OF PAY GRADE
+#     2011
+#     MAY
+#     30
+#     13. DECORATIONS, MEDALS, BADGES, CITATIONS AND CAMPAIGN
+#     RIBBONS AWARDED OR AUTHORIZED (All periods of service)
+#     Defense Meritorious Service Medal, Air Force Commendation Medal with
+#     1 oak leaf cluster, Air Force Achievement Medal with 1 oak leaf cluster,
+#     Joint Meritorious Unit Award, AF Outstanding Unit Award, AF
+#     Organizational Excellence Award with 1 oak leaf cluster, National
+#     Defense Service Medal, Afghanistan Campaign Medal,//SEE REMARKS//
+#     14. MILITARY EDUCATION (Course title, number of weeks, and month and
+#     year completed)
+#     PDÉ - SQUADRON OFFICER SCHOOL (SOS), MAY 2012; (JHE)
+#     SHAPING SMART BUSINESS ARRANGEMENTS, JUL 2011; (J01)
+#     FUNDAMENTALS OF SYSTEMS PLANNING RD&E, JUN 2011; (3NH)
+#     COMBAT AIRMAN SKILLS TRAINING, MAY 2011; (JHS) COST ANALYSIS
+#     AND NEGOTIATION TECHNIQUES, MAR 2010; (JHR) LEGAL
+#     CONSIDERATIONS IN CONTRACTING, AUG 2009; //SEE REMARKS//
+#     15a. COMMISSIONED THROUGH SERVICE ACADEMY
+#     b. COMMISSIONED THROUGH ROTC SCHOLARSHIP (10 USC Sec. 2107b)
+#     c. ENLISTED UNDER LOAN REPAYMENT PROGRAM (10 USC Chap. 109) (If yes, years of commitment:
+#     16. DAYS ACCRUED LEAVE
+#     YES
+#     NO
+#     YES
+#     NO
+#     )
+#     YES
+#     NO
+#     PAID
+#     0
+#     17. MEMBER WAS PROVIDED COMPLETE DENTAL EXAMINATION AND ALL APPROPRIATE
+#     DENTAL SERVICES AND TREATMENT WITHIN 90 DAYS PRIOR TO SEPARATION
+#     YES
+#     NO
+#     18. REMARKS
+#     ITEM 13: Global War on Terrorism Service Medal, Air Force Expeditionary Service Ribbon with Gold Border, AF Longevity Service with 1 oak leaf
+#     cluster, AF Training Ribbon, NATO Medal (Wear first NATO medal awarded.). ITEM 14: (055) INTERMEDIATE SYSTEMS ACQUISITION, JUL 2009;
+#     (JHP) BUSINESS DECISIONS FOR CONTRACTING, JUN 2009; (9A8) FUNDAMENTALS OF SYSTEMS ACQUISITION MGMT, JAN 2009; (07G)
+#     THE SMALL BUSINESS PROGRAM - WEB, AUG 2008; BDE-AIR AND SPACE BASIC COURSE (ASBC), DEC 2007; (CWI) SIMPLIFIED
+#     ACQUISITION PROCEDURES (SAP), OCT 2007; (BO1) MISSION SUPPORT PLANNING, OCT 2007; (GYO) MISSION FOCUSED CONTRACTING,
+#     SEP 2007; (JHN) MISSION FOCUSED CONTRACTING COURSE, SEP 2007; (OLC) MISSION READY CONTRACTING OFFICER COURSE, SEP
+#     2007. Member has completed first full term of service. Attended //See Continuation Page//
+#     The information contained herein is subject to computer matching within the Department of Defense or with any other affected Federal or non-Federal agency for verification purposes and
+#     to determine eligibility for, and/or continued compliance with, the requirements of a Federal benefit program.
+#     19a. MAILING ADDRESS AFTER SEPARATION (Include ZIP Code)
+#     b. NEAREST RELATIVE (Name and address - include ZIP Code)
+#     b. DATE
+#     (YYYYMMDD)
+#     N/A
+#     20. MEMBER REQUESTS COPY 6 BE SENT TO (Specify state/locality)
+#     MA
+#     OFFICE OF VETERANS AFFAIRS
+#     a. MEMBER REQUESTS COPY 3 BE SENT TO THE CENTRAL OFFICE OF THE DEPARTMENT OF VETERANS AFFAIRS
+#     (WASHINGTON, DC)
+#     21.a. MEMBER SIGNATURE
+#     MEMBER NOT AVAILABLE TO SIGN
+#     YES
+#     NO
+#     YES
+#     ☑ NO
+#     22.a. OFFICIAL AUTHORIZED TO SIGN (Typed name, grade, title, signature)
+#     CAC/PKI SIGNED BY
+#     b. DATE
+#     (YYYYMMDD)
+#     20121026
+#     DD FORM 214, AUG 2009
+#     CONTRACTOR, USAF, Separation Documantation Technician Oct 26 2012
+#     2:58:26:000PM
+#     CAC Serial Number: 18173E IssuerCN: DOD CA-26
+#     PREVIOUS EDITION IS OBSOLETE
+#     MEMBER-1
+#     """
 
-    # Parse the extracted text
-    parsed_dd214 = parse_dd214_text(extracted_text)
+#     # Parse the extracted text
+#     parsed_dd214 = parse_dd214_text(extracted_text)
 
-    # Print the parsed data
-    print("Parsed Data:")
-    for key, value in parsed_dd214.items():
-        print(f"{key}: {value}")
+#     # Print the parsed data
+#     print("Parsed Data:")
+#     for key, value in parsed_dd214.items():
+#         print(f"{key}: {value}")

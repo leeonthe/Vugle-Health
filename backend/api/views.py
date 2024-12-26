@@ -11,11 +11,17 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sessions.models import Session
 
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+
+
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
 from base64 import b64encode
+from .parsingPDF import parse_dd214_text
 
 
 import requests
@@ -28,6 +34,8 @@ import jwt
 import json
 import time
 import uuid
+import traceback
+
 # 
 class OAuthHandler:
     def __init__(self):
@@ -71,8 +79,8 @@ class OAuthHandler:
         request.session.save()
 
 
-        print("PLATFORM STORED IN SESSION:", platform)
-        print("SESSION DATA AFTER LOGIN:", request.session.items())
+        # print("PLATFORM STORED IN SESSION:", platform)
+        # print("SESSION DATA AFTER LOGIN:", request.session.items())
         params = {
             'client_id': self.client_id,
             'redirect_uri': self.redirect_uri,
@@ -95,9 +103,9 @@ class OAuthHandler:
         state_parts = state.split('|')
         platform = state_parts[1] if len(state_parts) > 1 else None
 
-        print("PLATFORM RETRIEVED FROM SESSION:", platform)
-        print("SESSION DATA DURING CALLBACK:", request.session.items())
-        print("PLATFORM IS ", platform)
+        # print("PLATFORM RETRIEVED FROM SESSION:", platform)
+        # print("SESSION DATA DURING CALLBACK:", request.session.items())
+        # print("PLATFORM IS ", platform)
 
         saved_state = request.session.get('oauth_state')
         saved_nonce = request.session.get('oauth_nonce')
@@ -503,6 +511,7 @@ class PatientHealthView(View):
 
 PROMPTS_DIR = os.path.join(os.path.dirname(__file__), "prompts")
 
+@method_decorator(csrf_exempt, name='dispatch') 
 class ChatPromptView(APIView):
     def get(self, request, file_name):
         """
@@ -527,62 +536,6 @@ class ChatPromptView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    # def post(self, request):
-    #     print("POST endpoint hit! URL:", request.build_absolute_uri())
-    #     """
-    #     POST method to process user selections and return the next prompt.
-    #     :param request: Request containing user selection and current file name.
-    #     """
-    #     try:
-    #         current_file = request.data.get("current_file")  # e.g., "start/start"
-    #         user_selection = request.data.get("user_selection")
-
-    #         # Resolve the current file path
-    #         current_file_path = os.path.join(PROMPTS_DIR, current_file.replace("/", os.sep) + ".json")
-    #         if not os.path.exists(current_file_path):
-    #             return Response({"error": "Current file not found"}, status=status.HTTP_404_NOT_FOUND)
-            
-    #         # Load the current JSON file
-    #         with open(current_file_path, "r") as json_file:
-    #             data = json.load(json_file)
-
-    #         # Handle automatic transitions (e.g., "NONE")
-    #         # if not user_selection or user_selection == "NONE":
-    #         #     next_prompt_file = data.get("options", [{}])[0].get("next")
-    #         #     if not next_prompt_file:
-    #         #         return Response({"error": "Next prompt not defined"}, status=status.HTTP_404_NOT_FOUND)
-    #         # else:
-    #         #     # Find the next prompt file based on the user's selection
-    #         #     next_prompt_file = None
-    #         #     for option in data.get("options", []):
-    #         #         if option["text"] == user_selection:
-    #         #             next_prompt_file = option["next"]
-    #         #             break
-                
-    #         #     if not next_prompt_file:
-    #         #         return Response({"error": "Next prompt not found"}, status=status.HTTP_404_NOT_FOUND)
-    #         next_prompt_file = None
-    #         for option in data.get("options", []):
-    #             if option["text"] == user_selection:
-    #                 next_prompt_file = option["next"]
-    #                 break
-                
-    #         if not next_prompt_file:
-    #             return Response({"error": "Next prompt not found"}, status=status.HTTP_404_NOT_FOUND)
-
-    #         # Resolve the next file path
-    #         next_file_path = os.path.join(PROMPTS_DIR, next_prompt_file.replace("/", os.sep) + ".json")
-    #         if not os.path.exists(next_file_path):
-    #             return Response({"error": "Next file not found"}, status=status.HTTP_404_NOT_FOUND)
-            
-    #         with open(next_file_path, "r") as next_json_file:
-    #             next_data = json.load(next_json_file)
-    #         return Response(next_data, status=status.HTTP_200_OK)
-    #     except Exception as e:
-    #         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
 
 
     def post(self, request):
@@ -619,3 +572,51 @@ class ChatPromptView(APIView):
         except Exception as e:
             print("Error:", str(e))
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ParsingDD214(APIView):
+    def post(self, request):
+        try:
+            print("FILES:", request.FILES)
+            # Save uploaded file temporarily
+            uploaded_file = request.FILES["file"]
+            file_path = default_storage.save(uploaded_file.name, ContentFile(uploaded_file.read()))
+            
+            # Call the parsing function
+            parsed_data = parse_dd214_text(file_path, processor_name="document_ocr")
+            print("Parsed PDF:", parsed_data)
+            
+            # Save parsed data in session
+            request.session["parsed_dd214_data"] = parsed_data
+           
+            # Delete temporary file
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+            return JsonResponse({"message": "File processed successfully", "data": parsed_data}, status=200)
+
+        except Exception as e:
+            print("Error in ParsingDD214:", str(e))
+            print(traceback.format_exc()) 
+            return JsonResponse({"error": str(e)}, status=400)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class StoreUserInputView(View):
+    def post(self, request, *args, **kwargs):
+        try:
+            data = request.POST or json.loads(request.body)
+            typed_text = data.get('userInput', '').strip()
+
+            if not typed_text:
+                return JsonResponse({'success': False, 'message': 'No input provided'}, status=400)
+
+            # Save user typed text in session
+            request.session['userTypedText'] = typed_text
+            # TESTING
+            print(f"User input stored in session: {typed_text}")
+
+            return JsonResponse({'success': True, 'message': 'Input stored successfully'})
+        except Exception as e:
+            print(f"Error storing user input: {e}")
+            return JsonResponse({'success': False, 'message': 'An error occurred'}, status=500)

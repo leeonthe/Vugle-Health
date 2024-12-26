@@ -1,5 +1,15 @@
 from django.urls import path
-from .views import oauth_login, oauth_callback, UserInfoView, DisabilityRatingView, EligibleLettersView, PatientHealthView, ChatPromptView
+from .views import (
+    oauth_login,
+    oauth_callback,
+    UserInfoView,
+    DisabilityRatingView,
+    EligibleLettersView,
+    PatientHealthView,
+    ChatPromptView,
+    ParsingDD214,
+    StoreUserInputView,
+)
 
 urlpatterns = [
     path('auth/login/', oauth_login, name='oauth-login'),
@@ -10,5 +20,8 @@ urlpatterns = [
     path('auth/patient-health/', PatientHealthView.as_view(), name='patient-health'),
     path('auth/prompt/<str:file_name>/', ChatPromptView.as_view(), name='get_prompt'),
     path('auth/prompt/', ChatPromptView.as_view(), name='chat_prompt_post'),
+    path('auth/upload_dd214/', ParsingDD214.as_view(), name='upload_dd214'),
+    path('auth/store_user_input', StoreUserInputView.as_view(), name='store_user_input'),
     
+
 ]

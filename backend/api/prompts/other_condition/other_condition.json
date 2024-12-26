@@ -1,12 +1,24 @@
 {
-  "chat_bubbles_id": 2,
-  "options_id": 2,
+  "chat_bubbles_id": 5,
+  "options_id": 5,
   "chat_bubbles": [
     {
       "container": [
         {
+          "type": "image",
+          "content": "app_logo",
+          "style": {
+            "width": 24,
+            "height": 24
+          }
+        }
+      ]
+    },
+    {
+      "container": [
+        {
           "type": "text",
-          "content": "Please upload your DD214.",
+          "content": "Any other conditions?",
           "style": {
             "color": "#323D4C",
             "fontSize": 16,
@@ -19,7 +31,7 @@
         },
         {
           "type": "text",
-          "content": "Before we begin, we just need one more document from you to evaluate the best approach for your application!",
+          "content": "It’s okay if they are not severe. Any conditions or symptoms that are troubling you can help us improve your chance.",
           "style": {
             "color": "#323D4C",
             "fontSize": 16,
@@ -29,24 +41,18 @@
             "wordWrap": "break-word",
             "marginBottom": 16
           }
-        },
-        {
-          "type": "link",
-          "content": "I don't have it right now",
-          "url": "https://example.com/more-info",
-          "style": {
-            "color": "#3182F6",
-            "textDecorationLine": "underline",
-            "marginBottom": 0
-          }
         }
       ]
     }
   ],
   "options": [
     {
-      "text": "Upload DD214",
-      "next": "choose_your_claim"
+      "text": "Add more",
+      "next": "add_more"
+    },
+    {
+      "text": "Not that I can think of",
+      "next": "potential_conditions"
     }
   ]
 }
