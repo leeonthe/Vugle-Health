@@ -110,14 +110,16 @@ const fetchPatientHealth = async (icn: string): Promise<PatientHealthResponse> =
   return data;
 };
 
+
 // Hook for fetching patient health data
 export const usePatientHealth = (icn: string): UseQueryResult<PatientHealthResponse> => {
   console.log('usePatientHealth Hook Triggered');
   return useQuery<PatientHealthResponse>({
-    queryKey: ['patientHealth', icn], 
-    queryFn: () => fetchPatientHealth(icn), 
-    enabled: !!icn, 
-    staleTime: 5 * 60 * 1000, 
-    retry: 1, 
+    queryKey: ['patientHealth', icn], // Ensure consistent query key
+    queryFn: () => fetchPatientHealth(icn),
+    enabled: !!icn, // Ensure the query runs only when `icn` is valid
+    staleTime: 10 * 60 * 1000, // Cache for 10 minutes to reduce re-fetching
+    retry: 1, // Retry only once if there’s a failure
+    refetchOnWindowFocus: false, // Prevent re-fetching when the window is focused
   });
 };

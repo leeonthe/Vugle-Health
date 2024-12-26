@@ -8,69 +8,57 @@ import CheckMark from "../../assets/images/postAuth/dexPage/checkMark.svg";
 import { ChatBubble } from "../../utils/interfaces/promptTypes";
 import { useDevice } from "@/utils/hooks/useDevice";
 
-//ISSUE: issue where the styles.container is not applied to the entire screen and the ScrollView content seems divided into sections
-// This is bc container styling is only applied in const renderChatBubble. 
+// TODO:Diplay different container if isHealthLoading and isHealthSuccessful
+  // ISSUE: it displays .json from beginning
+    // I think its bc I am using useQuery in usePatientHealth.
+  //ISSUE: issue where the styles.container is not applied to the entire screen and the ScrollView content seems divided into sections
+    // This is bc container styling is only applied in const renderChatBubble. 
 
-interface ChatProps extends ChatBubble {
-  onOptionSelect: (next: string, isAutomatic: boolean) => void;
+
+interface ChatProps extends ChatBubble{
+  chatHistory: {
+    chat_bubbles: { container: { type: string; content: string; style?: Record<string, any> }[] }[];
+    options: { text: string; next: string }[];
+  }[];
+  onOptionSelect: (nextStep: string, isAutomatic: boolean) => void;
+  isHealthLoading: boolean;
+  isHealthSuccess: boolean;
 }
 
-const ChatRenderer: React.FC<ChatProps & { isHealthLoading: boolean; isHealthSuccess: boolean }> = ({
-  chat_bubbles,
-  options,
+const ChatRenderer: React.FC<ChatProps> = ({
+  chatHistory,
   onOptionSelect,
   isHealthLoading,
   isHealthSuccess,
 }) => {
 
-    const { isDesktop } = useDevice();
+  const { isDesktop } = useDevice();
 
-    const [shouldTransition, setShouldTransition] = useState(false);
-
-    useEffect(() => {
-      if (isHealthSuccess) {
-        // Start a timer for 3 seconds once data fetching is successful
-        const timer = setTimeout(() => {
-          setShouldTransition(true);
-        }, 3000);
-        return () => clearTimeout(timer); 
+  const handleFileUpload = async () => {
+    try {
+      if (isDesktop) {
+        const fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.accept = ".pdf,.jpg,.png";
+        fileInput.onchange = (event) => {
+          const file = (event.target as HTMLInputElement).files?.[0];
+          console.log("File selected:", file);
+        };
+        fileInput.click();
+      } else {
+        const res = await DocumentPicker.getDocumentAsync({
+          type: ["application/pdf", "image/jpeg", "image/png"],
+        });
+        if (res.type === "success") {
+          console.log("File selected:", res);
+        }
       }
-    }, [isHealthSuccess]);
-    
-    const handleFileUpload = async () => {
-        try {
-        if (isDesktop) {
-            // Web File Upload
-            const fileInput = document.createElement("input");
-            fileInput.type = "file";
-            fileInput.accept = ".pdf,.jpg,.png";
-            fileInput.onchange = (event) => {
-            const file = event.target.files[0];
-            console.log("File selected:", file); 
-            };
-            fileInput.click();
-        } else {
-            // Mobile File Upload
-            const res = await DocumentPicker.getDocumentAsync({
-            type: [
-                "application/pdf", 
-                "image/jpeg", 
-                "image/png", 
-            ],
-            });
-            if (res.type === "success") {
-            console.log("File selected:", res); 
-            }
-        }
-        } catch (err) {
-        console.error("File upload error:", err);
-        }
-    };
+    } catch (err) {
+      console.error("File upload error:", err);
+    }
+  };
 
-  const renderElement = (
-    element: ChatBubble["chat_bubbles"][number]["container"][number],
-    index: number
-  ) => {
+  const renderElement = (element: ChatBubble["chat_bubbles"][number]["container"][number], index: number) => {
     switch (element.type) {
       case "text":
         return (
@@ -80,49 +68,54 @@ const ChatRenderer: React.FC<ChatProps & { isHealthLoading: boolean; isHealthSuc
         );
       case "image":
         return (
-          <View key={`image-${index}`} style={styles.logoBackground}>
+          <View key={`image-${index}`} style={styles.logoContainer}>
             <Logo style={styles.logo} />
           </View>
         );
       case "link":
         return (
-          <TouchableOpacity
-            key={`link-${index}`}
-            onPress={() => console.log("Link clicked")}
-          >
+          <TouchableOpacity key={`link-${index}`} onPress={() => console.log("Link clicked")}>
             <Text style={[styles.linkText, element.style]}>{element.content}</Text>
           </TouchableOpacity>
         );
-        case "group":
+      case "group":
+        return (
+          <View key={`group-${index}`} style={styles.groupContainer}>
+            {element.content.map((childElement, childIndex) => renderElement(childElement, childIndex))}
+          </View>
+        );
+      case "animation":
+        if (element.condition === "usePatientHealth.isLoading") {
+          return <ActivityIndicator key={`animation-${index}`} size="large" color="#3182F6" />;
+        }
+        break;
+      case "loadingImage":
+        if (element.condition === "usePatientHealth.isSuccess") {
           return (
-            <View key={`group-${index}`} style={styles.groupContainer}>
-              {element.content.map((childElement, childIndex) => renderElement(childElement, childIndex))}
+            <View key={`loadingImage-${index}`}>
+              <CheckMark />
             </View>
           );
-        case "animation":
-          if (element.condition === "usePatientHealth.isLoading") {
-            return <ActivityIndicator key={`animation-${index}`} size="large" color="#3182F6" />;
-          }
-          break;
-        case "loadingImage":
-          if (element.condition === "usePatientHealth.isSuccess") {
-            return <View key={`loadingImage-${index}`}>
-                      <CheckMark/>
-                    </View>
-                    };
-          break;
+        }
+        break;
       default:
         return null;
     }
   };
 
-  const renderChatBubble = (bubble: ChatBubble["chat_bubbles"][number], bubbleIndex: number) => {
-    console.log("Rendering Chat Bubble:", bubble);
-  console.log("Bubble Index:", bubbleIndex);
-    const isLastBubble = bubbleIndex === chat_bubbles.length - 1;
-  
+  const renderChatBubble = (
+    bubble: ChatBubble["chat_bubbles"][number], 
+    bubbleIndex: number,
+    chatIndex: number, 
+  ) => {
+    
+    const isLastBubble = 
+      chatIndex === chatHistory.length - 1 && 
+      bubbleIndex === chatHistory[chatIndex].chat_bubbles.length - 1;
+
+
     return (
-      <View style={styles.chatContainer}>
+      <View key={`bubble-container-${bubbleIndex}`} style={styles.chatContainer}>
         <Animatable.View
           key={`bubble-${bubbleIndex}`}
           animation="fadeIn"
@@ -135,72 +128,60 @@ const ChatRenderer: React.FC<ChatProps & { isHealthLoading: boolean; isHealthSuc
           }
         >
           {bubble.container.map((element, index) => renderElement(element, index))}
-  
-          {/* Render options explicitly inside the last chat bubble */}
-          {isLastBubble && (
-            <View style={styles.optionsContainer}>
-              {options.map((option, idx) => {
-                if (option.text === "NONE") {
-                  // Automatically transition to the next JSON when data fetching is complete.
-                  if (isHealthSuccess) {
-                    // Display check mark while waiting for the 3-second delay
-                    if (!shouldTransition) {
-                      return (
-                        <View key={`checkmark-${idx}`} style={styles.successIndicatorContainer}>
-                          <CheckMark />
-                        </View>
-                      );
-                    }
 
-                    // After 3 seconds, transition to the next JSON
-                    if (shouldTransition) {
-                      setTimeout(() => onOptionSelect(option.next, true), 0);
-                    }
-                  }
+          {/* TODO: Diplay different container if isHealthLoading and isHealthSuccessful
+              ISSUE: it displays .json from beginning, I think its bc I am using useQuery in usePatientHealth.
+          */}
+          {isLastBubble && chatHistory[chatIndex].options && (
+          <View style={styles.optionsContainer}>
+            {chatHistory[chatIndex].options.map((option, idx) => {
+              if (option.text === "NONE") {
+                if (isHealthSuccess) {
+                    setTimeout(() => onOptionSelect(option.next, true), 0);
+                } 
 
-                  return null; // No need to display anything for "NONE".
-                }
-  
-                return (
-                  <TouchableOpacity
-                    key={`option-${idx}`}
-                    onPress={() => {
-                      if (option.text === "Upload DD214") {
-                        handleFileUpload();
-                      } else {
-                        onOptionSelect(option.next, false);
-                      }
-                    }}
-                    style={styles.optionButton}
-                  >
-                    <Text style={styles.optionText}>{option.text}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+              }
+
+              // Render other options as buttons
+              return (
+                <TouchableOpacity
+                  key={`option-${idx}`}
+                  onPress={() => {
+                    if (option.text === "Upload DD214") {
+                      handleFileUpload();
+                    } else {
+                      onOptionSelect(option.next, false);
+                    }
+                  }}
+                  style={styles.optionButton}
+                >
+                  <Text style={styles.optionText}>{option.text}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
           )}
         </Animatable.View>
       </View>
     );
   };
+
+  const renderChatHistory = () => {
+    return chatHistory.map((chat, chatIndex) => (
+      <View key={`chat-${chatIndex}`}>
+        {chat.chat_bubbles.map((bubble, bubbleIndex) =>
+          renderChatBubble(bubble, bubbleIndex, chatIndex)
+        )}
+      </View>
+    ));
+  };
+  
+  return <View>{renderChatHistory()}</View>;
   
 
-
-  return (
-    <View>
-
-      {chat_bubbles.map(renderChatBubble)}
-    </View>
-  );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    backgroundColor: "#ffffff",
-    padding: 16,
-    overflow: "scroll", 
-  },
   chatContainer: {
     flexDirection: "column",
     alignItems: "flex-start",

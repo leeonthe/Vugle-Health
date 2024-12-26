@@ -528,47 +528,94 @@ class ChatPromptView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    # def post(self, request):
+    #     print("POST endpoint hit! URL:", request.build_absolute_uri())
+    #     """
+    #     POST method to process user selections and return the next prompt.
+    #     :param request: Request containing user selection and current file name.
+    #     """
+    #     try:
+    #         current_file = request.data.get("current_file")  # e.g., "start/start"
+    #         user_selection = request.data.get("user_selection")
+
+    #         # Resolve the current file path
+    #         current_file_path = os.path.join(PROMPTS_DIR, current_file.replace("/", os.sep) + ".json")
+    #         if not os.path.exists(current_file_path):
+    #             return Response({"error": "Current file not found"}, status=status.HTTP_404_NOT_FOUND)
+            
+    #         # Load the current JSON file
+    #         with open(current_file_path, "r") as json_file:
+    #             data = json.load(json_file)
+
+    #         # Handle automatic transitions (e.g., "NONE")
+    #         # if not user_selection or user_selection == "NONE":
+    #         #     next_prompt_file = data.get("options", [{}])[0].get("next")
+    #         #     if not next_prompt_file:
+    #         #         return Response({"error": "Next prompt not defined"}, status=status.HTTP_404_NOT_FOUND)
+    #         # else:
+    #         #     # Find the next prompt file based on the user's selection
+    #         #     next_prompt_file = None
+    #         #     for option in data.get("options", []):
+    #         #         if option["text"] == user_selection:
+    #         #             next_prompt_file = option["next"]
+    #         #             break
+                
+    #         #     if not next_prompt_file:
+    #         #         return Response({"error": "Next prompt not found"}, status=status.HTTP_404_NOT_FOUND)
+    #         next_prompt_file = None
+    #         for option in data.get("options", []):
+    #             if option["text"] == user_selection:
+    #                 next_prompt_file = option["next"]
+    #                 break
+                
+    #         if not next_prompt_file:
+    #             return Response({"error": "Next prompt not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    #         # Resolve the next file path
+    #         next_file_path = os.path.join(PROMPTS_DIR, next_prompt_file.replace("/", os.sep) + ".json")
+    #         if not os.path.exists(next_file_path):
+    #             return Response({"error": "Next file not found"}, status=status.HTTP_404_NOT_FOUND)
+            
+    #         with open(next_file_path, "r") as next_json_file:
+    #             next_data = json.load(next_json_file)
+    #         return Response(next_data, status=status.HTTP_200_OK)
+    #     except Exception as e:
+    #         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
     def post(self, request):
         """
         POST method to process user selections and return the next prompt.
-        :param request: Request containing user selection and current file name.
         """
         try:
             current_file = request.data.get("current_file")  # e.g., "start/start"
-            user_selection = request.data.get("user_selection")
+            next_file = request.data.get("user_selection")  # Now `user_selection` is the "next" value
 
-            # Resolve the current file path
-            current_file_path = os.path.join(PROMPTS_DIR, current_file.replace("/", os.sep) + ".json")
-            if not os.path.exists(current_file_path):
-                return Response({"error": "Current file not found"}, status=status.HTTP_404_NOT_FOUND)
-            
-            # Load the current JSON file
-            with open(current_file_path, "r") as json_file:
-                data = json.load(json_file)
-
-            # Handle automatic transitions (e.g., "NONE")
-            if not user_selection or user_selection == "NONE":
-                next_prompt_file = data.get("options", [{}])[0].get("next")
-                if not next_prompt_file:
-                    return Response({"error": "Next prompt not defined"}, status=status.HTTP_404_NOT_FOUND)
-            else:
-                # Find the next prompt file based on the user's selection
-                next_prompt_file = None
-                for option in data.get("options", []):
-                    if option["text"] == user_selection:
-                        next_prompt_file = option["next"]
-                        break
-                
-                if not next_prompt_file:
-                    return Response({"error": "Next prompt not found"}, status=status.HTTP_404_NOT_FOUND)
+            print("POST endpoint hit! URL:", request.build_absolute_uri())
+            print("Current File:", current_file)
+            print("Next File:", next_file)
 
             # Resolve the next file path
-            next_file_path = os.path.join(PROMPTS_DIR, next_prompt_file.replace("/", os.sep) + ".json")
-            if not os.path.exists(next_file_path):
-                return Response({"error": "Next file not found"}, status=status.HTTP_404_NOT_FOUND)
+            nested_file_path = os.path.join(next_file, next_file + ".json")
+            next_file_path = os.path.join(PROMPTS_DIR, nested_file_path)
+
+            print("Resolved Next File Path:", next_file_path)
             
+           
+            if not os.path.exists(next_file_path):
+                print("Next file not found!")
+                return Response({"error": "Next file not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            # Load the next JSON file
             with open(next_file_path, "r") as next_json_file:
                 next_data = json.load(next_json_file)
+
+            next_data["next"] = next_file  # Include the next file name in the response
+
             return Response(next_data, status=status.HTTP_200_OK)
+
         except Exception as e:
+            print("Error:", str(e))
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

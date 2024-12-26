@@ -9,6 +9,6 @@ urlpatterns = [
     path('auth/eligible-letters/', EligibleLettersView.as_view(), name='eligible-letters'),
     path('auth/patient-health/', PatientHealthView.as_view(), name='patient-health'),
     path('auth/prompt/<str:file_name>/', ChatPromptView.as_view(), name='get_prompt'),
-    path('auth/prompt/', ChatPromptView.as_view(), name='post_prompt'),
+    path('auth/prompt/', ChatPromptView.as_view(), name='chat_prompt_post'),
     
 ]

@@ -8,7 +8,7 @@ export interface BaseElement {
 
 export interface GroupElement {
   type: "group";
-  content: BaseElement[]; // Group contains an array of elements
+  content: BaseElement[]; 
 }
 
 export type Element = BaseElement | GroupElement;
@@ -18,7 +18,9 @@ export interface Container {
 }
 
 export interface ChatBubble {
+  chat_bubbles_id: number;
   chat_bubbles: Container[];
+  options_id: number,
   options: { text: string; next: string }[];
   next?: string;
 }
