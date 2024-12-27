@@ -47,8 +47,8 @@
   ],
   "options": [
     {
-      "text": "SCALESLIDER",
-      "next": "suitable_claim_typ"
+      "text": "SCALE_SLIDER",
+      "next": "suitable_claim_type"
     }
   ]
 }

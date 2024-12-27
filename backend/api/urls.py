@@ -9,6 +9,7 @@ from .views import (
     ChatPromptView,
     ParsingDD214,
     StoreUserInputView,
+    StorePotentialConditions,
 )
 
 urlpatterns = [
@@ -22,6 +23,7 @@ urlpatterns = [
     path('auth/prompt/', ChatPromptView.as_view(), name='chat_prompt_post'),
     path('auth/upload_dd214/', ParsingDD214.as_view(), name='upload_dd214'),
     path('auth/store_user_input', StoreUserInputView.as_view(), name='store_user_input'),
+    path('auth/potential_conditions/', StorePotentialConditions.as_view(), name='store_potential_conditions'),
     
 
 ]

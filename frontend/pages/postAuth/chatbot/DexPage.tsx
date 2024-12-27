@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, ActivityIndicator, Text, StyleSheet, ScrollView } from "react-native";
-import { useChat } from "../../utils/hooks/useChat";
-import ChatRenderer from "../../components/ui/ChatRenderer";
-import { ChatBubble } from "../../utils/interfaces/promptTypes";
-import { useDisabilityRating } from "../../utils/hooks/useDisabilityRating";
-import { usePatientHealth } from "../../utils/hooks/usePatientHealth";
+import { useChat } from "../../../utils/hooks/useChat";
+import ChatRenderer from "./ChatRenderer";
+import { ChatBubble } from "../../../utils/interfaces/promptTypes";
+import { useDisabilityRating } from "../../../utils/hooks/useDisabilityRating";
+import { usePatientHealth } from "../../../utils/hooks/usePatientHealth";
 
 const DexPage: React.FC = () => {
   const { useFetchPrompt, useSendSelection } = useChat();

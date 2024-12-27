@@ -510,7 +510,6 @@ class PatientHealthView(View):
 
 
 PROMPTS_DIR = os.path.join(os.path.dirname(__file__), "prompts")
-
 @method_decorator(csrf_exempt, name='dispatch') 
 class ChatPromptView(APIView):
     def get(self, request, file_name):
@@ -620,3 +619,30 @@ class StoreUserInputView(View):
         except Exception as e:
             print(f"Error storing user input: {e}")
             return JsonResponse({'success': False, 'message': 'An error occurred'}, status=500)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class StorePotentialConditions(View):
+    def post(self, request):
+        try:
+            # Parse the JSON body of the request
+            body = json.loads(request.body)
+            conditions = body.get('conditions', [])
+            print("ADDED POTENTIAL CONDITIONS: ", conditions)
+            if not isinstance(conditions, list):
+                return JsonResponse({'error': 'Invalid data format. "conditions" should be a list.'}, status=400)
+
+            # Ensure there's a session for the user
+            if 'potential_conditions' not in request.session:
+                request.session['potential_conditions'] = []
+
+            # Store the conditions in the session
+            request.session['potential_conditions'].extend(conditions)
+            request.session.modified = True
+
+            return JsonResponse({'message': 'Conditions stored successfully.', 'stored_conditions': request.session['potential_conditions']}, status=200)
+        
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)

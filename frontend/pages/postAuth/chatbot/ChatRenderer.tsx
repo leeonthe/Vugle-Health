@@ -1,26 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
-  ScrollView,
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
   TextInput,
-  KeyboardAvoidingView,
-  Keyboard,
-  Platform,
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import * as DocumentPicker from "expo-document-picker";
-import Logo from "../../assets/images/logo/dexLogo.svg";
-import CheckMark from "../../assets/images/postAuth/dexPage/checkMark.svg";
+import Logo from "../../../assets/images/logo/dexLogo.svg";
+import CheckMark from "../../../assets/images/postAuth/dexPage/checkMark.svg";
 import axios from "axios";
 
-import { ChatBubble } from "../../utils/interfaces/promptTypes";
+import { ChatBubble } from "../../../utils/interfaces/promptTypes";
 import { useDevice } from "@/utils/hooks/useDevice";
 import { useKeyboardStatus } from "@/utils/hooks/useKeyboardStatus";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
 
 // TODO:
 //      + Diplay different container if isHealthLoading and isHealthSuccessful
@@ -52,9 +49,14 @@ const ChatRenderer: React.FC<ChatProps> = ({
   isHealthLoading,
   isHealthSuccess,
 }) => {
+
   const [inputValue, setInputValue] = useState("");
   const isKeyboardVisible = useKeyboardStatus();
+  
   const { isDesktop } = useDevice();
+  const navigation = useNavigation();
+
+
   const handleFileUpload = async () => {
     try {
       if (isDesktop) {
@@ -136,7 +138,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
     }
   };
 
-  const handleType = async (tpyedText: string) => {
+  const handleConditionType = async (tpyedText: string) => {
     try {
       const response = await axios.post(
         "http://localhost:8000/api/auth/store_user_input",
@@ -153,6 +155,33 @@ const ChatRenderer: React.FC<ChatProps> = ({
     } catch (error) {
       console.error("ERROR SENDING USER TYPE TO BACKEND", error);
     }
+  };
+
+  const handleNavigateToConditions = () => {
+    // Mock data for potential conditions
+    const potentialConditions = [
+      {
+        name: "Condition A",
+        risk: "High",
+        riskColor: "red",
+        description: "Description for Condition A",
+      },
+      {
+        name: "Condition B",
+        risk: "Medium",
+        riskColor: "orange",
+        description: "Description for Condition B",
+      },
+    ];
+
+    navigation.navigate("PotentialConditionsPage", {
+      potentialConditions,
+      onReturn: (selectedConditions) => {
+        console.log("Selected conditions:", selectedConditions);
+       onOptionSelect("pain_duration", false);
+
+      },
+    });
   };
 
   const renderElement = (
@@ -252,6 +281,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
               ISSUE: it displays .json from beginning, I think its bc I am using useQuery in usePatientHealth.
           */}
           {isLastBubble && chatHistory[chatIndex].options && (
+
             <View style={styles.optionsContainer}>
               {chatHistory[chatIndex].options.map((option, idx) => {
 
@@ -274,7 +304,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
                         placeholderTextColor="#A0A4A8"
                         value={inputValue}
                         onChangeText={setInputValue}
-                        onSubmitEditing={() => handleType(inputValue)}
+                        onSubmitEditing={() => handleConditionType(inputValue)}
                       />
                       <Text style={styles.status}>
                         {isKeyboardVisible
@@ -284,6 +314,19 @@ const ChatRenderer: React.FC<ChatProps> = ({
                     </SafeAreaView>
                   );
                 }
+
+                if (option.text === "Let's check") {
+                  return (
+                    <TouchableOpacity
+                      key={`option-${idx}`}
+                      style={styles.optionButton}
+                      onPress={handleNavigateToConditions}
+                    >
+                      <Text style={styles.optionText}>{option.text}</Text>
+                    </TouchableOpacity>
+                  );
+                }
+
 
                 // Render other options as buttons
                 return (
@@ -309,6 +352,8 @@ const ChatRenderer: React.FC<ChatProps> = ({
     );
   };
 
+  
+
   const renderChatHistory = () => {
     return chatHistory.map((chat, chatIndex) => (
       <View key={`chat-${chatIndex}`}>
@@ -320,6 +365,14 @@ const ChatRenderer: React.FC<ChatProps> = ({
   };
 
   return <View>{renderChatHistory()}</View>;
+
+
+  // return (
+  //   <View>
+  //     {chatHistory.map((bubble, index) => renderChatBubble(bubble, index))}
+  //   </View>
+  // );
+
 };
 
 const styles = StyleSheet.create({

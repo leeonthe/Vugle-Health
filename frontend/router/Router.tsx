@@ -8,7 +8,8 @@ import Welcome from '../app/Welcome';
 import HomePage from '../pages/postAuth/HomePage'
 
 import DexStartPage from '../pages/postAuth/DexStartPage'
-import DexPage from '@/pages/postAuth/DexPage';
+import DexPage from '../pages/postAuth/chatbot/DexPage';
+import PotentialConditionsPage from '../pages/postAuth/DexNavigationPages/PotentialConditionsPage';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,6 +26,7 @@ const Router: React.FC = () => {
       <Stack.Screen name="HomePage" component={HomePage} options={{headerShown: false}} />
       <Stack.Screen name="DexStartPage" component={DexStartPage} options={{headerShown: false}} />
       <Stack.Screen name="DexPage" component={DexPage} options={{headerShown: false}} />
+      <Stack.Screen name="PotentialConditionsPage" component={PotentialConditionsPage} options={{headerShown: false}} />
 
     </Stack.Navigator>
   );
