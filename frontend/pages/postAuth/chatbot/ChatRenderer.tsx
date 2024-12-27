@@ -314,6 +314,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
                   if (option.inputType === "conditionType") {
                     return (
                       <TypeInput
+                        key={`type-condition-${idx}`}
                         placeholder="e.g. severe lower back pain"
                         handleSubmit={handleConditionType}
                       />
@@ -323,6 +324,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
                   if (option.inputType === "painDuration") {
                     return (
                       <TypeInput
+                        key={`type-pain-${idx}`}
                         placeholder="e.g. about 3 months"
                         handleSubmit={handlePainDuration}
                       />
@@ -333,7 +335,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
                 if (option.text === "Let's check") {
                   return (
                     <TouchableOpacity
-                      key={`option-${idx}`}
+                      key={`check-${idx}`}
                       style={styles.optionButton}
                       onPress={handleNavigateToConditions}
                     >
@@ -346,6 +348,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
                   // return null;
                   return (
                     <PainScaleSlider
+                      key={`slider-${idx}`}
                       painScale={painScale}
                       setPainScale={setPainScale}
                       onSubmit={() => {
@@ -393,7 +396,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
       </Animatable.View>
     </View>
   );
-  
 
   const renderChatHistory = () => {
     return chatHistory.map((chat, chatIndex) => (
@@ -407,7 +409,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
       </View>
     ));
   };
-  
 
   return <View>{renderChatHistory()}</View>;
 };
@@ -421,9 +422,9 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   logoContainer: {
-    flexDirection: 'column',
-      alignItems: 'flex-start',
-      marginBottom: 2,
+    flexDirection: "column",
+    alignItems: "flex-start",
+    marginBottom: 2,
   },
   logoBackground: {
     width: 36,
