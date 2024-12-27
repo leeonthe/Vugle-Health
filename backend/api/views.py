@@ -568,7 +568,7 @@ class StoreUserInputView(View):
     def post(self, request):
         try:
             data = request.POST or json.loads(request.body)
-            typed_text = data.get('userInput', '').strip()
+            typed_text = data.get('userInput')
             # to handle handleConditionType & hanldePainDuration by determining inputType which is provided it in .json file
             input_type = data.get('inputType', '').strip()  
 
@@ -590,6 +590,13 @@ class StoreUserInputView(View):
                 request.session.modified = True
                 print(f"Pain duration input stored: {typed_text}")
                 return JsonResponse({'success': True, 'message': 'Pain duration input stored successfully'})
+
+            
+            elif input_type == "painSeverity":
+                request.session['user_pain_severity'] = typed_text
+                request.session.modified = True
+                print(f"Pain severity input stored: {typed_text}")
+                return JsonResponse({'success': True, 'message': 'Pain severity input stored successfully'})
             
             # Add other behavior if added / existed
             # For now, this is default

@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, Button } from "react-native";
 import Slider from "@react-native-community/slider"; // Mobile slider
 import ReactSlider from "react-slider"; // Web slider
+import axios from "axios";
 import { useDevice } from "@/utils/hooks/useDevice";
 import reactSliderStyles from "../../styles/DexNavigationPagesStyles/PainScaleSlider.module.css";
 
@@ -26,6 +27,26 @@ const PainScaleSlider: React.FC<PainScaleSliderProps> = ({
     return "#CE5476"; // Red for high pain
   };
 
+  const handleSubmitPainSeverity = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/auth/store_user_input",
+        {
+            userInput: painScale,
+            inputType: "painSeverity",
+        }
+      );
+      if (response.status === 200) {
+        console.log("Pain severity submitted successfully:", painScale);
+        onSubmit(); 
+      } else {
+        console.error("Error submitting pain severity:", response.data);
+      }
+    } catch (error) {
+      console.error("Error sending pain severity:", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.sliderWrapper}>
@@ -40,7 +61,7 @@ const PainScaleSlider: React.FC<PainScaleSliderProps> = ({
 
           {isDesktop ? (
             <ReactSlider
-              className={reactSliderStyles.reactlider}
+              className={reactSliderStyles.reactSlider}
               thumbClassName={reactSliderStyles.reactSliderThumb}
               trackClassName={reactSliderStyles.reactSliderTrack}
               min={0}
@@ -105,7 +126,11 @@ const PainScaleSlider: React.FC<PainScaleSliderProps> = ({
           <Text style={styles.labelVerySevere}>very severe</Text>
         </View>
 
-        <Button title="Select severity" onPress={onSubmit} color="#3182F6" />
+        <Button
+          title="Select severity"
+          onPress={handleSubmitPainSeverity}
+          color="#3182F6"
+        />
       </View>
     </View>
   );
@@ -145,7 +170,7 @@ const styles = StyleSheet.create({
   },
   painScaleText: {
     position: "absolute",
-    top: -23,
+    top: -22,
     fontSize: 23,
     fontFamily: "SF Pro",
     fontWeight: "510",

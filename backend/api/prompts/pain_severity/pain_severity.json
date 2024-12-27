@@ -48,7 +48,9 @@
   "options": [
     {
       "text": "SCALE_SLIDER",
+      "inputType": "painSeverity",
       "next": "suitable_claim_type"
     }
   ]
 }
+

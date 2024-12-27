@@ -301,21 +301,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
             renderElement(element, index)
           )}
 
-          {/* Check if the current bubble has SCALE_SLIDER */}
-        {/* {isLastBubble &&
-          chatHistory[chatIndex].options.some(
-            (option) => option.text === "SCALE_SLIDER"
-          ) && (
-            <PainScaleSlider
-              painScale={painScale}
-              setPainScale={setPainScale}
-              onSubmit={() => {
-                console.log("Pain Scale submitted:", painScale);
-                onOptionSelect("pain_severity", false); // Replace with the next step
-              }}
-            />
-          )} */}
-
           {/* TODO: Diplay different container if isHealthLoading and isHealthSuccessful
               ISSUE: it displays .json from beginning, I think its bc I am using useQuery in usePatientHealth.
           */}
@@ -364,7 +349,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
                   // return null;
                   return (
                     <PainScaleSlider
-                      painScale={painScale} // Maintain this state in ChatRenderer
+                      painScale={painScale} 
                       setPainScale={setPainScale}
                       onSubmit={() => {
                         console.log("Pain Scale submitted:", painScale);
