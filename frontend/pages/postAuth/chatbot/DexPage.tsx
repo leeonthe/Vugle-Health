@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, ActivityIndicator, Text, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  ActivityIndicator,
+  Text,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
 import { useChat } from "../../../utils/hooks/useChat";
 import ChatRenderer from "./ChatRenderer";
 import { ChatBubble } from "../../../utils/interfaces/promptTypes";
@@ -9,17 +15,25 @@ const DexPage: React.FC = () => {
   const { useFetchPrompt, useSendSelection } = useChat();
   const [currentStep, setCurrentStep] = useState<string>("start");
   const [chatHistory, setChatHistory] = useState<ChatBubble[]>([]);
-  const [loadingState, setLoadingState] = useState({ showLoading: false, showSuccess: false });
+  const [loadingState, setLoadingState] = useState({
+    showLoading: false,
+    showSuccess: false,
+  });
 
-  const { data: promptData, isLoading: isPromptLoading, error: isPromptError } = useFetchPrompt(currentStep);
+  const {
+    data: promptData,
+    isLoading: isPromptLoading,
+    error: isPromptError,
+  } = useFetchPrompt(currentStep);
   const mutation = useSendSelection();
 
   // Fetch patient health data
   const { data: disabilityData } = useDisabilityRating();
   const icn = disabilityData?.disability_rating?.data?.id;
-  const { isLoading: isHealthLoading, isSuccess: isHealthSuccess } = usePatientHealth(icn || "");
+  const { isLoading: isHealthLoading, isSuccess: isHealthSuccess } =
+    usePatientHealth(icn || "");
 
-  // Add prompt data to chatHistory when fetched
+  // Add prompt data to chatHistory when fetcheda
   useEffect(() => {
     if (promptData) {
       const isAlreadyAdded = chatHistory.some(
@@ -47,11 +61,29 @@ const DexPage: React.FC = () => {
     }
   }, [isHealthSuccess]);
 
-  const handleOptionSelect = (nextStep: string, isAutomatic: boolean) => {
-    console.log("Option selected:", nextStep, "IsAutomatic:", isAutomatic);
+  const handleOptionSelect = (
+    nextStep: string,
+    isAutomatic: boolean,
+    userResponse?: string
+  ) => {
+    console.log("Option selected:", nextStep, "User Response:", userResponse);
+
+    // Append user response to chatHistory
+    if (userResponse) {
+      setChatHistory((prevHistory) => [
+        ...prevHistory,
+        {
+          chat_bubbles_id: -1, // Use a placeholder value for user responses
+          chat_bubbles: [], // No chatbot bubbles, aka prompts for user response
+          options_id: -1, // Use a placeholder value for user responses
+          options: [], // No options for user response
+          userResponse,
+        },
+      ]);
+    }
 
     if (isAutomatic) {
-      setCurrentStep(nextStep); // Navigate directly if automatic
+      setCurrentStep(nextStep); // Navigate directly if automatic TOOD: Delete isAutomatic, if I can resolve NONE options 
     } else {
       mutation.mutate(
         { currentFile: currentStep, userSelection: nextStep }, // Pass current file and next step
@@ -95,7 +127,6 @@ const DexPage: React.FC = () => {
     </ScrollView>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {

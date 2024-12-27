@@ -33,10 +33,9 @@ const PotentialConditionsPage = ({ route }) => {
     }
 
     if (onReturn) {
-      onReturn(addedConditions);
+      const formattedConditions = addedConditions.join(", ");
+      onReturn(formattedConditions);
     }
-
-    // onContinueToChatbot("pain_duration");
     navigation.goBack();
   };
 

@@ -24,23 +24,14 @@ import PainScaleSlider from "@/components/common/PainScalesSlider";
 // TODO:
 //      + Diplay different container if isHealthLoading and isHealthSuccessful
 //      + Display Keyboard when TextInput is focused
-// ISSUE: it displays .json from beginning
-// I think its bc I am using useQuery in usePatientHealth.
-// ISSUE: issue where the styles.container is not applied to the entire screen and the ScrollView content seems divided into sections
-// This is bc container styling is only applied in const renderChatBubble.
 
-interface ChatProps extends ChatBubble {
-  chatHistory: {
-    chat_bubbles: {
-      container: {
-        type: string;
-        content: string;
-        style?: Record<string, any>;
-      }[];
-    }[];
-    options: { text: string; inputType?: string; next: string }[];
-  }[];
-  onOptionSelect: (nextStep: string, isAutomatic: boolean) => void;
+interface ChatProps {
+  chatHistory: ChatBubble[];
+  onOptionSelect: (
+    nextStep: string,
+    isAutomatic: boolean,
+    userResponse?: string
+  ) => void;
   isHealthLoading: boolean;
   isHealthSuccess: boolean;
 }
@@ -51,7 +42,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
   isHealthLoading,
   isHealthSuccess,
 }) => {
-  const [inputValue, setInputValue] = useState("");
+  const [userInput, setUserInput] = React.useState<string>("");
 
   const [painScale, setPainScale] = useState<number>(0);
   const isKeyboardVisible = useKeyboardStatus();
@@ -75,7 +66,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
             const formData = new FormData();
             formData.append("file", file);
 
-            onOptionSelect("choose_your_claim", false);
+            onOptionSelect("choose_your_claim", false, file.name);
 
             // try {
             //   // Send POST request to backend
@@ -115,7 +106,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
           //   type: file.mimeType,
           // });
 
-          onOptionSelect("choose_your_claim", false);
+          onOptionSelect("choose_your_claim", false, fileName);
 
           // try {
           //   // Send POST request to backend
@@ -152,7 +143,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
 
       if (response.status === 200) {
         console.log("Response from backend:", response.data);
-        onOptionSelect("other_condition", false); // Trigger next step
+        onOptionSelect("other_condition", false, typedText); // Trigger next step
       } else {
         console.error("Unexpected response from backend:", response);
       }
@@ -173,7 +164,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
       );
       if (response.status === 200) {
         console.log("Pain duration input saved:", response.data);
-        onOptionSelect("pain_severity", false);
+        onOptionSelect("pain_severity", false, typedText);
       } else {
         console.error("Unexpected response from backend:", response);
       }
@@ -201,9 +192,9 @@ const ChatRenderer: React.FC<ChatProps> = ({
 
     navigation.navigate("PotentialConditionsPage", {
       potentialConditions,
-      onReturn: (selectedConditions) => {
-        console.log("Selected conditions:", selectedConditions);
-        onOptionSelect("pain_duration", false);
+      onReturn: (formattedConditions) => {
+        console.log("Selected conditions:", formattedConditions);
+        onOptionSelect("pain_duration", false, formattedConditions); //TODO
       },
     });
   };
@@ -309,13 +300,16 @@ const ChatRenderer: React.FC<ChatProps> = ({
               {chatHistory[chatIndex].options.map((option, idx) => {
                 if (option.text === "NONE" && isHealthSuccess) {
                   return isHealthLoading ? (
-                    <ActivityIndicator key={`loading-${idx}`} size="large" color="#3182F6" />
+                    <ActivityIndicator
+                      key={`loading-${idx}`}
+                      size="large"
+                      color="#3182F6"
+                    />
                   ) : (
                     <CheckMark key={`success-${idx}`} />
                   );
                 }
-                
-          
+
                 if (option.text === "TYPE") {
                   if (option.inputType === "conditionType") {
                     return (
@@ -352,11 +346,11 @@ const ChatRenderer: React.FC<ChatProps> = ({
                   // return null;
                   return (
                     <PainScaleSlider
-                      painScale={painScale} 
+                      painScale={painScale}
                       setPainScale={setPainScale}
                       onSubmit={() => {
                         console.log("Pain Scale submitted:", painScale);
-                        onOptionSelect(option.next, false);
+                        onOptionSelect(option.next, false, `${painScale}`);
                       }}
                     />
                   );
@@ -370,7 +364,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
                       if (option.text === "Upload DD214") {
                         handleFileUpload();
                       } else {
-                        onOptionSelect(option.next, false);
+                        onOptionSelect(option.next, false, option.text);
                       }
                     }}
                     style={styles.optionButton}
@@ -389,20 +383,29 @@ const ChatRenderer: React.FC<ChatProps> = ({
   const renderChatHistory = () => {
     return chatHistory.map((chat, chatIndex) => (
       <View key={`chat-${chatIndex}`}>
+        {/* Render chatbot prompt */}
         {chat.chat_bubbles.map((bubble, bubbleIndex) =>
           renderChatBubble(bubble, bubbleIndex, chatIndex)
+        )}
+        {/* Render User's Response */}
+        {chat.userResponse && (
+          <View style={styles.chatContainer}>
+            <Animatable.View
+              animation="fadeIn"
+              duration={1000}
+              style={[styles.messageContainer, styles.userMessage]}
+            >
+              <View key={`user-response-${chatIndex}`}>
+                <Text style={[styles.userText]}>{chat.userResponse}</Text>
+              </View>
+            </Animatable.View>
+          </View>
         )}
       </View>
     ));
   };
 
   return <View>{renderChatHistory()}</View>;
-
-  // return (
-  //   <View>
-  //     {chatHistory.map((bubble, index) => renderChatBubble(bubble, index))}
-  //   </View>
-  // );
 };
 
 const styles = StyleSheet.create({
@@ -504,6 +507,13 @@ const styles = StyleSheet.create({
     color: "#323D4C",
     fontSize: 16,
     height: 40,
+  },
+  userMessage: {
+    alignSelf: "flex-end",
+    backgroundColor: "#3182F6",
+  },
+  userText: {
+    color: "#ffffff",
   },
 });
 

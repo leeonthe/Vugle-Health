@@ -6,7 +6,7 @@ export const useChat = () => {
   const backendUrl = "http://localhost:8000/api/auth/prompt/";
 
   const fetchPrompt = async (fileName: string): Promise<ChatBubble> => {
-    console.log(`Fetching: ${backendUrl}${fileName}/`); // Debugging log
+    console.log(`Fetching: ${backendUrl}${fileName}/`);
     const response = await fetch(`${backendUrl}${fileName}/`); // fileName includes subfolders
     if (!response.ok) {
       throw new Error(`Error fetching prompt: ${response.statusText}`);
@@ -34,7 +34,7 @@ export const useChat = () => {
     useQuery({
       queryKey: ["prompt", fileName],
       queryFn: () => fetchPrompt(fileName),
-      staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+      staleTime: 1000 * 60 * 5, 
       refetchOnWindowFocus: false,
     });
 

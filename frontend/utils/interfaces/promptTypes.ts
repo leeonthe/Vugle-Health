@@ -25,4 +25,5 @@ export interface ChatBubble {
   options_id: number;
   options: { text: string; inputType?: string, next: string }[]; 
   next?: string;
+  userResponse?: string;
 }
