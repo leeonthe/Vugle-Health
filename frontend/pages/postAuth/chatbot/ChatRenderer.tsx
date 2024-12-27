@@ -75,7 +75,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
             const formData = new FormData();
             formData.append("file", file);
 
-            onOptionSelect("choose_your_claim", true);
+            onOptionSelect("choose_your_claim", false);
 
             // try {
             //   // Send POST request to backend
@@ -115,7 +115,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
           //   type: file.mimeType,
           // });
 
-          onOptionSelect("choose_your_claim", true);
+          onOptionSelect("choose_your_claim", false);
 
           // try {
           //   // Send POST request to backend
