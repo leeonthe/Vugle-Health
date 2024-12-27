@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -307,12 +307,15 @@ const ChatRenderer: React.FC<ChatProps> = ({
           {isLastBubble && chatHistory[chatIndex].options && (
             <View style={styles.optionsContainer}>
               {chatHistory[chatIndex].options.map((option, idx) => {
-                if (option.text === "NONE") {
-                  if (isHealthSuccess) {
-                    setTimeout(() => onOptionSelect(option.next, true), 0);
-                  }
+                if (option.text === "NONE" && isHealthSuccess) {
+                  return isHealthLoading ? (
+                    <ActivityIndicator key={`loading-${idx}`} size="large" color="#3182F6" />
+                  ) : (
+                    <CheckMark key={`success-${idx}`} />
+                  );
                 }
-
+                
+          
                 if (option.text === "TYPE") {
                   if (option.inputType === "conditionType") {
                     return (

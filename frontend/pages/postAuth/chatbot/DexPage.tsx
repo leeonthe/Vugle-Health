@@ -5,26 +5,19 @@ import ChatRenderer from "./ChatRenderer";
 import { ChatBubble } from "../../../utils/interfaces/promptTypes";
 import { useDisabilityRating } from "../../../utils/hooks/useDisabilityRating";
 import { usePatientHealth } from "../../../utils/hooks/usePatientHealth";
-
 const DexPage: React.FC = () => {
   const { useFetchPrompt, useSendSelection } = useChat();
   const [currentStep, setCurrentStep] = useState<string>("start");
   const [chatHistory, setChatHistory] = useState<ChatBubble[]>([]);
+  const [loadingState, setLoadingState] = useState({ showLoading: false, showSuccess: false });
 
   const { data: promptData, isLoading: isPromptLoading, error: isPromptError } = useFetchPrompt(currentStep);
   const mutation = useSendSelection();
 
-  // THIS IS FOR START.JSON
-  // const { data: disabilityData, isLoading: isDisabilityLoading } = useDisabilityRating();
-  // const icn = disabilityData?.disability_rating?.data?.id;
-  // const { isLoading: isHealthLoading, isSuccess: isHealthSuccess } = usePatientHealth(icn || "");
-  // const [shouldTransition, setShouldTransition] = useState(false);
-  // useEffect(() => {
-  //   if (isHealthSuccess) {
-  //     const timer = setTimeout(() => setShouldTransition(true), 5000);
-  //     return () => clearTimeout(timer); // Clean up the timer
-  //   }
-  // }, [isHealthSuccess]);
+  // Fetch patient health data
+  const { data: disabilityData } = useDisabilityRating();
+  const icn = disabilityData?.disability_rating?.data?.id;
+  const { isLoading: isHealthLoading, isSuccess: isHealthSuccess } = usePatientHealth(icn || "");
 
   // Add prompt data to chatHistory when fetched
   useEffect(() => {
@@ -32,21 +25,34 @@ const DexPage: React.FC = () => {
       const isAlreadyAdded = chatHistory.some(
         (chat) => chat.chat_bubbles_id === promptData.chat_bubbles_id
       );
-  
+
       if (!isAlreadyAdded) {
         console.log("Adding to chatHistory:", promptData);
         setChatHistory((prevHistory) => [...prevHistory, promptData]);
       }
     }
-  }, [promptData]); // Only update when `promptData` changes
+  }, [promptData]);
+
+  // Transition from loading to success
+  useEffect(() => {
+    if (isHealthSuccess) {
+      setLoadingState({ showLoading: true, showSuccess: false });
+
+      const timeout = setTimeout(() => {
+        setLoadingState({ showLoading: false, showSuccess: true });
+        handleOptionSelect("upload_dd214", true); // Automatically navigate after success
+      }, 10000);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [isHealthSuccess]);
 
   const handleOptionSelect = (nextStep: string, isAutomatic: boolean) => {
     console.log("Option selected:", nextStep, "IsAutomatic:", isAutomatic);
 
     if (isAutomatic) {
       setCurrentStep(nextStep); // Navigate directly if automatic
-    } 
-    else {
+    } else {
       mutation.mutate(
         { currentFile: currentStep, userSelection: nextStep }, // Pass current file and next step
         {
@@ -66,7 +72,6 @@ const DexPage: React.FC = () => {
     }
   };
 
-
   if (isPromptLoading) {
     return <ActivityIndicator size="large" color="#3182F6" />;
   }
@@ -80,16 +85,17 @@ const DexPage: React.FC = () => {
       <View>
         {chatHistory.length > 0 && (
           <ChatRenderer
-            chatHistory={chatHistory} // Pass full chat history
-            onOptionSelect={handleOptionSelect} // Handle option selection
-            isHealthLoading={false} //TODO
-            isHealthSuccess={false} //TODO
+            chatHistory={chatHistory}
+            onOptionSelect={handleOptionSelect}
+            isHealthLoading={loadingState.showLoading}
+            isHealthSuccess={loadingState.showSuccess}
           />
         )}
       </View>
     </ScrollView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
