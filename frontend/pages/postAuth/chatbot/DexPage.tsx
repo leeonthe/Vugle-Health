@@ -133,6 +133,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: "#ffffff",
     padding: 16,
+    paddingTop: 40,
   },
 });
 

@@ -215,7 +215,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
         );
       case "image":
         return (
-          <View key={`image-${index}`} style={styles.logoContainer}>
+          <View key={`image-${index}`} style={styles.logoBackground}>
             <Logo style={styles.logo} />
           </View>
         );
@@ -380,6 +380,21 @@ const ChatRenderer: React.FC<ChatProps> = ({
     );
   };
 
+  const renderUserResponse = (userResponse: string, chatIndex: number) => (
+    <View style={styles.chatContainer}>
+      <Animatable.View
+        animation="fadeIn"
+        duration={1000}
+        style={[styles.messageContainer, styles.userMessage]}
+      >
+        <View key={`user-response-${chatIndex}`}>
+          <Text style={[styles.userText]}>{userResponse}</Text>
+        </View>
+      </Animatable.View>
+    </View>
+  );
+  
+
   const renderChatHistory = () => {
     return chatHistory.map((chat, chatIndex) => (
       <View key={`chat-${chatIndex}`}>
@@ -388,22 +403,11 @@ const ChatRenderer: React.FC<ChatProps> = ({
           renderChatBubble(bubble, bubbleIndex, chatIndex)
         )}
         {/* Render User's Response */}
-        {chat.userResponse && (
-          <View style={styles.chatContainer}>
-            <Animatable.View
-              animation="fadeIn"
-              duration={1000}
-              style={[styles.messageContainer, styles.userMessage]}
-            >
-              <View key={`user-response-${chatIndex}`}>
-                <Text style={[styles.userText]}>{chat.userResponse}</Text>
-              </View>
-            </Animatable.View>
-          </View>
-        )}
+        {chat.userResponse && renderUserResponse(chat.userResponse, chatIndex)}
       </View>
     ));
   };
+  
 
   return <View>{renderChatHistory()}</View>;
 };
@@ -417,9 +421,9 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   logoContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 12,
+    flexDirection: 'column',
+      alignItems: 'flex-start',
+      marginBottom: 2,
   },
   logoBackground: {
     width: 36,
@@ -439,7 +443,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5F6F8",
     borderRadius: 16,
     alignItems: "flex-start",
-    marginBottom: 8,
+    marginBottom: 2,
     maxWidth: "90%",
     width: "auto",
   },

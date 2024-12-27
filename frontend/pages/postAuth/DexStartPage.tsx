@@ -121,7 +121,7 @@ const DexStartPage: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
       flexGrow: 1,
-      backgroundColor: 'white',
+      backgroundColor: '#ffffff',
       padding: 16,
     } as ViewStyle, 
     back: {
