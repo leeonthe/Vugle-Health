@@ -1,0 +1,26 @@
+.react-slider {
+    height: 40px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .react-slider-thumb {
+    height: 20px;
+    width: 20px;
+    background-color: #3182F6;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    top: -12px; /* Center the thumb */
+  }
+  
+  .react-slider-track {
+    height: 4px;
+    background: transparent;
+    cursor: pointer;
+  }
+  
+  .react-slider:hover .react-slider-thumb {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  }
+  

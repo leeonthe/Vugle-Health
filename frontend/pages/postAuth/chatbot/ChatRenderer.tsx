@@ -19,6 +19,7 @@ import { useKeyboardStatus } from "@/utils/hooks/useKeyboardStatus";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import TypeInput from "@/components/common/TypeInput";
+import PainScaleSlider from "@/components/common/PainScalesSlider";
 
 // TODO:
 //      + Diplay different container if isHealthLoading and isHealthSuccessful
@@ -51,6 +52,8 @@ const ChatRenderer: React.FC<ChatProps> = ({
   isHealthSuccess,
 }) => {
   const [inputValue, setInputValue] = useState("");
+
+  const [painScale, setPainScale] = useState<number>(0);
   const isKeyboardVisible = useKeyboardStatus();
 
   const { isDesktop } = useDevice();
@@ -298,6 +301,21 @@ const ChatRenderer: React.FC<ChatProps> = ({
             renderElement(element, index)
           )}
 
+          {/* Check if the current bubble has SCALE_SLIDER */}
+        {/* {isLastBubble &&
+          chatHistory[chatIndex].options.some(
+            (option) => option.text === "SCALE_SLIDER"
+          ) && (
+            <PainScaleSlider
+              painScale={painScale}
+              setPainScale={setPainScale}
+              onSubmit={() => {
+                console.log("Pain Scale submitted:", painScale);
+                onOptionSelect("pain_severity", false); // Replace with the next step
+              }}
+            />
+          )} */}
+
           {/* TODO: Diplay different container if isHealthLoading and isHealthSuccessful
               ISSUE: it displays .json from beginning, I think its bc I am using useQuery in usePatientHealth.
           */}
@@ -339,6 +357,20 @@ const ChatRenderer: React.FC<ChatProps> = ({
                     >
                       <Text style={styles.optionText}>{option.text}</Text>
                     </TouchableOpacity>
+                  );
+                }
+
+                if (option.text === "SCALE_SLIDER") {
+                  // return null;
+                  return (
+                    <PainScaleSlider
+                      painScale={painScale} // Maintain this state in ChatRenderer
+                      setPainScale={setPainScale}
+                      onSubmit={() => {
+                        console.log("Pain Scale submitted:", painScale);
+                        onOptionSelect(option.next, false);
+                      }}
+                    />
                   );
                 }
 
