@@ -17,10 +17,12 @@ export interface Container {
   container: Element[];
 }
 
+// inputType is optional since its only in .json that has "text": "TYPE"
+// --> This is to differentiate TYPE options in prompt that requires user's text input. 
 export interface ChatBubble {
   chat_bubbles_id: number;
   chat_bubbles: Container[];
   options_id: number;
-  options: { text: string; next: string }[];
+  options: { text: string; inputType?: string, next: string }[]; 
   next?: string;
 }

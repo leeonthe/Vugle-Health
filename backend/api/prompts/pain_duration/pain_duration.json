@@ -65,6 +65,7 @@
   "options": [
     {
       "text": "TYPE",
+      "inputType": "painDuration",
       "next": "pain_severity"
     }
   ]

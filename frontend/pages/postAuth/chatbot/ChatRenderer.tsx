@@ -18,6 +18,7 @@ import { useDevice } from "@/utils/hooks/useDevice";
 import { useKeyboardStatus } from "@/utils/hooks/useKeyboardStatus";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
+import TypeInput from "@/components/common/TypeInput";
 
 // TODO:
 //      + Diplay different container if isHealthLoading and isHealthSuccessful
@@ -36,7 +37,7 @@ interface ChatProps extends ChatBubble {
         style?: Record<string, any>;
       }[];
     }[];
-    options: { text: string; next: string }[];
+    options: { text: string; inputType?: string; next: string }[];
   }[];
   onOptionSelect: (nextStep: string, isAutomatic: boolean) => void;
   isHealthLoading: boolean;
@@ -49,13 +50,11 @@ const ChatRenderer: React.FC<ChatProps> = ({
   isHealthLoading,
   isHealthSuccess,
 }) => {
-
   const [inputValue, setInputValue] = useState("");
   const isKeyboardVisible = useKeyboardStatus();
-  
+
   const { isDesktop } = useDevice();
   const navigation = useNavigation();
-
 
   const handleFileUpload = async () => {
     try {
@@ -138,11 +137,14 @@ const ChatRenderer: React.FC<ChatProps> = ({
     }
   };
 
-  const handleConditionType = async (tpyedText: string) => {
+  const handleConditionType = async (typedText: string) => {
     try {
       const response = await axios.post(
         "http://localhost:8000/api/auth/store_user_input",
-        { userInput: tpyedText }
+        {
+          userInput: typedText,
+          inputType: "conditionType",
+        }
       );
 
       if (response.status === 200) {
@@ -154,6 +156,26 @@ const ChatRenderer: React.FC<ChatProps> = ({
       // onOptionSelect("other_condition", false);
     } catch (error) {
       console.error("ERROR SENDING USER TYPE TO BACKEND", error);
+    }
+  };
+
+  const handlePainDuration = async (typedText: string) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/auth/store_user_input",
+        {
+          userInput: typedText,
+          inputType: "painDuration",
+        }
+      );
+      if (response.status === 200) {
+        console.log("Pain duration input saved:", response.data);
+        onOptionSelect("pain_severity", false);
+      } else {
+        console.error("Unexpected response from backend:", response);
+      }
+    } catch (error) {
+      console.error("Error sending pain duration input to backend:", error);
     }
   };
 
@@ -178,8 +200,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
       potentialConditions,
       onReturn: (selectedConditions) => {
         console.log("Selected conditions:", selectedConditions);
-       onOptionSelect("pain_duration", false);
-
+        onOptionSelect("pain_duration", false);
       },
     });
   };
@@ -281,10 +302,8 @@ const ChatRenderer: React.FC<ChatProps> = ({
               ISSUE: it displays .json from beginning, I think its bc I am using useQuery in usePatientHealth.
           */}
           {isLastBubble && chatHistory[chatIndex].options && (
-
             <View style={styles.optionsContainer}>
               {chatHistory[chatIndex].options.map((option, idx) => {
-
                 if (option.text === "NONE") {
                   if (isHealthSuccess) {
                     setTimeout(() => onOptionSelect(option.next, true), 0);
@@ -292,27 +311,23 @@ const ChatRenderer: React.FC<ChatProps> = ({
                 }
 
                 if (option.text === "TYPE") {
-                  return (
-                    <SafeAreaView style={styles.typeBoxContainer}>
-                      <TextInput
-                        autoFocus={true}
-                        style={[
-                          styles.typeBox,
-                          isKeyboardVisible ? styles.typeBoxFocused : null,
-                        ]}
+                  if (option.inputType === "conditionType") {
+                    return (
+                      <TypeInput
                         placeholder="e.g. severe lower back pain"
-                        placeholderTextColor="#A0A4A8"
-                        value={inputValue}
-                        onChangeText={setInputValue}
-                        onSubmitEditing={() => handleConditionType(inputValue)}
+                        handleSubmit={handleConditionType}
                       />
-                      <Text style={styles.status}>
-                        {isKeyboardVisible
-                          ? "Keyboard is vissdible"
-                          : "Keyboard is hidssden"}
-                      </Text>
-                    </SafeAreaView>
-                  );
+                    );
+                  }
+
+                  if (option.inputType === "painDuration") {
+                    return (
+                      <TypeInput
+                        placeholder="e.g. about 3 months"
+                        handleSubmit={handlePainDuration}
+                      />
+                    );
+                  }
                 }
 
                 if (option.text === "Let's check") {
@@ -326,7 +341,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
                     </TouchableOpacity>
                   );
                 }
-
 
                 // Render other options as buttons
                 return (
@@ -352,8 +366,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
     );
   };
 
-  
-
   const renderChatHistory = () => {
     return chatHistory.map((chat, chatIndex) => (
       <View key={`chat-${chatIndex}`}>
@@ -366,13 +378,11 @@ const ChatRenderer: React.FC<ChatProps> = ({
 
   return <View>{renderChatHistory()}</View>;
 
-
   // return (
   //   <View>
   //     {chatHistory.map((bubble, index) => renderChatBubble(bubble, index))}
   //   </View>
   // );
-
 };
 
 const styles = StyleSheet.create({

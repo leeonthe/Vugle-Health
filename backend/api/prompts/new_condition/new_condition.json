@@ -48,6 +48,7 @@
   "options": [
     {
       "text": "TYPE",
+      "inputType": "conditionType",
       "next": "other_condition"
     }
   ]

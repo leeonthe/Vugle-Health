@@ -36,7 +36,6 @@ import time
 import uuid
 import traceback
 
-# 
 class OAuthHandler:
     def __init__(self):
         self.client_id = config('VA_CLIENT_ID')
@@ -66,8 +65,6 @@ class OAuthHandler:
 
     def oauth_login(self, request):
         """Redirect to VA.gov authorization URL."""
-        # state = self.generate_state()
-        # state = str(uuid.uuid4())
         platform = request.GET.get('platform', 'web')
         nonce = self.generate_nonce()
         state = f"{self.generate_state()}|{platform}"
@@ -78,9 +75,6 @@ class OAuthHandler:
         request.session['platform'] = platform
         request.session.save()
 
-
-        # print("PLATFORM STORED IN SESSION:", platform)
-        # print("SESSION DATA AFTER LOGIN:", request.session.items())
         params = {
             'client_id': self.client_id,
             'redirect_uri': self.redirect_uri,
@@ -90,22 +84,15 @@ class OAuthHandler:
             'nonce': nonce,
         }
         oauth_url = f"{self.authorization_url}?{urlencode(params)}"
-
-        print(f"Generated OAuth Request URL: {oauth_url}")  # Print the OAuth URL
         return redirect(f"{self.authorization_url}?{urlencode(params)}")
 
     def oauth_callback(self, request):
-        print("INCOMING COOKIES:", request.COOKIES)
         """Handle the callback and exchange the code for tokens."""
         code = request.GET.get('code')
         state = request.GET.get('state', '')
 
         state_parts = state.split('|')
         platform = state_parts[1] if len(state_parts) > 1 else None
-
-        # print("PLATFORM RETRIEVED FROM SESSION:", platform)
-        # print("SESSION DATA DURING CALLBACK:", request.session.items())
-        # print("PLATFORM IS ", platform)
 
         saved_state = request.session.get('oauth_state')
         saved_nonce = request.session.get('oauth_nonce')
@@ -156,9 +143,6 @@ class OAuthHandler:
                 options={"require": ["exp", "nonce"]},
             )
 
-            print("Decoded ID Token Payload:", payload)
-
-            
             # Extract name components
             full_name = payload.get("name", "")
             given_name, family_name = (full_name.split(" ", 1) + [None])[:2]  # Split into first and last names
@@ -173,9 +157,6 @@ class OAuthHandler:
                 "given_name": given_name,
                 "family_name": family_name,
             }
-
-            print("User info stored in session:", request.session['user_info'])
-
 
         except InvalidTokenError as e:
             print(f"Token validation error: {e}")
@@ -241,7 +222,6 @@ class UserInfoView(View):
 
             # Decode token to inspect claims
             unverified_payload = jwt.decode(token, options={"verify_signature": False})
-            print("Unverified Token Payload:", unverified_payload)
             expected_audience = unverified_payload.get("aud")
             
             # Validate the token
@@ -251,7 +231,6 @@ class UserInfoView(View):
                 algorithms=["RS256"],
                 audience=expected_audience,  
             )
-            print("Decoded ID Token Payload:", payload)
 
             # Extract user information
             name = payload.get("name", "")  
@@ -265,9 +244,9 @@ class UserInfoView(View):
                 "given_name": given_name,
                 "family_name": family_name,
             }
-            print("Extracted User Info:", user_info)
 
             return user_info
+
         except (InvalidTokenError, Exception) as e:
             print(f"Token validation error: {e}")
             return None
@@ -279,7 +258,6 @@ class DisabilityRatingView(View):
     API endpoint to fetch a Veteran's disability rating.
     Handles both web and mobile clients.
     """
-
     def get(self, request, *args, **kwargs):
         # Check for token in Authorization header (mobile clients)
         auth_header = request.headers.get("Authorization")
@@ -292,7 +270,6 @@ class DisabilityRatingView(View):
         if not access_token:
             return JsonResponse({"error": "Access token missing or invalid."}, status=401)
 
-        # api_url = "https://sandbox-api.va.gov/services/veteran_verification/v2/disability_rating"
         api_url = config('VA_DISABILITY_RATING_API_URL')
         headers = {
             "Authorization": f"Bearer {access_token}",
@@ -301,7 +278,6 @@ class DisabilityRatingView(View):
 
         try:
             response = requests.get(api_url, headers=headers)
-
             if response.status_code == 200:
                 data = response.json()
                 print("DISABILITY RATING DATA: ", data)
@@ -315,23 +291,19 @@ class DisabilityRatingView(View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class EligibleLettersView(View):
-    # Sandbox token URL
     ELIGIBLE_LETTER_TOKEN_URL = config('ELA_ELIGIBLE_LETTER_TOKEN_URL')
     ELA_AUDIENCE_URL = config('ELA_AUDIENCE_URL')
     LETTERS_URL = config('VA_ELIGIBLE_LETTER_API_URL')
 
-    print("ELIGIBLE_LETTER_TOKEN_URL IS ", ELIGIBLE_LETTER_TOKEN_URL)
-    print("ELA_AUDIENCE_URL IS ", ELA_AUDIENCE_URL)
     def get(self, request):
         ELA_icn = request.GET.get("icn", None)
         if not ELA_icn:
             return JsonResponse({"error": "ICN is required"}, status=400)
 
         try:
-            print("TRY CALLED: ")
             # Step 1: Generate JWT client assertion
             jwt_token = self._ela_generate_jwt()
-            print("GENERATED JWT TOKEN FROM _ela_generate_jwt: ", jwt_token)
+            
             # Step 2: Retrieve access token
             access_token = self._get_ela_access_token(jwt_token)
             if not access_token:
@@ -354,15 +326,11 @@ class EligibleLettersView(View):
         except Exception as e:
             return JsonResponse({"error": "Server error", "details": str(e)}, status=500)
 
-            # return JsonResponse({"error": str(e)}, status=500)
-
     def _ela_generate_jwt(self):
         private_key_path = config("ELA_PRIVATE_KEY_PATH")
-        print("PRIVATE.PEM: ", private_key_path)
-        # private_key_path = Path(__file__).resolve().parent.parent.parent / 'private.pem'
         client_id = config("ELA_JWT_CLIENT_ID")
         audience = self.ELA_AUDIENCE_URL
-        print("AUDIENCE: ", audience)
+
         # Load the private key
         with open(private_key_path, 'r') as key_file:
             private_key = key_file.read()
@@ -382,7 +350,6 @@ class EligibleLettersView(View):
 
         # Generate and sign the JWT
         signed_jwt = jwt.encode(claims, private_key, algorithm="RS256")
-        print("Generated JWT: ", signed_jwt)
 
         # TODO: Decode jwt token?
         return signed_jwt
@@ -505,10 +472,6 @@ class PatientHealthView(View):
             return None
 
 
-
-
-
-
 PROMPTS_DIR = os.path.join(os.path.dirname(__file__), "prompts")
 @method_decorator(csrf_exempt, name='dispatch') 
 class ChatPromptView(APIView):
@@ -606,16 +569,36 @@ class StoreUserInputView(View):
         try:
             data = request.POST or json.loads(request.body)
             typed_text = data.get('userInput', '').strip()
+            # to handle handleConditionType & hanldePainDuration by determining inputType which is provided it in .json file
+            input_type = data.get('inputType', '').strip()  
 
             if not typed_text:
                 return JsonResponse({'success': False, 'message': 'No input provided'}, status=400)
 
-            # Save user typed text in session
-            request.session['userTypedText'] = typed_text
-            # TESTING
-            print(f"User input stored in session: {typed_text}")
+            # For new_condition.json
+            if input_type == "conditionType":
+                if 'user_medical_condition_response' not in request.session:
+                    request.session['user_medical_condition_response'] = []
+                request.session['user_medical_condition_response'].append(typed_text)
+                request.session.modified = True
+                print(f"Condition input stored: {typed_text}")
+                return JsonResponse({'success': True, 'message': 'Condition input stored successfully'})
 
-            return JsonResponse({'success': True, 'message': 'Input stored successfully'})
+            # For pain_duration.json
+            elif input_type == "painDuration":
+                request.session['user_pain_duration'] = typed_text
+                request.session.modified = True
+                print(f"Pain duration input stored: {typed_text}")
+                return JsonResponse({'success': True, 'message': 'Pain duration input stored successfully'})
+            
+            # Add other behavior if added / existed
+            # For now, this is default
+            else:
+                request.session['userTypedText'] = typed_text
+                request.session.modified = True
+                print(f"User input stored in session: {typed_text}")
+                return JsonResponse({'success': True, 'message': 'Input stored successfully'})
+
         except Exception as e:
             print(f"Error storing user input: {e}")
             return JsonResponse({'success': False, 'message': 'An error occurred'}, status=500)
