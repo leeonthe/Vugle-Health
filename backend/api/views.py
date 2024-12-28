@@ -7,7 +7,8 @@ from jwt.exceptions import InvalidTokenError
 
 from django.views import View
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
+# from django.views.decorators.csrf import csrf_exempt
+from vugle_health.middleware.decorators import csrf_exempt_if_mobile
 from django.contrib.sessions.models import Session
 
 from django.core.files.base import ContentFile
@@ -18,8 +19,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+
 from base64 import b64encode
 
+from .permissions import IsWebOrMobileClient
 from .parsingPDF import parse_dd214_text
 from .dex_analysis import generate_potential_conditions
 
@@ -35,10 +38,19 @@ import time
 import uuid
 import traceback
 
+# FOR WEB:
+    # Store data in session since web views use cookies and session storage by default.
+    # Use Django's built-in session management and CSRF protection to store user data in session
+        #  When an API endpoint needs to use previously stored data (e.g., user input), it retrieves it directly from the session (request.session).
+
+# FOR MOBILE:
+    # Pass required data explicitly in the request body or headers for every API call.
+    # This is because in mobile, it does not use cookies and CSRF is not provided.
+        # When the mobile app makes an API call, it includes previously fetched or generated data as part of the request.
+
 def get_csrf_token(request):
-    """Endpoint to expose CSRF token to the frontend."""
-    token = get_token(request)
-    return JsonResponse({'csrfToken': token})
+    """Expose CSRF token to frontend."""
+    return JsonResponse({'csrfToken': get_token(request)})
 
 class OAuthHandler:
     def __init__(self):
@@ -101,9 +113,6 @@ class OAuthHandler:
         saved_state = request.session.get('oauth_state')
         saved_nonce = request.session.get('oauth_nonce')
 
-        # if not code or not state or state != saved_state:
-        #     return redirect('/error')
-
         # Validate state
         if not code or not state or state_parts[0] != saved_state:
             print("State validation failed.")
@@ -130,7 +139,8 @@ class OAuthHandler:
         id_token = token_data.get('id_token')
         access_token = token_data.get('access_token')
         # TODO: Store access_token in session if needed -> This is for disability_rating fetching.
-        request.session['access_token'] = access_token
+        # NOTE: Commented out 131, so in disability_rating in views.py for web view cant get access_token from session.
+        # request.session['access_token'] = access_token
         # Validate the ID token
         try:
             signing_key = self.get_signing_key(id_token)
@@ -162,19 +172,36 @@ class OAuthHandler:
                 "family_name": family_name,
             }
 
+            if platform == 'mobile':
+                print("MOBILE CALLED")
+                # Generate a JWT for mobile clients
+                mobile_token = jwt.encode(
+                    {
+                        "sub": payload["sub"],
+                        "name": full_name,
+                        "exp": time.time() + 3600,  # Token expires in 1 hour
+                    },
+                    self.client_secret,
+                    algorithm="HS256",
+                )
+                # NOTE: change it to if needed: return JsonResponse({"access_token": mobile_token, "id_token": id_token})
+                return redirect(f'http://localhost:8081/Welcome?access_token={mobile_token}&id_token={id_token}')
+            else:
+                return redirect(f'http://localhost:8081/Welcome?access_token={access_token}&id_token={id_token}')
+            
         except InvalidTokenError as e:
             print(f"Token validation error: {e}")
             return redirect('/error')
         
-        if platform == 'web':
-        # Redirect web users directly
-            print("WEB CALLED")
-            # return redirect('http://localhost:8081/Welcome')
-            return redirect(f'http://localhost:8081/Welcome?access_token={access_token}&id_token={id_token}')
+        # if platform == 'web':
+        # # Redirect web users directly
+        #     print("WEB CALLED")
+        #     # return redirect('http://localhost:8081/Welcome')
+        #     return redirect(f'http://localhost:8081/Welcome?access_token={access_token}&id_token={id_token}')
 
-        else:
-            print("APP CALLED") 
-            return redirect(f'http://localhost:8081/Welcome?access_token={access_token}&id_token={id_token}')
+        # else:
+        #     print("APP CALLED") 
+        #     return redirect(f'http://localhost:8081/Welcome?access_token={access_token}&id_token={id_token}')
        
 
 
@@ -186,34 +213,29 @@ def oauth_callback(request):
     handler = OAuthHandler()
     return handler.oauth_callback(request)
 
- # Exempt CSRF for mobile clients
-@method_decorator(csrf_exempt, name='dispatch')
+# User info view updated with permissions
 class UserInfoView(View):
     """
     API endpoint to fetch authenticated user's profile info for both web and mobile views.
     """
+    permission_classes = [IsWebOrMobileClient]
     def get(self, request, *args, **kwargs):
         """
-        Handle GET requests to retrieve user information for both web and mobile clients.
+        Handle GET requests to retrieve user profile information for both web and mobile clients.
         """
-        # Check for token in the Authorization header (mobile clients)
-        auth_header = request.headers.get("Authorization")
-        if auth_header and auth_header.startswith("Bearer "):
-            token = auth_header.split(" ")[1]
-            user_info = self.validate_access_token(token)
-            if user_info:
-                print("Extracted User Info for Mobile:", user_info)
-                return JsonResponse({"user_info": user_info})
-            else:
-                return JsonResponse({"error": "Invalid or expired token"}, status=401)
-
-        # For web clients, check session data
-        user_info = request.session.get("user_info")
-        if not user_info:
-            return JsonResponse({"error": "User not authenticated"}, status=401)
-
-
-        return JsonResponse({"user_info": user_info})
+        if request.is_mobile:
+            auth_header = request.headers.get("Authorization")
+            if auth_header and auth_header.startswith("Bearer "):
+                token = auth_header.split(" ")[1]
+                user_info = self.validate_access_token(token)
+                if user_info:
+                    return Response({"user_info": user_info}, status=200)
+                return Response({"error": "Invalid or expired token"}, status=401)
+        else:
+            user_info = request.session.get("user_info")
+            if not user_info:
+                return Response({"error": "User not authenticated"}, status=401)
+            return Response({"user_info": user_info})
 
     def validate_access_token(self, token):
         """Validate the access token or ID token and extract user info."""
@@ -256,46 +278,43 @@ class UserInfoView(View):
             return None
 
 
-@method_decorator(csrf_exempt, name='dispatch')
+# DisabilityRatingView updated with permissions
 class DisabilityRatingView(View):
     """
     API endpoint to fetch a Veteran's disability rating.
     Handles both web and mobile clients.
     """
-    def get(self, request, *args, **kwargs):
-        # Check for token in Authorization header (mobile clients)
-        auth_header = request.headers.get("Authorization")
-        if auth_header and auth_header.startswith("Bearer "):
-            access_token = auth_header.split(" ")[1]
+    permission_classes = [IsWebOrMobileClient]
+    def get(self, request):
+        if request.is_mobile:
+            auth_header = request.headers.get("Authorization")
+            if auth_header and auth_header.startswith("Bearer "):
+                access_token = auth_header.split(" ")[1]
+            else:
+                return Response({"error": "Access token missing or invalid."}, status=401)
         else:
-            # Check session for web clients
             access_token = request.session.get("access_token")
+            if not access_token:
+                return Response({"error": "Access token missing or invalid."}, status=401)
 
-        if not access_token:
-            return JsonResponse({"error": "Access token missing or invalid."}, status=401)
-
-        api_url = config('VA_DISABILITY_RATING_API_URL')
-        headers = {
-            "Authorization": f"Bearer {access_token}",
-            "accept": "application/json"
-        }
-
+        # Fetch disability rating from API
         try:
-            response = requests.get(api_url, headers=headers)
+            response = requests.get(
+                config('VA_DISABILITY_RATING_API_URL'),
+                headers={"Authorization": f"Bearer {access_token}", "accept": "application/json"}
+            )
             if response.status_code == 200:
                 data = response.json()
-                print("DISABILITY RATING DATA: ", data)
-                request.session["disability_rating_data"] = data
-                return JsonResponse({"disability_rating": data})
-            else:
-                return JsonResponse({"error": "Failed to fetch disability rating.", "details": response.text}, status=response.status_code)
-
-        except requests.RequestException as e:
-            return JsonResponse({"error": "An error occurred while fetching disability rating.", "details": str(e)}, status=500)
+                return Response({"disability_rating": data}, status=200)
+            return Response({"error": "Failed to fetch disability rating."}, status=response.status_code)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
+# EligibleLettersView updated with permissions
 class EligibleLettersView(View):
+    permission_classes = [IsWebOrMobileClient]
+    
     ELIGIBLE_LETTER_TOKEN_URL = config('ELA_ELIGIBLE_LETTER_TOKEN_URL')
     ELA_AUDIENCE_URL = config('ELA_AUDIENCE_URL')
     LETTERS_URL = config('VA_ELIGIBLE_LETTER_API_URL')
@@ -303,7 +322,7 @@ class EligibleLettersView(View):
     def get(self, request):
         ELA_icn = request.GET.get("icn", None)
         if not ELA_icn:
-            return JsonResponse({"error": "ICN is required"}, status=400)
+            return Response({"error": "ICN is required"}, status=400)
 
         try:
             # Step 1: Generate JWT client assertion
@@ -312,7 +331,7 @@ class EligibleLettersView(View):
             # Step 2: Retrieve access token
             access_token = self._get_ela_access_token(jwt_token)
             if not access_token:
-                return JsonResponse({"error": "Failed to retrieve access token"}, status=401)
+                return Response({"error": "Failed to retrieve access token"}, status=401)
 
             # Step 3: Fetch eligible letters
             headers = {
@@ -324,14 +343,14 @@ class EligibleLettersView(View):
             if response.status_code == 200:
                 data = response.json()
                 # Store eligible letter data in session
-                request.session["eligible_letter_data"] = data
+                # request.session["eligible_letter_data"] = data
                 print("ELIGIBLE LETTER DATA", data)
-                return JsonResponse(data, status=200)
+                return Response({response.json()}, status=200)
             else:
-                return JsonResponse({"error": "Failed to fetch eligible letters", "details": response.text}, status=response.status_code)
+                return Response({"error": "Failed to fetch eligible letters."}, status=response.status_code)
 
         except Exception as e:
-            return JsonResponse({"error": "Server error", "details": str(e)}, status=500)
+            return Response({"error": str(e)}, status=500)
 
     def _ela_generate_jwt(self):
         private_key_path = config("ELA_PRIVATE_KEY_PATH")
@@ -388,9 +407,8 @@ class EligibleLettersView(View):
             return None
 
 
-
-@method_decorator(csrf_exempt, name='dispatch')
 class PatientHealthView(View):
+    permission_classes = [IsWebOrMobileClient]
     PATIENT_HEALTH_TOKEN_URL = config('PHA_ELIGIBLE_LETTER_TOKEN_URL')
     PHA_AUDIENCE_URL = config('PHA_AUDIENCE_URL')
     PATIENT_HEALTH_API_URL = config('VA_PATIENT_HEALTH_API_URL')
@@ -398,13 +416,13 @@ class PatientHealthView(View):
     def get(self, request):
         PHA_icn = request.GET.get("patient", None)
         if not PHA_icn:
-            return JsonResponse({"error": "ICN is required"}, status=400)
+            return Response({"error": "ICN is required"}, status=400)
 
         try:
             jwt_token = self._pha_generate_jwt()
             access_token = self._get_pha_access_token(jwt_token, PHA_icn)
             if not access_token:
-                return JsonResponse({"error": "Failed to retrieve access token"}, status=401)
+                return Response({"error": "Failed to retrieve access token"}, status=401)
 
             headers = {
                 "Authorization": f"Bearer {access_token}",
@@ -416,13 +434,12 @@ class PatientHealthView(View):
             if response.status_code == 200:
                 data = response.json()
                 print("PATIENT MEDICAL CONDITION DATA", data)
-
-                return JsonResponse(data, status=200)
+                return Response(data, status=200)
             else:
-                return JsonResponse({"error": "Failed to fetch eligible letters", "details": response.text}, status=response.status_code)
+                return Response({"error": "Failed to fetch patient health data", "details": response.text}, status=response.status_code)
 
         except Exception as e:
-            return JsonResponse({"error": "Server error", "details": str(e)}, status=500)
+            return Response({"error": "Server error", "details": str(e)}, status=500)
 
     def _pha_generate_jwt(self):
         private_key_path = config("PHA_PRIVATE_KEY_PATH")
@@ -480,10 +497,10 @@ class PatientHealthView(View):
             print("Access Token Error:", response.json())
             return None
 
-
+# THIS NOT
 PROMPTS_DIR = os.path.join(os.path.dirname(__file__), "prompts")
-@method_decorator(csrf_exempt, name='dispatch') 
 class ChatPromptView(APIView):
+    permission_classes = [IsWebOrMobileClient]
     def get(self, request, file_name):
         """
         GET method to fetch a specific JSON prompt file.
@@ -497,16 +514,14 @@ class ChatPromptView(APIView):
             print(f"Resolved file path: {file_path}")  # Debugging log
 
             if not os.path.exists(file_path):
-                return Response({"error": f"File {file_name} not found in folder {folder_name}"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": f"File {file_name} not found"}, status=404)
             
             # Load the JSON file
             with open(file_path, "r") as json_file:
                 data = json.load(json_file)
-            return Response(data, status=status.HTTP_200_OK)
+            return Response(data, status=200)
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": str(e)}, status=500)
 
 
     def post(self, request):
@@ -530,7 +545,7 @@ class ChatPromptView(APIView):
            
             if not os.path.exists(next_file_path):
                 print("Next file not found!")
-                return Response({"error": "Next file not found"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": "Next file not found"}, status=404)
 
             # Load the next JSON file
             with open(next_file_path, "r") as next_json_file:
@@ -538,43 +553,57 @@ class ChatPromptView(APIView):
 
             next_data["next"] = next_file  # Include the next file name in the response
 
-            return Response(next_data, status=status.HTTP_200_OK)
+            return Response(next_data, status=200)
 
         except Exception as e:
             print("Error:", str(e))
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": str(e)}, status=500)
 
 
-# Store parsed dd214 in session
-@method_decorator(csrf_exempt, name='dispatch')
+# NOTE: Store parsed dd214 in session??
+# ParsingDD214 updated with permissions
 class ParsingDD214(APIView):
+    permission_classes = [IsWebOrMobileClient]
+
+    @method_decorator(csrf_exempt_if_mobile)
     def post(self, request):
         try:
             print("FILES:", request.FILES)
             # Save uploaded file temporarily
             uploaded_file = request.FILES["file"]
+            if not uploaded_file:
+                return Response({"error": "File is required"}, status=400)
+
             file_path = default_storage.save(uploaded_file.name, ContentFile(uploaded_file.read()))
-            
             # Call the parsing function
             parsed_data = parse_dd214_text(file_path, processor_name="document_ocr")
             print("Parsed PDF:", parsed_data)
             
             # Save parsed data in session
             request.session["parsed_dd214_data"] = parsed_data
+
+            # Save parsed data in session for web clients
+            if not request.is_mobile:
+                request.session["parsed_dd214_data"] = parsed_data
+                request.session.modified = True
            
             # Delete temporary file
             if os.path.exists(file_path):
                 os.remove(file_path)
 
-            return JsonResponse({"message": "File processed successfully", "data": parsed_data}, status=200)
+            return Response({"message": "File processed successfully", "data": parsed_data}, status=200)
 
         except Exception as e:
             print("Error in ParsingDD214:", str(e))
             print(traceback.format_exc()) 
-            return JsonResponse({"error": str(e)}, status=400)
+            return Response({"error": str(e)}, status=500)
 
-@method_decorator(csrf_exempt, name='dispatch')
+
+
 class StoreUserInputView(View):
+    permission_classes = [IsWebOrMobileClient]
+
+    @method_decorator(csrf_exempt_if_mobile)
     def post(self, request):
         try:
             data = request.POST or json.loads(request.body)
@@ -583,49 +612,43 @@ class StoreUserInputView(View):
             input_type = data.get('inputType', '').strip()  
 
             if not typed_text:
-                return JsonResponse({'success': False, 'message': 'No input provided'}, status=400)
+                return Response({"error": "Invalid input"}, status=400)
 
-            # For new_condition.json
-            if input_type == "conditionType":
-                request.session['user_medical_condition_response'] = typed_text.strip()
-                request.session.modified = True
-                request.session.save()
-                print(f"Session ID during POST: {request.session.session_key}")
-                print(f"Session data after saving: {dict(request.session.items())}")
+            # Store in session for web clients
+            if not request.is_mobile:
+                # For new_condition.json
+                if input_type == "conditionType":
+                    request.session['user_medical_condition_response'] = typed_text.strip()
+                    request.session.modified = True
+                # For pain_duration.json
+                elif input_type == "painDuration":
+                    request.session['user_pain_duration'] = typed_text.strip()
+                    request.session.modified = True
+                # For pain_severity.json
+                elif input_type == "painSeverity":
+                    request.session['user_pain_severity'] = typed_text.strip()
+                    request.session.modified = True
 
-                print(f"user_medical_condition_response: {request.session.get('user_medical_condition_response')}")
-                return JsonResponse({'success': True, 'message': 'Condition input stored successfully'})
+            # Return success without session storage for mobile clients
+            print(f"Stored input for type {input_type}: {typed_text}")
+            return Response(
+                {"success": True, "message": f"{input_type} input stored successfully."},
+                status=200,
+            ) 
 
-            # For pain_duration.json
-            elif input_type == "painDuration":
-                request.session['user_pain_duration'] = typed_text
-                request.session.modified = True
-                print(f"Pain duration input stored: {typed_text}")
-                return JsonResponse({'success': True, 'message': 'Pain duration input stored successfully'})
-
-            # for pain_severity.json
-            elif input_type == "painSeverity":
-                request.session['user_pain_severity'] = typed_text
-                request.session.modified = True
-                print(f"Pain severity input stored: {typed_text}")
-                return JsonResponse({'success': True, 'message': 'Pain severity input stored successfully'})
-            
-            # Add other behavior if added / existed
-            # For now, this is default
-            else:
-                request.session['userTypedText'] = typed_text
-                request.session.modified = True
-                print(f"User input stored in session: {typed_text}")
-                return JsonResponse({'success': True, 'message': 'Input stored successfully'})
-            print(f"Session data during POST: {request.session.items()}")
 
         except Exception as e:
             print(f"Error storing user input: {e}")
-            return JsonResponse({'success': False, 'message': 'An error occurred'}, status=500)
+            return Response(
+                {"success": False, "message": "An error occurred while storing input."},
+                status=500
+            )
 
-# Store potential conditions in session
-@method_decorator(csrf_exempt, name='dispatch')
+
 class StorePotentialConditions(View):
+    permission_classes = [IsWebOrMobileClient]
+
+    @method_decorator(csrf_exempt_if_mobile)
     def post(self, request):
         try:
             # Parse the JSON body of the request
@@ -633,39 +656,38 @@ class StorePotentialConditions(View):
             conditions = body.get('conditions', [])
             print("ADDED POTENTIAL CONDITIONS: ", conditions)
             if not isinstance(conditions, list):
-                return JsonResponse({'error': 'Invalid data format. "conditions" should be a list.'}, status=400)
+                return Response({"error": "Invalid data format. 'conditions' should be a list."}, status=400)
 
-            # Ensure there's a session for the user
-            if 'potential_conditions' not in request.session:
-                request.session['potential_conditions'] = []
+            if not request.is_mobile:
+                if "potential_conditions" not in request.session:
+                    request.session["potential_conditions"] = []
 
-            # Store the conditions in the session
-            request.session['potential_conditions'].extend(conditions)
-            request.session.modified = True
+                request.session["potential_conditions"].extend(conditions)
+                request.session.modified = True
 
-            return JsonResponse({'message': 'Conditions stored successfully.', 'stored_conditions': request.session['potential_conditions']}, status=200)
-        
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON.'}, status=400)
+            return Response(
+                {"message": "Conditions stored successfully.", "stored_conditions": conditions},
+                status=200,
+            )
+
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+            return Response({"error": str(e)}, status=500)
 
 
-class DexAnalysisResponse():
+
+class DexPotentialConditionsListResponse(APIView):
     # This is for PotentialConditionsPage
-    @staticmethod
-    @csrf_exempt
-    def get_potential_conditions(request):
-        # print(f"user_medical_condition_response: {request.session.get('user_medical_condition_response')}")
+    permission_classes = [IsWebOrMobileClient]
 
-        if request.method == "GET":
-            print(f"Session ID during GET: {request.session.session_key}")
-            print(f"Session data during GET: {request.session.items()}")
-            user_input = request.session.get('user_medical_condition_response', None)
-            print("USER INPUT FROM request.session.get('user_medical_condition_response', None): ", user_input)
+    @method_decorator(csrf_exempt_if_mobile)
+    def get(self, request):
+        try:
+            user_input = (
+                request.headers.get("X-User-Medical-Condition") if request.is_mobile else request.session.get("user_medical_condition_response")
+            )
+
             if not user_input:
-                print("NO user_medical_condition_response IN SESSION", user_input)
-                return JsonResponse({"error": "No user input found in session"}, status=400)
+                return Response({"error": "No user input found"}, status=400)
 
             conditions = generate_potential_conditions(user_input)
             parsed_conditions = []
@@ -693,6 +715,49 @@ class DexAnalysisResponse():
                 except IndexError:
                     continue
 
-            return JsonResponse({"conditions": parsed_conditions}, status=200)
+            return Response({"conditions": parsed_conditions}, status=200)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
 
-        return JsonResponse({"error": "Invalid request method"}, status=405)
+
+    # def get_potential_conditions(request):
+    #     # print(f"user_medical_condition_response: {request.session.get('user_medical_condition_response')}")
+
+    #     if request.method == "GET":
+    #         print(f"Session ID during GET: {request.session.session_key}")
+    #         print(f"Session data during GET: {request.session.items()}")
+    #         user_input = request.session.get('user_medical_condition_response', None)
+    #         print("USER INPUT FROM request.session.get('user_medical_condition_response', None): ", user_input)
+    #         if not user_input:
+    #             print("NO user_medical_condition_response IN SESSION", user_input)
+    #             return JsonResponse({"error": "No user input found in session"}, status=400)
+
+    #         conditions = generate_potential_conditions(user_input)
+    #         parsed_conditions = []
+            
+    #         for condition in conditions:
+    #             try:
+    #                 lines = condition.split('\n')
+    #                 condition_name = lines[0].split(":")[1].strip()
+    #                 risk_level = lines[1].split(":")[1].strip()
+    #                 description = lines[2].split(":")[1].strip()
+
+    #                 # Assign risk color based on risk level
+    #                 risk_color = (
+    #                     "red" if risk_level == "High risk" else
+    #                     "orange" if risk_level == "Medium risk" else
+    #                     "green"
+    #                 )
+
+    #                 parsed_conditions.append({
+    #                     "name": condition_name,
+    #                     "risk": risk_level,
+    #                     "riskColor": risk_color,
+    #                     "description": description,
+    #                 })
+    #             except IndexError:
+    #                 continue
+
+    #         return JsonResponse({"conditions": parsed_conditions}, status=200)
+
+    #     return JsonResponse({"error": "Invalid request method"}, status=405)

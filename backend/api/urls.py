@@ -11,7 +11,7 @@ from .views import (
     ParsingDD214,
     StoreUserInputView,
     StorePotentialConditions,
-    DexAnalysisResponse,
+    DexPotentialConditionsListResponse,
 )
 
 urlpatterns = [
@@ -27,7 +27,7 @@ urlpatterns = [
     path('auth/upload_dd214/', ParsingDD214.as_view(), name='upload_dd214'),
     path('auth/store_user_input', StoreUserInputView.as_view(), name='store_user_input'),
     path('auth/potential_conditions/', StorePotentialConditions.as_view(), name='store_potential_conditions'),
-    path('auth/potential_conditions_list/', DexAnalysisResponse.get_potential_conditions, name='get_potential_conditions_list'),
+    path('auth/potential_conditions_list/', DexPotentialConditionsListResponse.as_view(), name='get_potential_conditions_list'),
     
 
 ]
