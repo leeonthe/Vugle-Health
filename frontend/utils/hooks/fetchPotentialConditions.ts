@@ -1,4 +1,4 @@
-import api from "../../services/axiosConfig"; // Adjust the path to match your project structure
+import api from "../../services/config/axiosConfig"; // Adjust the path to match your project structure
 import { PotentialCondition } from "../interfaces/dexTypes";
 
 const fetchPotentialConditions = async (): Promise<PotentialCondition[]>=> {

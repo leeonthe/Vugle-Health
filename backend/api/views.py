@@ -184,8 +184,14 @@ class OAuthHandler:
                     self.client_secret,
                     algorithm="HS256",
                 )
+                return redirect(f'http://localhost:8081/Welcome?access_token={access_token}&id_token={id_token}&jwt_token={mobile_token}')
                 # NOTE: change it to if needed: return JsonResponse({"access_token": mobile_token, "id_token": id_token})
-                return redirect(f'http://localhost:8081/Welcome?access_token={mobile_token}&id_token={id_token}')
+                # return redirect(f'http://localhost:8081/Welcome?access_token={mobile_token}&id_token={id_token}')
+                # return JsonResponse({
+                #     "access_token": mobile_token,
+                #     "id_token": id_token,
+                #     "message": "Login successful"
+                # })
             else:
                 return redirect(f'http://localhost:8081/Welcome?access_token={access_token}&id_token={id_token}')
             
