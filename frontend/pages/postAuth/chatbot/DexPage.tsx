@@ -36,7 +36,7 @@ const DexPage: React.FC = () => {
   const icn = disabilityData?.disability_rating?.data?.id;
   const { isLoading: isHealthLoading, isSuccess: isHealthSuccess } =
     usePatientHealth(icn || "");
-
+// 1011537977V693883 -> ICN provided in the va.gov API docs 
   // Add prompt data to chatHistory
   useEffect(() => {
     if (promptData) {
@@ -172,8 +172,8 @@ const DexPage: React.FC = () => {
           <ChatRenderer
             chatHistory={chatHistory}
             onOptionSelect={handleOptionSelect}
-            isHealthLoading={loadingState.showLoading}
-            isHealthSuccess={loadingState.showSuccess}
+            isHealthLoading={false}
+            isHealthSuccess={false}
           />
         )}
       </View>

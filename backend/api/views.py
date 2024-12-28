@@ -281,6 +281,7 @@ class DisabilityRatingView(View):
             if response.status_code == 200:
                 data = response.json()
                 print("DISABILITY RATING DATA: ", data)
+                request.session["disability_rating_data"] = data
                 return JsonResponse({"disability_rating": data})
             else:
                 return JsonResponse({"error": "Failed to fetch disability rating.", "details": response.text}, status=response.status_code)
@@ -318,6 +319,8 @@ class EligibleLettersView(View):
 
             if response.status_code == 200:
                 data = response.json()
+                # Store eligible letter data in session
+                request.session["eligible_letter_data"] = data
                 print("ELIGIBLE LETTER DATA", data)
                 return JsonResponse(data, status=200)
             else:
@@ -403,11 +406,13 @@ class PatientHealthView(View):
                 "Authorization": f"Bearer {access_token}",
                 "Accept": "accept: application/fhir+json",
             }
-            response = requests.get(f"{self.PATIENT_HEALTH_API_URL}Patient?_id={PHA_icn}", headers=headers)
+
+            response = requests.get(f"{self.PATIENT_HEALTH_API_URL}Condition?patient={PHA_icn}", headers=headers)
 
             if response.status_code == 200:
                 data = response.json()
                 print("PATIENT MEDICAL CONDITION DATA", data)
+
                 return JsonResponse(data, status=200)
             else:
                 return JsonResponse({"error": "Failed to fetch eligible letters", "details": response.text}, status=response.status_code)
@@ -536,6 +541,7 @@ class ChatPromptView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+# Store parsed dd214 in session
 @method_decorator(csrf_exempt, name='dispatch')
 class ParsingDD214(APIView):
     def post(self, request):
@@ -591,7 +597,7 @@ class StoreUserInputView(View):
                 print(f"Pain duration input stored: {typed_text}")
                 return JsonResponse({'success': True, 'message': 'Pain duration input stored successfully'})
 
-            
+            # for pain_severity.json
             elif input_type == "painSeverity":
                 request.session['user_pain_severity'] = typed_text
                 request.session.modified = True
@@ -610,7 +616,7 @@ class StoreUserInputView(View):
             print(f"Error storing user input: {e}")
             return JsonResponse({'success': False, 'message': 'An error occurred'}, status=500)
 
-
+# Store potential conditions in session
 @method_decorator(csrf_exempt, name='dispatch')
 class StorePotentialConditions(View):
     def post(self, request):
