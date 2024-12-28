@@ -1,5 +1,3 @@
-import { CSSProperties } from 'react';
-
 const styles = {
     container: {
       flex: 1,

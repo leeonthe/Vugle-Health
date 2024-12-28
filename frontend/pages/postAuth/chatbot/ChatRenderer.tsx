@@ -31,7 +31,6 @@ interface ChatProps {
   chatHistory: ChatBubble[];
   onOptionSelect: (
     nextStep: string,
-    isAutomatic: boolean,
     userResponse?: string
   ) => void;
   isHealthLoading: boolean;
@@ -56,25 +55,10 @@ const ChatRenderer: React.FC<ChatProps> = ({
   const { fetchLoadingPrompt } = useChat();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingData, setLoadingData] = useState<ChatBubble | null>(null);
+
   const triggerOptionAction = async (option: any) => {
-    const { text, next, inputType } = option;
-
-    // Display loading.json for 2 seconds
-    setIsLoading(true);
-    try {
-      const loadingPrompt = await fetchLoadingPrompt();
-      setLoadingData(loadingPrompt);
-
-      setTimeout(() => {
-        setIsLoading(false);
-        setLoadingData(null);
-
-        onOptionSelect(next, false, text || userInput || `${painScale}`);
-      }, 0); //Change here for timing.
-    } catch (error) {
-      console.error("Error fetching loading.json:", error);
-      setIsLoading(false);
-    }
+    const { text, next } = option;
+    onOptionSelect(next, text || userInput || `${painScale}`);
   };
 
   const handleFileUpload = async () => {
@@ -93,7 +77,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
             const formData = new FormData();
             formData.append("file", file);
 
-            // onOptionSelect("choose_your_claim", false, file.name);
+
             triggerOptionAction({ text: file.name, next: "choose_your_claim" });
 
             /**
@@ -111,7 +95,8 @@ const ChatRenderer: React.FC<ChatProps> = ({
                 }
               );
               console.log("File uploaded successfully:", response.data);
-              onOptionSelect("choose_your_claim", true);
+              triggerOptionAction({ text: file.name, next: "choose_your_claim" });
+
             } catch (err) {
               console.error("Error uploading file:", err);
             }
@@ -138,7 +123,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
           //   type: file.mimeType,
           // });
 
-          // onOptionSelect("choose_your_claim", false, fileName);
           triggerOptionAction({ text: fileName, next: "choose_your_claim" });
 
           /**
@@ -155,7 +139,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
               }
             );
             console.log("File uploaded successfully:", response.data);
-            // onOptionSelect("choose_your_claim", true);
+            triggerOptionAction({ text: fileName, next: "choose_your_claim" });
           } catch (err) {
             console.error("Error uploading file:", err);
           }
@@ -179,12 +163,10 @@ const ChatRenderer: React.FC<ChatProps> = ({
 
       if (response.status === 200) {
         console.log("Response from backend:", response.data);
-        // onOptionSelect("other_condition", false, typedText); // Trigger next step
         triggerOptionAction({ text: typedText, next: "other_condition" });
       } else {
         console.error("Unexpected response from backend:", response);
       }
-      // onOptionSelect("other_condition", false);
     } catch (error) {
       console.error("ERROR SENDING USER TYPE TO BACKEND", error);
     }
@@ -201,7 +183,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
       );
       if (response.status === 200) {
         console.log("Pain duration input saved:", response.data);
-        // onOptionSelect("pain_severity", false, typedText);
         triggerOptionAction({ text: typedText, next: "pain_severity" });
       } else {
         console.error("Unexpected response from backend:", response);
@@ -235,7 +216,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
         const conditionsArray = Array.isArray(formattedConditions)
           ? formattedConditions
           : [formattedConditions];
-        // onOptionSelect("pain_duration", false, formattedConditions); //TODO
         triggerOptionAction({
           text: conditionsArray.join(", "), // Convert selected conditions to string
           next: "pain_duration",
@@ -303,6 +283,10 @@ const ChatRenderer: React.FC<ChatProps> = ({
           );
         }
         break;
+
+      case "custom":
+        return <View key={`custom-${index}`}>{element.content}</View>;
+
       default:
         return null;
     }
@@ -381,7 +365,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
             setPainScale={setPainScale}
             onSubmit={() => {
               console.log("Pain Scale submitted:", painScale);
-              // onOptionSelect(option.next, false, `${painScale}`);
               triggerOptionAction({
                 text: `${painScale}`,
                 next: option.next,
@@ -403,6 +386,35 @@ const ChatRenderer: React.FC<ChatProps> = ({
     });
   };
 
+
+  const renderUserResponse = (userResponse: string, chatIndex: number) => (
+    <View style={styles.chatContainer}>
+      <Animatable.View
+        animation="fadeIn"
+        duration={1000}
+        style={[styles.messageContainer, styles.userMessage]}
+      >
+        <View key={`user-response-${chatIndex}`}>
+          <Text style={[styles.userText]}>{userResponse}</Text>
+        </View>
+      </Animatable.View>
+    </View>
+  );
+
+
+  /**
+   * @param bubble -> Represents a single chat bubble (💬), which contains one or more elements in its `container` array.
+                    * Each element can be a piece of content such as text, an image, styles, or a custom component, 
+                    * all of which collectively define how the chat bubble is displayed within the `chat_bubbles` array of a `ChatBubble`. 
+                    * Check promptTypes.ts for detailed explanation. TODO: ADD EXPLANATION
+
+   * @param bubbleIndex -> Index of the current bubble (💬) within the chat_bubbles array.
+                         * Used in identifying and rendering each bubble sequentially within its parent ChatBubble. 
+
+   * @param chatIndex -> Index of the current ChatBubble within the chatHistory array.
+                       * Used in positioning and identifying which set of chat bubbles belongs to a specific step in the conversational chatbot flow.
+   * @returns 
+   */
   const renderChatBubble = (
     bubble: ChatBubble["chat_bubbles"][number],
     bubbleIndex: number,
@@ -412,6 +424,8 @@ const ChatRenderer: React.FC<ChatProps> = ({
       chatIndex === chatHistory.length - 1 &&
       bubbleIndex === chatHistory[chatIndex].chat_bubbles.length - 1;
 
+    const isLoadingBubble = chatHistory[chatIndex].chat_bubbles_id === 0;
+
     return (
       <View
         key={`bubble-container-${bubbleIndex}`}
@@ -419,9 +433,9 @@ const ChatRenderer: React.FC<ChatProps> = ({
       >
         <Animatable.View
           key={`bubble-${bubbleIndex}`}
-          animation="fadeIn"
-          duration={1000}
-          delay={bubbleIndex * 1000}
+          animation={isLoadingBubble ? undefined : "fadeIn"}
+          duration= {isLoadingBubble ? 0 : 1000}
+          delay={isLoadingBubble ? 0 : bubbleIndex * 1000}
           style={
             bubble.container.some((element) => element.type === "image")
               ? styles.logoContainer
@@ -441,19 +455,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
     );
   };
 
-  const renderUserResponse = (userResponse: string, chatIndex: number) => (
-    <View style={styles.chatContainer}>
-      <Animatable.View
-        animation="fadeIn"
-        duration={1000}
-        style={[styles.messageContainer, styles.userMessage]}
-      >
-        <View key={`user-response-${chatIndex}`}>
-          <Text style={[styles.userText]}>{userResponse}</Text>
-        </View>
-      </Animatable.View>
-    </View>
-  );
 
   const renderChatHistory = () => {
     return chatHistory.map((chat, chatIndex) => (
@@ -462,7 +463,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
         {chat.chat_bubbles.map((bubble, bubbleIndex) =>
           renderChatBubble(bubble, bubbleIndex, chatIndex)
         )}
-
         {/* Render User's Response */}
         {chat.userResponse && renderUserResponse(chat.userResponse, chatIndex)}
       </View>

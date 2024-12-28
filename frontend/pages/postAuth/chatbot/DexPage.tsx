@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   ActivityIndicator,
@@ -6,11 +6,15 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import { useChat } from "../../../utils/hooks/useChat";
+import * as Animatable from "react-native-animatable";
 import ChatRenderer from "./ChatRenderer";
-import { ChatBubble } from "../../../utils/interfaces/promptTypes";
+
+// hooks
+import { useChat } from "../../../utils/hooks/useChat";
 import { useDisabilityRating } from "../../../utils/hooks/useDisabilityRating";
 import { usePatientHealth } from "../../../utils/hooks/usePatientHealth";
+import { ChatBubble } from "../../../utils/interfaces/promptTypes";
+
 const DexPage: React.FC = () => {
   const { useFetchPrompt, useSendSelection } = useChat();
   const [currentStep, setCurrentStep] = useState<string>("start");
@@ -33,7 +37,7 @@ const DexPage: React.FC = () => {
   const { isLoading: isHealthLoading, isSuccess: isHealthSuccess } =
     usePatientHealth(icn || "");
 
-  // Add prompt data to chatHistory when fetcheda
+  // Add prompt data to chatHistory
   useEffect(() => {
     if (promptData) {
       const isAlreadyAdded = chatHistory.some(
@@ -41,29 +45,41 @@ const DexPage: React.FC = () => {
       );
 
       if (!isAlreadyAdded) {
-        console.log("Adding to chatHistory:", promptData);
         setChatHistory((prevHistory) => [...prevHistory, promptData]);
       }
     }
   }, [promptData]);
 
-  // Transition from loading to success
-  useEffect(() => {
-    if (isHealthSuccess) {
-      setLoadingState({ showLoading: true, showSuccess: false });
+  /**
+   *   ExpandingDot & LoadingAnimation
+   *   --> To display loading message: ... with animation after user submits selection from options.
+   */
+  const ExpandingDot = ({ delay }: { delay: number }) => (
+    <Animatable.Text
+      animation={{
+        0: { transform: [{ scale: 1 }] },
+        0.5: { transform: [{ scale: 1.5 }] },
+        1: { transform: [{ scale: 1 }] },
+      }}
+      iterationCount="infinite"
+      direction="alternate"
+      delay={delay}
+      style={styles.dot}
+    >
+      .
+    </Animatable.Text>
+  );
 
-      const timeout = setTimeout(() => {
-        setLoadingState({ showLoading: false, showSuccess: true });
-        handleOptionSelect("upload_dd214", true); // Automatically navigate after success
-      }, 10000);
+  const LoadingAnimation = () => (
+    <View style={styles.loadingContainer}>
+      <ExpandingDot delay={0} />
+      <ExpandingDot delay={200} />
+      <ExpandingDot delay={400} />
+    </View>
+  );
 
-      return () => clearTimeout(timeout);
-    }
-  }, [isHealthSuccess]);
-
-  const handleOptionSelect = (
+  const handleOptionSelect = async (
     nextStep: string,
-    isAutomatic: boolean,
     userResponse?: string
   ) => {
     console.log("Option selected:", nextStep, "User Response:", userResponse);
@@ -73,35 +89,72 @@ const DexPage: React.FC = () => {
       setChatHistory((prevHistory) => [
         ...prevHistory,
         {
-          chat_bubbles_id: -1, // Use a placeholder value for user responses
-          chat_bubbles: [], // No chatbot bubbles, aka prompts for user response
-          options_id: -1, // Use a placeholder value for user responses
-          options: [], // No options for user response
+          chat_bubbles_id: -1,
+          chat_bubbles: [],
+          options_id: -1,
+          options: [],
           userResponse,
         },
       ]);
     }
 
-    if (isAutomatic) {
-      setCurrentStep(nextStep); // Navigate directly if automatic TOOD: Delete isAutomatic, if I can resolve NONE options 
-    } else {
+    /**
+     * Adding a temporary loading message with a logo and animation to the chatHistory.
+     * Specified loadingId = 0, to display both logo & loading message simultaneously
+     */
+    const loadingId = 0;
+    setChatHistory((prevHistory) => [
+      ...prevHistory,
+      {
+        chat_bubbles_id: 0,
+        options_id: 0,
+        chat_bubbles: [
+          {
+            container: [
+              {
+                type: "image",
+                content: "app_logo",
+                style: {
+                  width: 24,
+                  height: 24,
+                },
+              },
+            ],
+          },
+          {
+            container: [
+              {
+                type: "custom",
+                content: <LoadingAnimation />,
+              },
+            ],
+          },
+        ],
+        options: [],
+      },
+    ]);
+
+    setTimeout(() => {
+      // Removing loading message
+      setChatHistory((prevHistory) =>
+        prevHistory.filter((chat) => chat.chat_bubbles_id !== loadingId)
+      );
+
+      // Navigate to next step
       mutation.mutate(
-        { currentFile: currentStep, userSelection: nextStep }, // Pass current file and next step
+        { currentFile: currentStep, userSelection: nextStep },
         {
           onSuccess: (data) => {
-            console.log("Mutation success:", data);
             if (data.next) {
-              setCurrentStep(data.next); // Navigate to next prompt
-            } else {
-              console.warn("Backend response missing 'next' field.");
+              setCurrentStep(data.next);
             }
           },
           onError: (error) => {
-            console.error("Mutation error:", error);
+            console.error("Error during mutation:", error);
           },
         }
       );
-    }
+    }, 2000);
   };
 
   if (isPromptLoading) {
@@ -134,6 +187,26 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     padding: 16,
     paddingTop: 40,
+  },
+  loadingContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 0,
+    marginTop: -10,
+    marginBottom: -10,
+    borderRadius: 24,
+  },
+
+  logo: {
+    width: 24,
+    height: 24,
+  },
+  dot: {
+    fontSize: 30,
+    marginHorizontal: 2,
+    color: "#D7D7D7",
+    marginBottom: 15,
   },
 });
 

@@ -1,5 +1,8 @@
+import React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChatBubble } from "../../utils/interfaces/promptTypes";
+import * as Animatable from "react-native-animatable";
+import Logo from "../../../assets/images/logo/dexLogo.svg";
 
 export const useChat = () => {
   const queryClient = useQueryClient();
@@ -33,6 +36,8 @@ export const useChat = () => {
     }
     return response.json();
   };
+  
+  
 
   const useFetchPrompt = (fileName: string) =>
     useQuery({
@@ -56,6 +61,7 @@ export const useChat = () => {
       },
     });
 
+    
   const fetchLoadingPrompt = async (): Promise<ChatBubble> => {
     const loadingFileName = "loading";
     console.log(`Fetching loading prompt: ${backendUrl}${loadingFileName}/`);
