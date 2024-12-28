@@ -15,6 +15,8 @@ import axios from "axios";
 
 import { ChatBubble } from "../../../utils/interfaces/promptTypes";
 import { useDevice } from "@/utils/hooks/useDevice";
+import { useChat } from "../../../utils/hooks/useChat";
+
 import { useKeyboardStatus } from "@/utils/hooks/useKeyboardStatus";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -50,6 +52,31 @@ const ChatRenderer: React.FC<ChatProps> = ({
   const { isDesktop } = useDevice();
   const navigation = useNavigation();
 
+  // Hook to fetch loading.json
+  const { fetchLoadingPrompt } = useChat();
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState<ChatBubble | null>(null);
+  const triggerOptionAction = async (option: any) => {
+    const { text, next, inputType } = option;
+
+    // Display loading.json for 2 seconds
+    setIsLoading(true);
+    try {
+      const loadingPrompt = await fetchLoadingPrompt();
+      setLoadingData(loadingPrompt);
+
+      setTimeout(() => {
+        setIsLoading(false);
+        setLoadingData(null);
+
+        onOptionSelect(next, false, text || userInput || `${painScale}`);
+      }, 0); //Change here for timing.
+    } catch (error) {
+      console.error("Error fetching loading.json:", error);
+      setIsLoading(false);
+    }
+  };
+
   const handleFileUpload = async () => {
     try {
       if (isDesktop) {
@@ -66,24 +93,29 @@ const ChatRenderer: React.FC<ChatProps> = ({
             const formData = new FormData();
             formData.append("file", file);
 
-            onOptionSelect("choose_your_claim", false, file.name);
+            // onOptionSelect("choose_your_claim", false, file.name);
+            triggerOptionAction({ text: file.name, next: "choose_your_claim" });
 
-            // try {
-            //   // Send POST request to backend
-            //   const response = await axios.post(
-            //     "http://localhost:8000/api/auth/upload_dd214/",
-            //     formData,
-            //     {
-            //       headers: {
-            //         "Content-Type": "multipart/form-data",
-            //       },
-            //     }
-            //   );
-            //   console.log("File uploaded successfully:", response.data);
-            //   onOptionSelect("choose_your_claim", true);
-            // } catch (err) {
-            //   console.error("Error uploading file:", err);
-            // }
+            /**
+             * FOR ACTUAL USEAGE
+             * 
+             * try {
+              // Send POST request to backend
+              const response = await axios.post(
+                "http://localhost:8000/api/auth/upload_dd214/",
+                formData,
+                {
+                  headers: {
+                    "Content-Type": "multipart/form-data",
+                  },
+                }
+              );
+              console.log("File uploaded successfully:", response.data);
+              onOptionSelect("choose_your_claim", true);
+            } catch (err) {
+              console.error("Error uploading file:", err);
+            }
+             */
           }
         };
         fileInput.click();
@@ -106,24 +138,28 @@ const ChatRenderer: React.FC<ChatProps> = ({
           //   type: file.mimeType,
           // });
 
-          onOptionSelect("choose_your_claim", false, fileName);
+          // onOptionSelect("choose_your_claim", false, fileName);
+          triggerOptionAction({ text: fileName, next: "choose_your_claim" });
 
-          // try {
-          //   // Send POST request to backend
-          //   const response = await axios.post(
-          //     "http://localhost:8000/api/auth/upload_dd214/",
-          //     formData,
-          //     {
-          //       headers: {
-          //         "Content-Type": "multipart/form-data",
-          //       },
-          //     }
-          //   );
-          //   console.log("File uploaded successfully:", response.data);
-          //   // onOptionSelect("choose_your_claim", true);
-          // } catch (err) {
-          //   console.error("Error uploading file:", err);
-          // }
+          /**
+           * FOR ACUTAL USAGE
+           * try {
+            // Send POST request to backend
+            const response = await axios.post(
+              "http://localhost:8000/api/auth/upload_dd214/",
+              formData,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            );
+            console.log("File uploaded successfully:", response.data);
+            // onOptionSelect("choose_your_claim", true);
+          } catch (err) {
+            console.error("Error uploading file:", err);
+          }
+           */
         }
       }
     } catch (err) {
@@ -143,7 +179,8 @@ const ChatRenderer: React.FC<ChatProps> = ({
 
       if (response.status === 200) {
         console.log("Response from backend:", response.data);
-        onOptionSelect("other_condition", false, typedText); // Trigger next step
+        // onOptionSelect("other_condition", false, typedText); // Trigger next step
+        triggerOptionAction({ text: typedText, next: "other_condition" });
       } else {
         console.error("Unexpected response from backend:", response);
       }
@@ -164,7 +201,8 @@ const ChatRenderer: React.FC<ChatProps> = ({
       );
       if (response.status === 200) {
         console.log("Pain duration input saved:", response.data);
-        onOptionSelect("pain_severity", false, typedText);
+        // onOptionSelect("pain_severity", false, typedText);
+        triggerOptionAction({ text: typedText, next: "pain_severity" });
       } else {
         console.error("Unexpected response from backend:", response);
       }
@@ -194,7 +232,14 @@ const ChatRenderer: React.FC<ChatProps> = ({
       potentialConditions,
       onReturn: (formattedConditions) => {
         console.log("Selected conditions:", formattedConditions);
-        onOptionSelect("pain_duration", false, formattedConditions); //TODO
+        const conditionsArray = Array.isArray(formattedConditions)
+          ? formattedConditions
+          : [formattedConditions];
+        // onOptionSelect("pain_duration", false, formattedConditions); //TODO
+        triggerOptionAction({
+          text: conditionsArray.join(", "), // Convert selected conditions to string
+          next: "pain_duration",
+        });
       },
     });
   };
@@ -263,6 +308,101 @@ const ChatRenderer: React.FC<ChatProps> = ({
     }
   };
 
+  const renderOptions = (options: any[], chatIndex: number) => {
+    return options.map((option, idx) => {
+      const key = `${chatIndex}-option-${idx}`;
+
+      // {/* TODO: Diplay different container if isHealthLoading and isHealthSuccessful
+      //         ISSUE: it displays .json from beginning, I think its bc I am using useQuery in usePatientHealth.
+      //     */}
+      if (option.text === "NONE" && isHealthSuccess) {
+        return isHealthLoading ? (
+          <ActivityIndicator
+            key={`${key}-loading`}
+            size="large"
+            color="#3182F6"
+          />
+        ) : (
+          <CheckMark key={`${key}-success`} />
+        );
+      }
+
+      if (option.text === "Upload DD214") {
+        return (
+          <TouchableOpacity
+            key={`${key}-upload`}
+            onPress={handleFileUpload}
+            style={styles.optionButton}
+          >
+            <Text style={styles.optionText}>{option.text}</Text>
+          </TouchableOpacity>
+        );
+      }
+
+      if (option.text === "TYPE") {
+        if (option.inputType === "conditionType") {
+          return (
+            <TypeInput
+              key={`${key}-type-condition`}
+              placeholder="e.g. severe lower back pain"
+              handleSubmit={handleConditionType}
+            />
+          );
+        }
+
+        if (option.inputType === "painDuration") {
+          return (
+            <TypeInput
+              key={`${key}-type-pain`}
+              placeholder="e.g. about 3 months"
+              handleSubmit={handlePainDuration}
+            />
+          );
+        }
+      }
+
+      if (option.text === "Let's check") {
+        return (
+          <TouchableOpacity
+            key={`${key}-check`}
+            style={styles.optionButton}
+            onPress={handleNavigateToConditions}
+          >
+            <Text style={styles.optionText}>{option.text}</Text>
+          </TouchableOpacity>
+        );
+      }
+
+      if (option.text === "SCALE_SLIDER") {
+        return (
+          <PainScaleSlider
+            key={`${key}-slider`}
+            painScale={painScale}
+            setPainScale={setPainScale}
+            onSubmit={() => {
+              console.log("Pain Scale submitted:", painScale);
+              // onOptionSelect(option.next, false, `${painScale}`);
+              triggerOptionAction({
+                text: `${painScale}`,
+                next: option.next,
+              });
+            }}
+          />
+        );
+      }
+
+      return (
+        <TouchableOpacity
+          key={`${key}-default`}
+          onPress={() => triggerOptionAction(option)}
+          style={styles.optionButton}
+        >
+          <Text style={styles.optionText}>{option.text}</Text>
+        </TouchableOpacity>
+      );
+    });
+  };
+
   const renderChatBubble = (
     bubble: ChatBubble["chat_bubbles"][number],
     bubbleIndex: number,
@@ -291,91 +431,9 @@ const ChatRenderer: React.FC<ChatProps> = ({
           {bubble.container.map((element, index) =>
             renderElement(element, index)
           )}
-
-          {/* TODO: Diplay different container if isHealthLoading and isHealthSuccessful
-              ISSUE: it displays .json from beginning, I think its bc I am using useQuery in usePatientHealth.
-          */}
           {isLastBubble && chatHistory[chatIndex].options && (
             <View style={styles.optionsContainer}>
-              {chatHistory[chatIndex].options.map((option, idx) => {
-                if (option.text === "NONE" && isHealthSuccess) {
-                  return isHealthLoading ? (
-                    <ActivityIndicator
-                      key={`loading-${idx}`}
-                      size="large"
-                      color="#3182F6"
-                    />
-                  ) : (
-                    <CheckMark key={`success-${idx}`} />
-                  );
-                }
-
-                if (option.text === "TYPE") {
-                  if (option.inputType === "conditionType") {
-                    return (
-                      <TypeInput
-                        key={`type-condition-${idx}`}
-                        placeholder="e.g. severe lower back pain"
-                        handleSubmit={handleConditionType}
-                      />
-                    );
-                  }
-
-                  if (option.inputType === "painDuration") {
-                    return (
-                      <TypeInput
-                        key={`type-pain-${idx}`}
-                        placeholder="e.g. about 3 months"
-                        handleSubmit={handlePainDuration}
-                      />
-                    );
-                  }
-                }
-
-                if (option.text === "Let's check") {
-                  return (
-                    <TouchableOpacity
-                      key={`check-${idx}`}
-                      style={styles.optionButton}
-                      onPress={handleNavigateToConditions}
-                    >
-                      <Text style={styles.optionText}>{option.text}</Text>
-                    </TouchableOpacity>
-                  );
-                }
-
-                if (option.text === "SCALE_SLIDER") {
-                  // return null;
-                  return (
-                    <PainScaleSlider
-                      key={`slider-${idx}`}
-                      painScale={painScale}
-                      setPainScale={setPainScale}
-                      onSubmit={() => {
-                        console.log("Pain Scale submitted:", painScale);
-                        onOptionSelect(option.next, false, `${painScale}`);
-                      }}
-                    />
-                  );
-                }
-
-                // Render other options as buttons
-                return (
-                  <TouchableOpacity
-                    key={`option-${idx}`}
-                    onPress={() => {
-                      if (option.text === "Upload DD214") {
-                        handleFileUpload();
-                      } else {
-                        onOptionSelect(option.next, false, option.text);
-                      }
-                    }}
-                    style={styles.optionButton}
-                  >
-                    <Text style={styles.optionText}>{option.text}</Text>
-                  </TouchableOpacity>
-                );
-              })}
+              {renderOptions(chatHistory[chatIndex].options, chatIndex)}
             </View>
           )}
         </Animatable.View>
@@ -404,6 +462,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
         {chat.chat_bubbles.map((bubble, bubbleIndex) =>
           renderChatBubble(bubble, bubbleIndex, chatIndex)
         )}
+
         {/* Render User's Response */}
         {chat.userResponse && renderUserResponse(chat.userResponse, chatIndex)}
       </View>

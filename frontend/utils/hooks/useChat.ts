@@ -13,39 +13,58 @@ export const useChat = () => {
     }
     return response.json();
   };
-  
 
-    const sendSelection = async (currentFile: string, userSelection: string): Promise<ChatBubble> => {
+  const sendSelection = async (
+    currentFile: string,
+    userSelection: string
+  ): Promise<ChatBubble> => {
     const response = await fetch(backendUrl, {
-        method: "POST",
-        headers: {
+      method: "POST",
+      headers: {
         "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ current_file: currentFile, user_selection: userSelection }), // e.g., current_file: 'start/start'
+      },
+      body: JSON.stringify({
+        current_file: currentFile,
+        user_selection: userSelection,
+      }), // e.g., current_file: 'start/start'
     });
     if (!response.ok) {
-        throw new Error(`Error processing selection: ${response.statusText}`);
+      throw new Error(`Error processing selection: ${response.statusText}`);
     }
     return response.json();
-    };
-
+  };
 
   const useFetchPrompt = (fileName: string) =>
     useQuery({
       queryKey: ["prompt", fileName],
       queryFn: () => fetchPrompt(fileName),
-      staleTime: 1000 * 60 * 5, 
+      staleTime: 1000 * 60 * 5,
       refetchOnWindowFocus: false,
     });
 
   const useSendSelection = () =>
     useMutation({
-      mutationFn: ({ currentFile, userSelection }: { currentFile: string; userSelection: string }) =>
-        sendSelection(currentFile, userSelection),
+      mutationFn: ({
+        currentFile,
+        userSelection,
+      }: {
+        currentFile: string;
+        userSelection: string;
+      }) => sendSelection(currentFile, userSelection),
       onSuccess: (data) => {
-        queryClient.setQueryData(["prompt", data.next], data); 
+        queryClient.setQueryData(["prompt", data.next], data);
       },
     });
 
-  return { useFetchPrompt, useSendSelection };
+  const fetchLoadingPrompt = async (): Promise<ChatBubble> => {
+    const loadingFileName = "loading";
+    console.log(`Fetching loading prompt: ${backendUrl}${loadingFileName}/`);
+    const response = await fetch(`${backendUrl}${loadingFileName}/`);
+    if (!response.ok) {
+      throw new Error(`Error fetching loading prompt: ${response.statusText}`);
+    }
+    return response.json();
+  };
+
+  return { useFetchPrompt, useSendSelection, fetchLoadingPrompt };
 };
