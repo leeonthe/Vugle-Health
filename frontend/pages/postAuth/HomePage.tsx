@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '@/styles/postAuthStyles/HomePageStyles';
+import styles from '../../styles/postAuthStyles/HomePageStyles';
 
 import {
 

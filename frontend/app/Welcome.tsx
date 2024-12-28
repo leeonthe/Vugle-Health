@@ -32,8 +32,8 @@ import Lock from "../assets/images/postAuth/WelcomePage/lock.svg";
 import HomePage from "@/pages/postAuth/HomePage";
 import DexStartPage from "@/pages/postAuth/DexStartPage";
 import DexPage from "../pages/postAuth/chatbot/DexPage";
-import PotentialConditionsPage from '../pages/postAuth/DexNavigationPages/PotentialConditionsPage';
-
+import PotentialConditionsPage from "../pages/postAuth/DexNavigationPages/PotentialConditionsPage";
+import MobileView from "@/components/deviceLayout/MobileView";
 
 type RootStackParamList = {
   HomePage: undefined;
@@ -325,19 +325,24 @@ const Welcome: React.FC = () => {
             <Stack.Screen name="HomePage" component={HomePage} />
             <Stack.Screen name="DexStartPage" component={DexStartPage} />
             <Stack.Screen name="DexPage" component={DexPage} />
-            <Stack.Screen name="PotentialConditionsPage" component={PotentialConditionsPage} options={{headerShown: false}} />
-
+            <Stack.Screen
+              name="PotentialConditionsPage"
+              component={PotentialConditionsPage}
+              options={{ headerShown: false }}
+            />
           </Stack.Navigator>
         </DesktopView>
       ) : (
-        <Stack.Navigator
-          initialRouteName="WelcomePage"
-          screenOptions={{ headerShown: false }}
-        >
-          <Stack.Screen name="WelcomePage" component={WelcomePage} />
-          <Stack.Screen name="HomePage" component={HomePage} />
-          <Stack.Screen name="DexPage" component={DexPage} />
-        </Stack.Navigator>
+        <MobileView>
+          <Stack.Navigator
+            initialRouteName="WelcomePage"
+            screenOptions={{ headerShown: false }}
+          >
+            <Stack.Screen name="WelcomePage" component={WelcomePage} />
+            <Stack.Screen name="HomePage" component={HomePage} />
+            <Stack.Screen name="DexPage" component={DexPage} />
+          </Stack.Navigator>
+        </MobileView>
       )}
     </QueryClientProvider>
   );

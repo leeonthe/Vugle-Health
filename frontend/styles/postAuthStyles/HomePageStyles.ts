@@ -4,6 +4,7 @@ const styles = {
     container: {
       flex: 1,
       backgroundColor: '#F7F9FD',
+
     },
     scrollContainer: {
       paddingHorizontal: 20,
@@ -14,7 +15,7 @@ const styles = {
       justifyContent: 'space-between',
       alignItems: 'center',
       paddingHorizontal: 20,
-      paddingTop: 80,
+      paddingTop: 40,
     },
     headerText: {
       fontSize: 20,

@@ -1,15 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 
 const MobileView: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    return <View style={styles.container}>{children}</View>;
+    return <SafeAreaView style={styles.container}>{children}</SafeAreaView>;
   };
   
   const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      backgroundColor: '#ffffff',
-      padding: 16, // Mobile-specific padding
+        flex: 1, // Ensure the container still fills the screen
     },
   });
   
