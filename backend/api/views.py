@@ -185,13 +185,6 @@ class OAuthHandler:
                     algorithm="HS256",
                 )
                 return redirect(f'http://localhost:8081/Welcome?access_token={access_token}&id_token={id_token}&jwt_token={mobile_token}')
-                # NOTE: change it to if needed: return JsonResponse({"access_token": mobile_token, "id_token": id_token})
-                # return redirect(f'http://localhost:8081/Welcome?access_token={mobile_token}&id_token={id_token}')
-                # return JsonResponse({
-                #     "access_token": mobile_token,
-                #     "id_token": id_token,
-                #     "message": "Login successful"
-                # })
             else:
                 return redirect(f'http://localhost:8081/Welcome?access_token={access_token}&id_token={id_token}')
             
@@ -220,11 +213,12 @@ def oauth_callback(request):
     return handler.oauth_callback(request)
 
 # User info view updated with permissions
-class UserInfoView(View):
+class UserInfoView(APIView):
     """
     API endpoint to fetch authenticated user's profile info for both web and mobile views.
     """
-    permission_classes = [IsWebOrMobileClient]
+    # permission_classes = [IsWebOrMobileClient]
+    @method_decorator(csrf_exempt_if_mobile)
     def get(self, request, *args, **kwargs):
         """
         Handle GET requests to retrieve user profile information for both web and mobile clients.

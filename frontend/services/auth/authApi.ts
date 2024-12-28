@@ -1,7 +1,7 @@
 import api from "../config/axiosConfig";
 
 export const initiateLogin = async (platform: "mobile" | "web") => {
-    const baseUrl = "http://localhost:8000"; // Update with your actual backend base URL
+    const baseUrl = "http://localhost:8000";
     return `${baseUrl}/api/auth/login?platform=${platform}`;
   };
 
