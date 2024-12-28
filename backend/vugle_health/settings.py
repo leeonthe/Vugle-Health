@@ -22,7 +22,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*kz-b==ksj5f4%y4*9p9oh3gk^^e8pd(v*)@&6q#f!n)@d_=f1'
+SECRET_KEY = config("DJANGO_SECRET_KEY")
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -61,26 +62,27 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 # Set secure cookies for mobile and cross-origin use
 SESSION_COOKIE_NAME = 'sessionid'
-SESSION_COOKIE_SAMESITE = 'None'  # Required for cross-origin cookies
-SESSION_COOKIE_SECURE = False    # Set True in production with HTTPS
 
-# SESSION_COOKIE_SECURE = False  # For local dev (set True in production)
-# SESSION_COOKIE_SAMESITE = 'None'  # Prevent SameSite cookie restrictions
-# CSRF_COOKIE_SAMESITE = 'None'  # For CSRF cookies during OAuth
-# CSRF_COOKIE_SECURE = False
+# Session cookies
+SESSION_COOKIE_SAMESITE = 'None'  # Allows cross-origin requests
+SESSION_COOKIE_SECURE = False     # Set to True in production with HTTPS
+
+# CSRF cookies
+CSRF_COOKIE_SAMESITE = 'None'  # Allows cross-origin requests
+CSRF_COOKIE_SECURE = False     # Set to True in production with HTTPS
 
 MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
 
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:19006',  # React Native Expo (mobile)
     'http://localhost:8081',  # Web app frontend
+    'http://localhost:19006',  # React Native Expo (mobile)
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:19006',  # React Native Expo (mobile)
     'http://localhost:8081',  # Web app frontend
+    'http://localhost:19006',  # React Native Expo (mobile)
 ]
 
 CORS_ALLOW_METHODS = [
@@ -117,29 +119,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'vugle_health.wsgi.application'
 
-# # CORS: for WEB VIEW
-# CORS_ALLOW_CREDENTIALS = True
-
-# # CORS_ALLOW_ALL_ORIGINS = False  # Restrict to specific origins for security
-# CORS_ALLOWED_ORIGINS = [
-#     'http://localhost:8081',  # Add your frontend origin here
-# ]
-
-# # Allow HTTP methods
-# CORS_ALLOW_METHODS = [
-#     'GET',
-#     'POST',
-#     'PUT',
-#     'DELETE',
-#     'OPTIONS',
-# ]
-
-# # Allow specific headers if needed
-# CORS_ALLOW_HEADERS = [
-#     'Authorization',
-#     'Content-Type',
-#     'X-CSRFToken',
-# ]
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

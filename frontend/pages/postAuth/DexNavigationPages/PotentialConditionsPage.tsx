@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -23,9 +29,12 @@ const PotentialConditionsPage = ({ route }) => {
 
     if (addedConditions.length > 0) {
       try {
-        await axios.post("http://localhost:8000/api/auth/potential_conditions/", {
-          conditions: addedConditions,
-        });
+        await axios.post(
+          "http://localhost:8000/api/auth/potential_conditions/",
+          {
+            conditions: addedConditions,
+          }
+        );
         console.log("Conditions sent to backend:", addedConditions);
       } catch (error) {
         console.error("Error sending conditions:", error);

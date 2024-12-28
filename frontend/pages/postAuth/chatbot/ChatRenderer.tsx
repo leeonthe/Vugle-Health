@@ -14,6 +14,8 @@ import CheckMark from "../../../assets/images/postAuth/dexPage/checkMark.svg";
 import axios from "axios";
 
 import { ChatBubble } from "../../../utils/interfaces/promptTypes";
+import { PotentialCondition } from "../../../utils/interfaces/dexTypes";
+
 import { useDevice } from "@/utils/hooks/useDevice";
 import { useChat } from "../../../utils/hooks/useChat";
 
@@ -22,17 +24,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import TypeInput from "@/components/common/TypeInput";
 import PainScaleSlider from "@/components/common/PainScalesSlider";
-
+import fetchPotentialConditions from "@/utils/hooks/fetchPotentialConditions";
 // TODO:
 //      + Diplay different container if isHealthLoading and isHealthSuccessful
 //      + Display Keyboard when TextInput is focused
 
 interface ChatProps {
   chatHistory: ChatBubble[];
-  onOptionSelect: (
-    nextStep: string,
-    userResponse?: string
-  ) => void;
+  onOptionSelect: (nextStep: string, userResponse?: string) => void;
   isHealthLoading: boolean;
   isHealthSuccess: boolean;
 }
@@ -76,7 +75,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
             // Create FormData to send the file
             const formData = new FormData();
             formData.append("file", file);
-
 
             triggerOptionAction({ text: file.name, next: "choose_your_claim" });
 
@@ -192,36 +190,49 @@ const ChatRenderer: React.FC<ChatProps> = ({
     }
   };
 
-  const handleNavigateToConditions = () => {
-    // Mock data for potential conditions
-    const potentialConditions = [
-      {
-        name: "Condition A",
-        risk: "High",
-        riskColor: "red",
-        description: "Description for Condition A",
-      },
-      {
-        name: "Condition B",
-        risk: "Medium",
-        riskColor: "orange",
-        description: "Description for Condition B",
-      },
-    ];
+  // Mock data for potential conditions
+  // const potentialConditions = [
+  //   {
+  //     name: "Condition A",
+  //     risk: "High",
+  //     riskColor: "red",
+  //     description: "Description for Condition A",
+  //   },
+  //   {
+  //     name: "Condition B",
+  //     risk: "Medium",
+  //     riskColor: "orange",
+  //     description: "Description for Condition B",
+  //   },
+  // ];
+  const handleNavigateToConditions = async () => {
+    try {
+      // const response = await axios.get(
+      //   "http://localhost:8000/api/auth/potential_conditions_list/"
+      // );
+      // const potentialConditions = response.data.conditions;
 
-    navigation.navigate("PotentialConditionsPage", {
-      potentialConditions,
-      onReturn: (formattedConditions) => {
-        console.log("Selected conditions:", formattedConditions);
-        const conditionsArray = Array.isArray(formattedConditions)
-          ? formattedConditions
-          : [formattedConditions];
-        triggerOptionAction({
-          text: conditionsArray.join(", "), // Convert selected conditions to string
-          next: "pain_duration",
-        });
-      },
-    });
+      const data = await fetchPotentialConditions();
+      const potentialConditions: PotentialCondition[] = data.conditions;
+      console.log("Fetched potential conditions:", potentialConditions);
+
+      navigation.navigate("PotentialConditionsPage", {
+        potentialConditions,
+        onReturn: (formattedConditions: string[] | string) => {
+          console.log("Selected conditions:", formattedConditions);
+          const conditionsArray = Array.isArray(formattedConditions)
+            ? formattedConditions
+            : [formattedConditions];
+          triggerOptionAction({
+            // Convert selected conditions to string
+            text: conditionsArray.join(", "),
+            next: "pain_duration",
+          });
+        },
+      });
+    } catch (error) {
+      console.error("ERROR FETCHING POTENTIAL CONDITONS ", error);
+    }
   };
 
   const renderElement = (
@@ -386,7 +397,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
     });
   };
 
-
   const renderUserResponse = (userResponse: string, chatIndex: number) => (
     <View style={styles.chatContainer}>
       <Animatable.View
@@ -400,7 +410,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
       </Animatable.View>
     </View>
   );
-
 
   /**
    * @param bubble -> Represents a single chat bubble (💬), which contains one or more elements in its `container` array.
@@ -434,7 +443,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
         <Animatable.View
           key={`bubble-${bubbleIndex}`}
           animation={isLoadingBubble ? undefined : "fadeIn"}
-          duration= {isLoadingBubble ? 0 : 1000}
+          duration={isLoadingBubble ? 0 : 1000}
           delay={isLoadingBubble ? 0 : bubbleIndex * 1000}
           style={
             bubble.container.some((element) => element.type === "image")
@@ -454,7 +463,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
       </View>
     );
   };
-
 
   const renderChatHistory = () => {
     return chatHistory.map((chat, chatIndex) => (

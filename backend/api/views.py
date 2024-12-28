@@ -6,23 +6,22 @@ from decouple import config
 from jwt.exceptions import InvalidTokenError
 
 from django.views import View
-from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sessions.models import Session
 
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-
-
+from django.middleware.csrf import get_token
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
 from base64 import b64encode
-from .parsingPDF import parse_dd214_text
 
+from .parsingPDF import parse_dd214_text
+from .dex_analysis import generate_potential_conditions
 
 import requests
 import base64
@@ -35,6 +34,11 @@ import json
 import time
 import uuid
 import traceback
+
+def get_csrf_token(request):
+    """Endpoint to expose CSRF token to the frontend."""
+    token = get_token(request)
+    return JsonResponse({'csrfToken': token})
 
 class OAuthHandler:
     def __init__(self):
@@ -183,7 +187,7 @@ def oauth_callback(request):
     return handler.oauth_callback(request)
 
  # Exempt CSRF for mobile clients
-@method_decorator(csrf_exempt, name='dispatch') 
+@method_decorator(csrf_exempt, name='dispatch')
 class UserInfoView(View):
     """
     API endpoint to fetch authenticated user's profile info for both web and mobile views.
@@ -583,11 +587,13 @@ class StoreUserInputView(View):
 
             # For new_condition.json
             if input_type == "conditionType":
-                if 'user_medical_condition_response' not in request.session:
-                    request.session['user_medical_condition_response'] = []
-                request.session['user_medical_condition_response'].append(typed_text)
+                request.session['user_medical_condition_response'] = typed_text.strip()
                 request.session.modified = True
-                print(f"Condition input stored: {typed_text}")
+                request.session.save()
+                print(f"Session ID during POST: {request.session.session_key}")
+                print(f"Session data after saving: {dict(request.session.items())}")
+
+                print(f"user_medical_condition_response: {request.session.get('user_medical_condition_response')}")
                 return JsonResponse({'success': True, 'message': 'Condition input stored successfully'})
 
             # For pain_duration.json
@@ -611,6 +617,7 @@ class StoreUserInputView(View):
                 request.session.modified = True
                 print(f"User input stored in session: {typed_text}")
                 return JsonResponse({'success': True, 'message': 'Input stored successfully'})
+            print(f"Session data during POST: {request.session.items()}")
 
         except Exception as e:
             print(f"Error storing user input: {e}")
@@ -642,3 +649,50 @@ class StorePotentialConditions(View):
             return JsonResponse({'error': 'Invalid JSON.'}, status=400)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
+
+
+class DexAnalysisResponse():
+    # This is for PotentialConditionsPage
+    @staticmethod
+    @csrf_exempt
+    def get_potential_conditions(request):
+        # print(f"user_medical_condition_response: {request.session.get('user_medical_condition_response')}")
+
+        if request.method == "GET":
+            print(f"Session ID during GET: {request.session.session_key}")
+            print(f"Session data during GET: {request.session.items()}")
+            user_input = request.session.get('user_medical_condition_response', None)
+            print("USER INPUT FROM request.session.get('user_medical_condition_response', None): ", user_input)
+            if not user_input:
+                print("NO user_medical_condition_response IN SESSION", user_input)
+                return JsonResponse({"error": "No user input found in session"}, status=400)
+
+            conditions = generate_potential_conditions(user_input)
+            parsed_conditions = []
+            
+            for condition in conditions:
+                try:
+                    lines = condition.split('\n')
+                    condition_name = lines[0].split(":")[1].strip()
+                    risk_level = lines[1].split(":")[1].strip()
+                    description = lines[2].split(":")[1].strip()
+
+                    # Assign risk color based on risk level
+                    risk_color = (
+                        "red" if risk_level == "High risk" else
+                        "orange" if risk_level == "Medium risk" else
+                        "green"
+                    )
+
+                    parsed_conditions.append({
+                        "name": condition_name,
+                        "risk": risk_level,
+                        "riskColor": risk_color,
+                        "description": description,
+                    })
+                except IndexError:
+                    continue
+
+            return JsonResponse({"conditions": parsed_conditions}, status=200)
+
+        return JsonResponse({"error": "Invalid request method"}, status=405)

@@ -81,7 +81,6 @@ const fetchEligibleLetters = async (icn: string): Promise<EligibleLettersRespons
     method: 'GET',
     headers: {
         Authorization: `Bearer ${accessToken}`,
-        // ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         'Content-Type': 'application/json',
     },
   });
