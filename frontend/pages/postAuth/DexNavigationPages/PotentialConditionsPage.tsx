@@ -6,15 +6,15 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuthenticatedRequest } from "../../../utils/hooks/useAuthenticatedRequest";
 
 const PotentialConditionsPage = ({ route }) => {
   const { potentialConditions, onReturn, onContinueToChatbot } = route.params;
   const navigation = useNavigation();
   const [selectedConditions, setSelectedConditions] = useState({});
+  const { makeRequest } = useAuthenticatedRequest();
 
   const toggleCondition = (conditionName) => {
     setSelectedConditions((prev) => ({
@@ -24,34 +24,21 @@ const PotentialConditionsPage = ({ route }) => {
   };
 
   const handleContinue = async () => {
-    const accessToken = await AsyncStorage.getItem("access_token");
-
     const addedConditions = Object.keys(selectedConditions).filter(
       (key) => selectedConditions[key]
     );
 
     if (addedConditions.length > 0) {
       try {
-        const response = await axios.post(
+        await makeRequest(
           "http://localhost:8000/api/auth/potential_conditions/",
           {
             conditions: addedConditions,
-          },
-          {
-            headers: {
-              ...(accessToken
-                ? { Authorization: `Bearer ${accessToken}` }
-                : {}),
-            },
-            withCredentials: true, 
           }
         );
-
-        if (response.status === 200) {
-          console.log("Conditions sent to backend:", response.data);
-        } else {
-          console.error("Unexpected response from backend:", response);
-        }
+        console.log(
+          "Added potential condition lists successfully sent to the backend."
+        );
       } catch (error) {
         console.error("Error sending conditions:", error);
       }

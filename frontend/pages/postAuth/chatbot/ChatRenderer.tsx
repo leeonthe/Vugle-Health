@@ -19,6 +19,7 @@ import { PotentialCondition } from "../../../utils/interfaces/dexTypes";
 
 import { useDevice } from "@/utils/hooks/useDevice";
 import { useChat } from "../../../utils/hooks/useChat";
+import { useAuthenticatedRequest } from "../../../utils/hooks/useAuthenticatedRequest";
 
 import { useKeyboardStatus } from "@/utils/hooks/useKeyboardStatus";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -51,10 +52,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
   const { isDesktop } = useDevice();
   const navigation = useNavigation();
 
-  // Hook to fetch loading.json
-  const { fetchLoadingPrompt } = useChat();
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadingData, setLoadingData] = useState<ChatBubble | null>(null);
+  const { makeRequest } = useAuthenticatedRequest();
 
   const triggerOptionAction = async (option: any) => {
     const { text, next } = option;
@@ -151,57 +149,26 @@ const ChatRenderer: React.FC<ChatProps> = ({
   };
 
   const handleConditionType = async (typedText: string) => {
-    const accessToken = await AsyncStorage.getItem("access_token");
-
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/auth/store_user_input",
-        {
-          userInput: typedText,
-          inputType: "conditionType",
-        },
-        {
-          headers: {
-            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-          },
-          withCredentials: true,
-        }
-      );
-
-      if (response.status === 200) {
-        console.log("Response from backend:", response.data);
-        triggerOptionAction({ text: typedText, next: "other_condition" });
-      } else {
-        console.error("Unexpected response from backend:", response);
-      }
+      await makeRequest("http://localhost:8000/api/auth/store_user_input", {
+        userInput: typedText,
+        inputType: "conditionType",
+      });
+      console.log("Condition type input successfully sent to the backend.");
+      triggerOptionAction({ text: typedText, next: "other_condition" });
     } catch (error) {
       console.error("ERROR SENDING USER TYPE TO BACKEND", error);
     }
   };
 
   const handlePainDuration = async (typedText: string) => {
-    const accessToken = await AsyncStorage.getItem("access_token");
-
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/auth/store_user_input",
-        {
-          userInput: typedText,
-          inputType: "painDuration",
-        },
-        {
-          headers: {
-            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-          },
-          withCredentials: true, // Include cookies for session persistence
-        }
-      );
-      if (response.status === 200) {
-        console.log("Pain duration input saved:", response.data);
-        triggerOptionAction({ text: typedText, next: "pain_severity" });
-      } else {
-        console.error("Unexpected response from backend:", response);
-      }
+      await makeRequest("http://localhost:8000/api/auth/store_user_input", {
+        userInput: typedText,
+        inputType: "conditionType",
+      });
+      console.log("Pain duration input successfully sent to the backend.");
+      triggerOptionAction({ text: typedText, next: "pain_severity" });
     } catch (error) {
       console.error("Error sending pain duration input to backend:", error);
     }
