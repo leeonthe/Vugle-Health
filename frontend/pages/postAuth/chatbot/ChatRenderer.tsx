@@ -164,7 +164,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
           headers: {
             ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
           },
-          withCredentials: true, 
+          withCredentials: true,
         }
       );
 
@@ -180,12 +180,20 @@ const ChatRenderer: React.FC<ChatProps> = ({
   };
 
   const handlePainDuration = async (typedText: string) => {
+    const accessToken = await AsyncStorage.getItem("access_token");
+
     try {
       const response = await axios.post(
         "http://localhost:8000/api/auth/store_user_input",
         {
           userInput: typedText,
           inputType: "painDuration",
+        },
+        {
+          headers: {
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          },
+          withCredentials: true, // Include cookies for session persistence
         }
       );
       if (response.status === 200) {

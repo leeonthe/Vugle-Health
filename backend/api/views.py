@@ -591,9 +591,9 @@ class StoreUserInputView(View):
                 return JsonResponse({'success': False, 'message': 'Access token missing or invalid.'}, status=401)
 
             data = request.POST or json.loads(request.body)
+
             typed_text = data.get('userInput')
-            # to handle handleConditionType & hanldePainDuration by determining inputType which is provided it in .json file
-            input_type = data.get('inputType', '').strip()  
+            input_type = data.get('inputType', '').strip() # to handle handleConditionType & hanldePainDuration by determining inputType which is provided it in .json file
 
             if not typed_text:
                 return JsonResponse({'success': False, 'message': 'No input provided'}, status=400)
@@ -602,11 +602,9 @@ class StoreUserInputView(View):
             if input_type == "conditionType":
                 request.session['user_medical_condition_response'] = typed_text.strip()
                 request.session.modified = True
-                # request.session.save()
-                print(f"Session ID during POST: {request.session.session_key}")
-                print(f"Session data after saving: {dict(request.session.items())}")
-
-                print(f"user_medical_condition_response: {request.session.get('user_medical_condition_response')}")
+                # print(f"Session ID during POST: {request.session.session_key}")
+                # print(f"Session data after saving: {dict(request.session.items())}")
+                print(f"user_medical_condition_response in session: {request.session.get('user_medical_condition_response')}")
                 return JsonResponse({'success': True, 'message': 'Condition input stored successfully'})
 
             # For pain_duration.json
@@ -620,7 +618,7 @@ class StoreUserInputView(View):
             elif input_type == "painSeverity":
                 request.session['user_pain_severity'] = typed_text
                 request.session.modified = True
-                print(f"Pain severity input stored: {typed_text}")
+                print(f"user_pain_severity in session: {request.session.get('user_medical_condition_response')}")
                 return JsonResponse({'success': True, 'message': 'Pain severity input stored successfully'})
             
             # Add other behavior if added / existed
@@ -641,10 +639,17 @@ class StoreUserInputView(View):
 class StorePotentialConditions(View):
     def post(self, request):
         try:
-            # Parse the JSON body of the request
+            auth_header = request.headers.get("Authorization")
+            if auth_header and auth_header.startswith("Bearer "):
+                access_token = auth_header.split(" ")[1]
+                print(f"Access Token Received [StorePotentialConditions]: {access_token}")
+            else:
+                access_token = request.session.get("access_token")
+                print(f"Session Access Token [StorePotentialConditions]: {access_token}")
+
             body = json.loads(request.body)
             conditions = body.get('conditions', [])
-            print("ADDED POTENTIAL CONDITIONS: ", conditions)
+
             if not isinstance(conditions, list):
                 return JsonResponse({'error': 'Invalid data format. "conditions" should be a list.'}, status=400)
 
@@ -655,7 +660,8 @@ class StorePotentialConditions(View):
             # Store the conditions in the session
             request.session['potential_conditions'].extend(conditions)
             request.session.modified = True
-
+            TEST_POT = request.session.get('potential_conditions')
+            print("STORED potential_conditions in session: ", TEST_POT)
             return JsonResponse({'message': 'Conditions stored successfully.', 'stored_conditions': request.session['potential_conditions']}, status=200)
         
         except json.JSONDecodeError:
