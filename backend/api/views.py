@@ -266,9 +266,11 @@ class DisabilityRatingView(View):
         # Check for token in Authorization header (mobile clients)
         auth_header = request.headers.get("Authorization")
         if auth_header and auth_header.startswith("Bearer "):
+            print("DISABILITY RATING WEB VIEW ACCESS TOKEN CALLED")
             access_token = auth_header.split(" ")[1]
         else:
             # Check session for web clients
+            # print("DISABILITY RATING WEB VIEW ACCESS TOKEN CALLED")
             access_token = request.session.get("access_token")
 
         if not access_token:
@@ -577,6 +579,17 @@ class ParsingDD214(APIView):
 class StoreUserInputView(View):
     def post(self, request):
         try:
+            auth_header = request.headers.get("Authorization")
+            if auth_header and auth_header.startswith("Bearer "):
+                access_token = auth_header.split(" ")[1]
+                print(f"AUTH HEADER HERE, IN STOREUSERINPUTVIEW: Access Token Received: {access_token}")
+            else:
+                access_token = request.session.get("access_token")
+                print(f"AUTH HEADER NOT HERE, IN STOREUSERINPUTVIEW: Session Access Token: {access_token}")
+
+            if not access_token:
+                return JsonResponse({'success': False, 'message': 'Access token missing or invalid.'}, status=401)
+
             data = request.POST or json.loads(request.body)
             typed_text = data.get('userInput')
             # to handle handleConditionType & hanldePainDuration by determining inputType which is provided it in .json file
@@ -589,7 +602,7 @@ class StoreUserInputView(View):
             if input_type == "conditionType":
                 request.session['user_medical_condition_response'] = typed_text.strip()
                 request.session.modified = True
-                request.session.save()
+                # request.session.save()
                 print(f"Session ID during POST: {request.session.session_key}")
                 print(f"Session data after saving: {dict(request.session.items())}")
 

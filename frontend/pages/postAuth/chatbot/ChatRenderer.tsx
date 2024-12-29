@@ -12,6 +12,7 @@ import * as DocumentPicker from "expo-document-picker";
 import Logo from "../../../assets/images/logo/dexLogo.svg";
 import CheckMark from "../../../assets/images/postAuth/dexPage/checkMark.svg";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { ChatBubble } from "../../../utils/interfaces/promptTypes";
 import { PotentialCondition } from "../../../utils/interfaces/dexTypes";
@@ -150,12 +151,20 @@ const ChatRenderer: React.FC<ChatProps> = ({
   };
 
   const handleConditionType = async (typedText: string) => {
+    const accessToken = await AsyncStorage.getItem("access_token");
+
     try {
       const response = await axios.post(
         "http://localhost:8000/api/auth/store_user_input",
         {
           userInput: typedText,
           inputType: "conditionType",
+        },
+        {
+          headers: {
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          },
+          withCredentials: true, 
         }
       );
 
