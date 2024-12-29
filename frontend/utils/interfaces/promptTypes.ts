@@ -5,6 +5,7 @@
  
  - `type`: The kind of element (e.g., "text", "image", "link", etc.).
  - `content`: The content of the element (e.g., text or image URL).
+ - `updated` (optional): An alternative content value used to replace the initial `content` when a state (e.g., `isLoading`) changes.
  - `style` (optional): Custom styles applied to the element.
  - `url` (optional): URL for "link" type elements.
  - `condition` (optional): A condition to control whether the element is displayed.
@@ -12,6 +13,7 @@
 export interface BaseElement {
   type: "text" | "image" | "link" | "animation" | "loadingImage";
   content: string;
+  updated?: string;
   style?: Record<string, any>;
   url?: string;
   condition?: string;

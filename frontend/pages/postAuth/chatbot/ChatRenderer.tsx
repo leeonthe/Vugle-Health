@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
   Text,
@@ -36,9 +36,38 @@ interface ChatProps {
 const ChatRenderer: React.FC<ChatProps> = ({
   chatHistory,
   onOptionSelect,
-  isHealthLoading,
-  isHealthSuccess,
+  isHealthLoading: initialIsHealthLoading,
+  isHealthSuccess: initialIsHealthSuccess,
 }) => {
+  const [loadingStates, setLoadingStates] = useState<Record<number, boolean>>(
+    {}
+  );
+  const [triggeredGroups, setTriggeredGroups] = useState<Set<number>>(
+    new Set()
+  );
+
+  const handleLoadingState = (groupIndex: number) => {
+    if (!(groupIndex in loadingStates)) {
+      // Delay the entire process by 3 seconds
+      setTimeout(() => {
+        setLoadingStates((prev) => ({
+          ...prev,
+          [groupIndex]: true, 
+        }));
+
+        // Stop loading after another 3 seconds
+        setTimeout(() => {
+          setLoadingStates((prev) => ({
+            ...prev,
+            [groupIndex]: false, // Set loading to false
+          }));
+        }, 3000);
+      }, 3000);
+    }
+
+    return loadingStates[groupIndex] ?? true;
+  };
+
   const [userInput, setUserInput] = React.useState<string>("");
 
   const [painScale, setPainScale] = useState<number>(0);
@@ -47,11 +76,22 @@ const ChatRenderer: React.FC<ChatProps> = ({
   const { isDesktop } = useDevice();
   const navigation = useNavigation();
 
+  const [isHealthLoading, setIsHealthLoading] = useState(
+    initialIsHealthLoading
+  );
+  const [isHealthSuccess, setIsHealthSuccess] = useState(
+    initialIsHealthSuccess
+  );
+
   const { makeRequest } = useAuthenticatedRequest();
 
   const triggerOptionAction = async (option: any) => {
     const { text, next } = option;
     onOptionSelect(next, text || userInput || `${painScale}`);
+  };
+
+  const triggerOptionSingleAction = async (nextStep: string) => {
+    onOptionSelect(nextStep);
   };
 
   const handleFileUpload = async () => {
@@ -169,11 +209,9 @@ const ChatRenderer: React.FC<ChatProps> = ({
     }
   };
 
-
-
-/**
- * Below handleNavigateToConditions is actual method. 
- */
+  /**
+   * Below handleNavigateToConditions is actual method.
+   */
   // const handleNavigateToConditions = async () => {
   //   try {
   //     // const response = await axios.get(
@@ -204,24 +242,22 @@ const ChatRenderer: React.FC<ChatProps> = ({
   //   }
   // };
 
-
   /**
-   * Below handleNavigateToConditions is for testing purpose. 
-   * -> it does not call gpt api.  
+   * Below handleNavigateToConditions is for testing purpose.
+   * -> it does not call gpt api.
    */
   const handleNavigateToConditions = async () => {
     try {
-    // Mock data for potential conditions
+      // Mock data for potential conditions
       const potentialConditions = [
         {
           name: "Condition A",
           risk: "High",
           riskColor: "red",
-          description: "DTo display the + icon on the right side, you can adjust the layout of the button to use flexDirection: This way, the Icon will be positioned after the Text.",
+          description:
+            "DTo display the + icon on the right side, you can adjust the layout of the button to use flexDirection: This way, the Icon will be positioned after the Text.",
         },
         {
-
-          
           name: "Condition B",
           risk: "Medium",
           riskColor: "orange",
@@ -286,9 +322,86 @@ const ChatRenderer: React.FC<ChatProps> = ({
 
   const renderElement = (
     element: ChatBubble["chat_bubbles"][number]["container"][number],
-    index: number
+    index: number,
+    groupIndex: number | null = null
   ) => {
+    const isStartBubble = chatHistory.some(
+      (chat) => chat.chat_bubbles_id === 1 
+    );
+    const isLoading = handleLoadingState(groupIndex ?? index);
+
     switch (element.type) {
+
+      /**
+       * Need to update to support suitable_claim_type.json
+       */
+      case "group":
+        console.log("groupIndex", groupIndex);
+        console.log("index", index);
+        console.log("isLoading:", isLoading);
+
+        if (!isLoading && isStartBubble && !triggeredGroups.has(index)) {
+          setTriggeredGroups((prev) => {
+            if (prev.has(index)) return prev; 
+            const updatedSet = new Set(prev);
+            updatedSet.add(index);
+            console.log("IM CALLED");
+            triggerOptionSingleAction("upload_dd214");
+            return updatedSet;
+          });
+        }
+
+        return (
+          <View key={`group-${index}`} style={styles.groupContainer}>
+            {element.content.map((childElement: any, childIndex: number) => {
+              if (childElement.type === "text") {
+                return (
+                  <View
+                    key={`group-row-${childIndex}`}
+                    style={styles.rowContainer} 
+                  >
+                    {/* Render the text on the left */}
+                    <View style={styles.loadingMessageContainer}>
+                      <Text style={[styles.loadingMessageText]}>
+                        {isLoading
+                          ? childElement.content
+                          : childElement.updated}
+                      </Text>
+                    </View>
+
+                    {/* Render the ActivityIndicator or CheckMark */}
+                    <View style={styles.rightAlignedContainer}>
+                      {isLoading ? (
+                        <ActivityIndicator
+                          key={`loading-${childIndex}`}
+                          size="small"
+                          color="#3182F6"
+                          style={styles.loadingIndicator}
+                        />
+                      ) : (
+                        <CheckMark
+                          key={`checkmark-${childIndex}`}
+                          style={styles.checkMarkPosition}
+                        />
+                      )}
+                    </View>
+                  </View>
+                );
+              }
+
+              if (
+                childElement.type === "animation" ||
+                childElement.type === "loadingImage"
+              ) {
+                return null;
+              }
+
+              // Default rendering for other elements
+              return renderElement(childElement, childIndex, index);
+            })}
+          </View>
+        );
+
       case "text":
         return (
           <Text
@@ -315,34 +428,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
             </Text>
           </TouchableOpacity>
         );
-      case "group":
-        return (
-          <View key={`group-${index}`} style={styles.groupContainer}>
-            {element.content.map((childElement, childIndex) =>
-              renderElement(childElement, childIndex)
-            )}
-          </View>
-        );
-      case "animation":
-        if (element.condition === "usePatientHealth.isLoading") {
-          return (
-            <ActivityIndicator
-              key={`animation-${index}`}
-              size="large"
-              color="#3182F6"
-            />
-          );
-        }
-        break;
-      case "loadingImage":
-        if (element.condition === "usePatientHealth.isSuccess") {
-          return (
-            <View key={`loadingImage-${index}`}>
-              <CheckMark />
-            </View>
-          );
-        }
-        break;
 
       case "custom":
         return <View key={`custom-${index}`}>{element.content}</View>;
@@ -355,20 +440,9 @@ const ChatRenderer: React.FC<ChatProps> = ({
   const renderOptions = (options: any[], chatIndex: number) => {
     return options.map((option, idx) => {
       const key = `${chatIndex}-option-${idx}`;
-
-      // {/* TODO: Diplay different container if isHealthLoading and isHealthSuccessful
-      //         ISSUE: it displays .json from beginning, I think its bc I am using useQuery in usePatientHealth.
-      //     */}
-      if (option.text === "NONE" && isHealthSuccess) {
-        return isHealthLoading ? (
-          <ActivityIndicator
-            key={`${key}-loading`}
-            size="large"
-            color="#3182F6"
-          />
-        ) : (
-          <CheckMark key={`${key}-success`} />
-        );
+      
+      if (option.text === "NONE") {
+        return null;
       }
 
       if (option.text === "Upload DD214") {
@@ -434,9 +508,11 @@ const ChatRenderer: React.FC<ChatProps> = ({
         );
       }
 
-      // Handle this case: display no option field, but wait til data is fetched from backend. 
-      // if (option.text === "TEST") {
-      // }
+      // Handle this case: display no option field, but wait til data is fetched from backend.
+      if (option.text === "TEST") {
+
+        // triggerOptionAction
+      }
 
       return (
         <TouchableOpacity
@@ -563,7 +639,7 @@ const styles = StyleSheet.create({
   messageContainer: {
     paddingHorizontal: 10,
     paddingVertical: 8,
-    paddingBottom: 10, 
+    paddingBottom: 10,
     backgroundColor: "#F5F6F8",
     borderRadius: 16,
     alignItems: "flex-start",
@@ -612,9 +688,31 @@ const styles = StyleSheet.create({
     lineHeight: 28,
     textAlign: "center",
   },
+  loadingMessageContainer: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  loadingMessageText: {
+    fontSize: 16,
+    color: "#323D4C",
+  },
   groupContainer: {
-    padding: 16,
-    borderRadius: 8,
+    marginBottom: 16,
+  },
+  rowContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  rightAlignedContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "column",
+    width: 30,
+  },
+  loadingIndicator: {
+    marginLeft: 12,
   },
   dataLoadingContainer: {
     backgroundColor: "#FFFAE5",
@@ -637,9 +735,9 @@ const styles = StyleSheet.create({
     height: 40,
   },
   userResponseContainer: {
-    paddingBottom: 12, 
-    paddingTop: 12, 
-  }, 
+    paddingBottom: 12,
+    paddingTop: 12,
+  },
   userMessage: {
     alignSelf: "flex-end",
     backgroundColor: "#3182F6",

@@ -43,6 +43,7 @@
             "fontWeight": "bold",
             "lineHeight": 28,
             "wordWrap": "break-word",
+            
             "marginBottom": 16
           }
         },
@@ -79,6 +80,7 @@
             {
               "type": "text",
               "content": "Retrieving STRs...",
+              "updated": "STRs",
               "style": {
                 "color": "#323D4C",
                 "fontSize": 16,
@@ -106,13 +108,14 @@
             {
               "type": "text",
               "content": "Retrieving Medical Records...",
+              "updated": "Medical Records",
               "style": {
                 "color": "#323D4C",
                 "fontSize": 16,
                 "fontFamily": "SF Pro",
                 "fontWeight": "400",
                 "lineHeight": 28,
-                "marginBottom": 8
+                "marginRight": 8
               }
             },
             {
@@ -133,6 +136,7 @@
             {
               "type": "text",
               "content": "Retrieving Previous Claims...",
+              "updated": "Previous Claims",
               "style": {
                 "color": "#323D4C",
                 "fontSize": 16,

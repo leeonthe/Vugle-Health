@@ -84,6 +84,7 @@
             {
               "type": "text",
               "content": "DD214",
+              "updated": "DD214",
               "style": {
                 "color": "#323D4C",
                 "fontSize": 16,
@@ -111,6 +112,7 @@
             {
               "type": "text",
               "content": "STRs",
+              "updated": "STRs",
               "style": {
                 "color": "#323D4C",
                 "fontSize": 16,
@@ -138,6 +140,7 @@
             {
               "type": "text",
               "content": "Medical Records",
+              "updated": "Medical Medical", 
               "style": {
                 "color": "#323D4C",
                 "fontSize": 16,
@@ -165,6 +168,7 @@
             {
               "type": "text",
               "content": "Previous Claims",
+              "updated": "Previous Claims", 
               "style": {
                 "color": "#323D4C",
                 "fontSize": 16,

@@ -19,6 +19,8 @@ const DexPage: React.FC = () => {
   const { useFetchPrompt, useSendSelection } = useChat();
   const [currentStep, setCurrentStep] = useState<string>("start");
   const [chatHistory, setChatHistory] = useState<ChatBubble[]>([]);
+  const [actionTriggered, setActionTriggered] = useState(false);
+
   const [loadingState, setLoadingState] = useState({
     showLoading: false,
     showSuccess: false,
@@ -82,6 +84,13 @@ const DexPage: React.FC = () => {
     nextStep: string,
     userResponse?: string
   ) => {
+    // Prevent duplicate calls
+    if (actionTriggered) {
+      console.log("Action already triggered. Skipping...");
+      return; 
+    }
+    setActionTriggered(true);
+
     console.log("Option selected:", nextStep, "User Response:", userResponse);
 
     // Append user response to chatHistory
@@ -150,9 +159,11 @@ const DexPage: React.FC = () => {
             } else{
               setChatHistory((prevHistory) => [...prevHistory, data]);
             }
+            setActionTriggered(false);
           },
           onError: (error) => {
             console.error("Error during mutation:", error);
+            setActionTriggered(false);
           },
         }
       );
