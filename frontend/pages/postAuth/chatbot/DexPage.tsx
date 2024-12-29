@@ -147,6 +147,8 @@ const DexPage: React.FC = () => {
           onSuccess: (data) => {
             if (data.next) {
               setCurrentStep(data.next);
+            } else{
+              setChatHistory((prevHistory) => [...prevHistory, data]);
             }
           },
           onError: (error) => {
@@ -156,6 +158,7 @@ const DexPage: React.FC = () => {
       );
     }, 2000);
   };
+
 
   if (isPromptLoading) {
     return <ActivityIndicator size="large" color="#3182F6" />;

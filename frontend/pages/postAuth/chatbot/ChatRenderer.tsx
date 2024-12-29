@@ -15,11 +15,10 @@ import { useNavigation } from "@react-navigation/native";
 import { ChatBubble } from "../../../utils/interfaces/promptTypes";
 import { PotentialCondition } from "../../../utils/interfaces/dexTypes";
 
-// hooks 
+// hooks
 import { useDevice } from "../../../utils/hooks/useDevice";
 import { useAuthenticatedRequest } from "../../../utils/hooks/useAuthenticatedRequest";
 import { useKeyboardStatus } from "../../../utils/hooks/useKeyboardStatus";
-import fetchPotentialConditions from "../../../utils/hooks/fetchPotentialConditions";
 
 import TypeInput from "@/components/common/TypeInput";
 import PainScaleSlider from "@/components/common/PainScalesSlider";
@@ -170,31 +169,63 @@ const ChatRenderer: React.FC<ChatProps> = ({
     }
   };
 
-  // Mock data for potential conditions
-  // const potentialConditions = [
-  //   {
-  //     name: "Condition A",
-  //     risk: "High",
-  //     riskColor: "red",
-  //     description: "Description for Condition A",
-  //   },
-  //   {
-  //     name: "Condition B",
-  //     risk: "Medium",
-  //     riskColor: "orange",
-  //     description: "Description for Condition B",
-  //   },
-  // ];
+
+
+/**
+ * Below handleNavigateToConditions is actual method. 
+ */
+  // const handleNavigateToConditions = async () => {
+  //   try {
+  //     // const response = await axios.get(
+  //     //   "http://localhost:8000/api/auth/potential_conditions_list/"
+  //     // );
+  //     // const potentialConditions = response.data.conditions;
+
+  //     const data = await fetchPotentialConditions();
+  //     const potentialConditions: PotentialCondition[] = data.conditions;
+  //     console.log("Fetched potential conditions:", potentialConditions);
+
+  //     navigation.navigate("PotentialConditionsPage", {
+  //       potentialConditions,
+  //       onReturn: (formattedConditions: string[] | string) => {
+  //         console.log("Selected conditions:", formattedConditions);
+  //         const conditionsArray = Array.isArray(formattedConditions)
+  //           ? formattedConditions
+  //           : [formattedConditions];
+  //         triggerOptionAction({
+  //           // Convert selected conditions to string
+  //           text: conditionsArray.join(", "),
+  //           next: "pain_duration",
+  //         });
+  //       },
+  //     });
+  //   } catch (error) {
+  //     console.error("ERROR FETCHING POTENTIAL CONDITONS ", error);
+  //   }
+  // };
+
+
+  /**
+   * Below handleNavigateToConditions is for testing purpose. 
+   * -> it does not call gpt api.  
+   */
   const handleNavigateToConditions = async () => {
     try {
-      // const response = await axios.get(
-      //   "http://localhost:8000/api/auth/potential_conditions_list/"
-      // );
-      // const potentialConditions = response.data.conditions;
-
-      const data = await fetchPotentialConditions();
-      const potentialConditions: PotentialCondition[] = data.conditions;
-      console.log("Fetched potential conditions:", potentialConditions);
+    // Mock data for potential conditions
+      const potentialConditions = [
+        {
+          name: "Condition A",
+          risk: "High",
+          riskColor: "red",
+          description: "Description for Condition A",
+        },
+        {
+          name: "Condition B",
+          risk: "Medium",
+          riskColor: "orange",
+          description: "Description for Condition B",
+        },
+      ];
 
       navigation.navigate("PotentialConditionsPage", {
         potentialConditions,
@@ -364,6 +395,10 @@ const ChatRenderer: React.FC<ChatProps> = ({
           />
         );
       }
+
+      // Handle this case: display no option field, but wait til data is fetched from backend. 
+      // if (option.text === "TEST") {
+      // }
 
       return (
         <TouchableOpacity

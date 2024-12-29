@@ -28,6 +28,6 @@ urlpatterns = [
     path('auth/store_user_input', StoreUserInputView.as_view(), name='store_user_input'),
     path('auth/potential_conditions/', StorePotentialConditions.as_view(), name='store_potential_conditions'),
     path('auth/potential_conditions_list/', DexAnalysisResponse.get_potential_conditions, name='get_potential_conditions_list'),
-    
+    path('auth/suitable_claim_type/', DexAnalysisResponse.generate_most_suitable_claim_response, name='get_most_suitable_claim_response'),
 
 ]

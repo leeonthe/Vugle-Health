@@ -93,14 +93,15 @@ def generate_most_suitable_claim_type(stored_user_data):
     suitable_claim_type_response = query_gpt(prompt)
 
 def test_generate_most_suitable_claim_type():
-    testResponse = 
-    """
+    
+    testResponse = f"""
     Type of claim: New Claim
     Description: THiS IS FOR TESTING PURPOSE 
     """
 
     return testResponse
+
 if __name__ == "__main__":
     user_input = "I have trouble in sleeping."
-    conditions = generate_potential_conditions(user_input)
+    conditions = test_generate_most_suitable_claim_type()
     print(conditions)

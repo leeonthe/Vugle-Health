@@ -525,6 +525,12 @@ class ChatPromptView(APIView):
             print("Current File:", current_file)
             print("Next File:", next_file)
 
+            if not next_file:
+                if current_file == "suitable_claim_type":
+                    print("CALLING DexAnalysisResponse.generate_most_suitable_claim_response(request) [ChatPromptView]")
+                    return DexAnalysisResponse.generate_most_suitable_claim_response(request)
+                return Response({"error": "No next file specified and no dynamic handler available."}, status=status.HTTP_400_BAD_REQUEST)
+
             # Resolve the next file path
             nested_file_path = os.path.join(next_file, next_file + ".json")
             next_file_path = os.path.join(PROMPTS_DIR, nested_file_path)
@@ -714,104 +720,104 @@ class DexAnalysisResponse():
 
         return JsonResponse({"error": "Invalid request method"}, status=405)
 
-        @staticmethod
-        @csrf_exempt
-        def generate_most_suitable_claim_response(request):
-            try:
-                # Placeholder: Extract user data from session or request
-                # stored_user_data = request.session.get('user_data', {})
+    @staticmethod
+    @csrf_exempt
+    def generate_most_suitable_claim_response(request):
+        try:
+            # Placeholder: Extract user data from session or request
+            # stored_user_data = request.session.get('user_data', {})
 
-                # Call the GPT-based function to generate the response
-                # gpt_response = generate_most_suitable_claim_type(stored_user_data)
+            # Call the GPT-based function to generate the response
+            # gpt_response = generate_most_suitable_claim_type(stored_user_data)
 
+            gpt_response = test_generate_most_suitable_claim_type()
 
+            lines = gpt_response.split('\n')
+            claim_type = lines[1].split(":")[1].strip()
+            description = lines[2].split(":")[1].strip()
 
-                gpt_response = test_generate_most_suitable_claim_type()
+            # claim_type = gpt_response.get("Type of claim")
+            # description = gpt_response.get(
+            #     "Description"
+            # )
 
-                lines = condition.split('\n')
-                claim_type = lines[0].split(":")[1].strip()
-                description = lines[1].split(":")[1].strip()
-
-                # claim_type = gpt_response.get("Type of claim")
-                # description = gpt_response.get(
-                #     "Description"
-                # )
-
-                # Format GPT response into the chat bubble structure
-                data = {
-                    "chat_bubbles_id": 10,
-                    "options_id": 10,
-                    "chat_bubbles": [
-                        {
-                            "container": [
-                                {
-                                    "type": "image",
-                                    "content": "app_logo",
-                                    "style": {
-                                        "width": 24,
-                                        "height": 24
-                                    }
+            # Format GPT response into the chat bubble structure
+            data = {
+                "chat_bubbles_id": 10,
+                "options_id": 10,
+                "chat_bubbles": [
+                    {
+                        "container": [
+                            {
+                                "type": "image",
+                                "content": "app_logo",
+                                "style": {
+                                    "width": 24,
+                                    "height": 24
                                 }
-                            ]
-                        },
-                        {
-                            "container": [
-                                {
-                                    "type": "text",
-                                    "content": claim_type,
-                                    "style": {
-                                        "color": "#323D4C",
-                                        "fontSize": 16,
-                                        "fontFamily": "SF Pro",
-                                        "fontWeight": "bold",
-                                        "lineHeight": 28,
-                                        "wordWrap": "break-word",
-                                        "marginBottom": 16
-                                    },
+                            }
+                        ]
+                    },
+                    {
+                        "container": [
+                            {
+                                "type": "text",
+                                "content": claim_type,
+                                "style": {
+                                    "color": "#323D4C",
+                                    "fontSize": 16,
+                                    "fontFamily": "SF Pro",
+                                    "fontWeight": "bold",
+                                    "lineHeight": 28,
+                                    "wordWrap": "break-word",
+                                    "marginBottom": 16
                                 },
-                                {
-                                    "type": "text",
-                                    "content": description,
-                                    "style": {
-                                        "color": "#323D4C",
-                                        "fontSize": 16,
-                                        "fontFamily": "SF Pro",
-                                        "fontWeight": "400",
-                                        "lineHeight": 28,
-                                        "wordWrap": "break-word",
-                                        "marginBottom": 16
-                                    },
+                            },
+                            {
+                                "type": "text",
+                                "content": description,
+                                "style": {
+                                    "color": "#323D4C",
+                                    "fontSize": 16,
+                                    "fontFamily": "SF Pro",
+                                    "fontWeight": "400",
+                                    "lineHeight": 28,
+                                    "wordWrap": "break-word",
+                                    "marginBottom": 16
                                 },
-                                {
-                                    "type": "link",
-                                    "content": "What is this claim?",
-                                    "url": "https://example.com/more-info",
-                                    "style": {
-                                        "color": "#3182F6",
-                                        "textDecorationLine": "underline",
-                                        "marginBottom": 0
-                                    }
+                            },
+                            {
+                                "type": "link",
+                                "content": "What is this claim?",
+                                "url": "https://example.com/more-info",
+                                "style": {
+                                    "color": "#3182F6",
+                                    "textDecorationLine": "underline",
+                                    "marginBottom": 0
                                 }
-                            ]
-                        },
-                    ],
-                    "options": [
-                        {
-                            "text": "Start Filing",
-                            "next": "clinics"
-                        }
-                    ]
-                }
+                            }
+                        ]
+                    },
+                ],
+                "options": [
+                    {
+                        "text": "Start Filing",
+                        "next": "clinics"
+                    }
+                ]
+            }
 
-                return JsonResponse(data, status=200)
+            print("JSON structured in DexAnalysisResponse, generate_most_suitable_claim_response: ",data)
 
-            except KeyError as ke:
-                return JsonResponse(
-                    {"error": f"Missing key in GPT response: {str(ke)}"},
-                    status=500
-                )
-            except Exception as e:
-                return JsonResponse(
-                    {"error": f"An unexpected error occurred: {str(e)}"},
-                    status=500
-                )
+            return JsonResponse(data, status=200)
+
+        except KeyError as ke:
+            return JsonResponse(
+                {"error": f"Missing key in GPT response: {str(ke)}"},
+                status=500
+            )
+        except Exception as e:
+            return JsonResponse(
+                {"error": f"An unexpected error occurred: {str(e)}"},
+                status=500
+            )

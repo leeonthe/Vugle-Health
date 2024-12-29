@@ -187,23 +187,11 @@
           ]
         }
       ]
-    },
-    {
-      "container": [
-        {
-          "type": "image",
-          "content": "app_logo",
-          "style": {
-            "width": 24,
-            "height": 24
-          }
-        }
-      ]
     }
   ],
   "options": [
     {
-      "text": "NONE"
+      "text": "TEST"
     }
   ]
 }
