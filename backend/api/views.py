@@ -22,6 +22,8 @@ from base64 import b64encode
 
 from .parsingPDF import parse_dd214_text
 from .dex_analysis import generate_potential_conditions
+from .dex_analysis import generate_most_suitable_claim_type
+from .dex_analysis import test_generate_most_suitable_claim_type
 
 import requests
 import base64
@@ -418,7 +420,7 @@ class PatientHealthView(View):
             if response.status_code == 200:
                 data = response.json()
                 print("PATIENT MEDICAL CONDITION DATA", data)
-
+                request.session["patient_health_data"] = data
                 return JsonResponse(data, status=200)
             else:
                 return JsonResponse({"error": "Failed to fetch eligible letters", "details": response.text}, status=response.status_code)
@@ -711,3 +713,105 @@ class DexAnalysisResponse():
             return JsonResponse({"conditions": parsed_conditions}, status=200)
 
         return JsonResponse({"error": "Invalid request method"}, status=405)
+
+        @staticmethod
+        @csrf_exempt
+        def generate_most_suitable_claim_response(request):
+            try:
+                # Placeholder: Extract user data from session or request
+                # stored_user_data = request.session.get('user_data', {})
+
+                # Call the GPT-based function to generate the response
+                # gpt_response = generate_most_suitable_claim_type(stored_user_data)
+
+
+
+                gpt_response = test_generate_most_suitable_claim_type()
+
+                lines = condition.split('\n')
+                claim_type = lines[0].split(":")[1].strip()
+                description = lines[1].split(":")[1].strip()
+
+                # claim_type = gpt_response.get("Type of claim")
+                # description = gpt_response.get(
+                #     "Description"
+                # )
+
+                # Format GPT response into the chat bubble structure
+                data = {
+                    "chat_bubbles_id": 10,
+                    "options_id": 10,
+                    "chat_bubbles": [
+                        {
+                            "container": [
+                                {
+                                    "type": "image",
+                                    "content": "app_logo",
+                                    "style": {
+                                        "width": 24,
+                                        "height": 24
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "container": [
+                                {
+                                    "type": "text",
+                                    "content": claim_type,
+                                    "style": {
+                                        "color": "#323D4C",
+                                        "fontSize": 16,
+                                        "fontFamily": "SF Pro",
+                                        "fontWeight": "bold",
+                                        "lineHeight": 28,
+                                        "wordWrap": "break-word",
+                                        "marginBottom": 16
+                                    },
+                                },
+                                {
+                                    "type": "text",
+                                    "content": description,
+                                    "style": {
+                                        "color": "#323D4C",
+                                        "fontSize": 16,
+                                        "fontFamily": "SF Pro",
+                                        "fontWeight": "400",
+                                        "lineHeight": 28,
+                                        "wordWrap": "break-word",
+                                        "marginBottom": 16
+                                    },
+                                },
+                                {
+                                    "type": "link",
+                                    "content": "What is this claim?",
+                                    "url": "https://example.com/more-info",
+                                    "style": {
+                                        "color": "#3182F6",
+                                        "textDecorationLine": "underline",
+                                        "marginBottom": 0
+                                    }
+                                }
+                            ]
+                        },
+                    ],
+                    "options": [
+                        {
+                            "text": "Start Filing",
+                            "next": "clinics"
+                        }
+                    ]
+                }
+
+                return JsonResponse(data, status=200)
+
+            except KeyError as ke:
+                return JsonResponse(
+                    {"error": f"Missing key in GPT response: {str(ke)}"},
+                    status=500
+                )
+            except Exception as e:
+                return JsonResponse(
+                    {"error": f"An unexpected error occurred: {str(e)}"},
+                    status=500
+                )
