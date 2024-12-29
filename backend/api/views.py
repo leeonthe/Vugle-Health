@@ -802,7 +802,7 @@ class DexAnalysisResponse():
                 "options": [
                     {
                         "text": "Start Filing",
-                        "next": "clinics"
+                        "next": "has_been_clinics"
                     }
                 ]
             }
