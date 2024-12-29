@@ -217,6 +217,20 @@ const ChatRenderer: React.FC<ChatProps> = ({
           name: "Condition A",
           risk: "High",
           riskColor: "red",
+          description: "DTo display the + icon on the right side, you can adjust the layout of the button to use flexDirection: This way, the Icon will be positioned after the Text.",
+        },
+        {
+
+          
+          name: "Condition B",
+          risk: "Medium",
+          riskColor: "orange",
+          description: "Description for Condition B",
+        },
+        {
+          name: "Condition A",
+          risk: "High",
+          riskColor: "red",
           description: "Description for Condition A",
         },
         {
@@ -225,6 +239,30 @@ const ChatRenderer: React.FC<ChatProps> = ({
           riskColor: "orange",
           description: "Description for Condition B",
         },
+        // {
+        //   name: "Condition A",
+        //   risk: "High",
+        //   riskColor: "red",
+        //   description: "Description for Condition A",
+        // },
+        // {
+        //   name: "Condition B",
+        //   risk: "Medium",
+        //   riskColor: "orange",
+        //   description: "Description for Condition B",
+        // },
+        // {
+        //   name: "Condition A",
+        //   risk: "High",
+        //   riskColor: "red",
+        //   description: "Description for Condition A",
+        // },
+        // {
+        //   name: "Condition B",
+        //   risk: "Medium",
+        //   riskColor: "orange",
+        //   description: "Description for Condition B",
+        // },
       ];
 
       navigation.navigate("PotentialConditionsPage", {
@@ -413,16 +451,18 @@ const ChatRenderer: React.FC<ChatProps> = ({
   };
 
   const renderUserResponse = (userResponse: string, chatIndex: number) => (
-    <View style={styles.chatContainer}>
-      <Animatable.View
-        animation="fadeIn"
-        duration={1000}
-        style={[styles.messageContainer, styles.userMessage]}
-      >
-        <View key={`user-response-${chatIndex}`}>
-          <Text style={[styles.userText]}>{userResponse}</Text>
-        </View>
-      </Animatable.View>
+    <View style={styles.userResponseContainer}>
+      <View style={styles.chatContainer}>
+        <Animatable.View
+          animation="fadeIn"
+          duration={1000}
+          style={[styles.messageContainer, styles.userMessage]}
+        >
+          <View key={`user-response-${chatIndex}`}>
+            <Text style={[styles.userText]}>{userResponse}</Text>
+          </View>
+        </Animatable.View>
+      </View>
     </View>
   );
 
@@ -523,6 +563,7 @@ const styles = StyleSheet.create({
   messageContainer: {
     paddingHorizontal: 10,
     paddingVertical: 8,
+    paddingBottom: 10, 
     backgroundColor: "#F5F6F8",
     borderRadius: 16,
     alignItems: "flex-start",
@@ -595,6 +636,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     height: 40,
   },
+  userResponseContainer: {
+    paddingBottom: 12, 
+    paddingTop: 12, 
+  }, 
   userMessage: {
     alignSelf: "flex-end",
     backgroundColor: "#3182F6",

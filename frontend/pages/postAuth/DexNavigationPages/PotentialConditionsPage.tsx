@@ -53,11 +53,14 @@ const PotentialConditionsPage = ({ route }) => {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Potential Affected Conditions</Text>
-        <Text style={styles.subtitle}>
-          Please check the following symptoms and select if you are having any.
-        </Text>
+      <View style={styles.headerContainer}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Potential Affected Conditions</Text>
+          <Text style={styles.subtitle}>
+            Please check the following symptoms and select if you are having
+            any.
+          </Text>
+        </View>
       </View>
 
       {potentialConditions.map((condition, index) => (
@@ -66,37 +69,48 @@ const PotentialConditionsPage = ({ route }) => {
             <View style={styles.iconPlaceholder} />
             <View style={styles.conditionDetails}>
               <Text style={styles.conditionName}>{condition.name}</Text>
+
               <Text style={[styles.riskText, { color: condition.riskColor }]}>
                 {condition.risk}
               </Text>
+
               <Text style={styles.description}>{condition.description}</Text>
             </View>
           </View>
-          <TouchableOpacity
-            style={[
-              styles.addButton,
-              selectedConditions[condition.name] && styles.addedButton,
-            ]}
-            onPress={() => toggleCondition(condition.name)}
-          >
-            {selectedConditions[condition.name] ? (
-              <>
-                <Icon name="check" size={16} color="white" />
-                <Text style={styles.addButtonText}>Added</Text>
-              </>
-            ) : (
-              <>
-                <Icon name="add" size={16} color="white" />
-                <Text style={styles.addButtonText}>Add +</Text>
-              </>
-            )}
-          </TouchableOpacity>
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity style={styles.viewButton}>
+              <Text style={styles.viewButtonText}>View</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.addButton,
+                selectedConditions[condition.name] && styles.addedButton,
+              ]}
+              onPress={() => toggleCondition(condition.name)}
+            >
+              {selectedConditions[condition.name] ? (
+                <>
+                  <Icon name="check" size={16} color="white" style={styles.icon} />
+                  <Text style={styles.addButtonText}>Added</Text>
+                </>
+              ) : (
+                <>
+                  <Icon name="add" size={16} color="white" style={styles.icon} />
+                  <Text style={styles.addButtonText}>Add</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
       ))}
-
-      <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
-        <Text style={styles.continueButtonText}>Continue</Text>
-      </TouchableOpacity>
+      <View style={styles.continueButtonContainer}>
+        <TouchableOpacity
+          style={styles.continueButton}
+          onPress={handleContinue}
+        >
+          <Text style={styles.continueButtonText}>Continue</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 };
@@ -107,29 +121,41 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     padding: 20,
   },
+  headerContainer: {
+    paddingBottom: 8, 
+    marginTop: 30,
+
+  },
   header: {
-    marginTop: 60,
     backgroundColor: "#F7F9FD",
     padding: 20,
     marginBottom: 35,
     borderRadius: 8,
   },
   title: {
-    color: "#191F28",
+    color: '#191F28',
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: 'SF Pro',
+    fontWeight: 'bold',
+    lineHeight: 25,
+    wordWrap: 'break-word',
     marginBottom: 16,
   },
   subtitle: {
-    color: "#6B7685",
+    color: '#6B7685',
     fontSize: 14,
+    fontFamily: 'SF Pro',
+    fontWeight: '400',
     lineHeight: 21,
+
+    wordWrap: 'break-word',
   },
   conditionContainer: {
     backgroundColor: "white",
     borderRadius: 8,
     padding: 16,
     marginBottom: 16,
+
   },
   conditionHeader: {
     flexDirection: "row",
@@ -146,34 +172,48 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   conditionName: {
-    color: "black",
+    color: 'black',
     fontSize: 16,
-    fontWeight: "500",
+    fontFamily: 'SF Pro',
+    fontWeight: '500',
+    lineHeight: 22.65,
   },
   riskText: {
     fontSize: 12,
-    fontWeight: "500",
+    fontFamily: 'SF Pro',
+    fontWeight: '500',
+    lineHeight: 28,
+
   },
   description: {
-    color: "#323D4C",
+    color: '#323D4C',
     fontSize: 13,
-    lineHeight: 22,
+    fontFamily: 'SF Pro',
+    fontWeight: '400',
+    lineHeight: 22.65,
   },
   addButton: {
-    backgroundColor: "#237AF2",
+    backgroundColor: '#237AF2',
     borderRadius: 24,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
   },
   addedButton: {
-    backgroundColor: "#0066CC",
+    backgroundColor: "#237AF2",
   },
   addButtonText: {
     color: "white",
     fontSize: 12,
+    fontFamily: 'SF Pro',
+    fontWeight: '500',
+    lineHeight: 22.65,
     marginLeft: 4,
+  },
+  continueButtonContainer: {
+    marginTop: 'auto',
+    paddingVertical: 16,
   },
   continueButton: {
     backgroundColor: "#237AF2",
@@ -181,10 +221,36 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 50,
   },
   continueButtonText: {
     color: "white",
     fontSize: 16,
+    fontFamily: "SF Pro",
+    fontWeight: "500",
+  },
+  buttonsContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  viewButton: {
+    borderColor: "#237AF2",
+    borderWidth: 1,
+    borderRadius: 24,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginRight: 8,
+  },
+  viewButtonText: {
+    color: "#237AF2",
+    fontSize: 12,
+    fontFamily: "SF Pro",
+    fontWeight: "500",
+    lineHeight: 22.65,
+  },
+  icon: {
+    // marginRight: 1,  
   },
 });
 

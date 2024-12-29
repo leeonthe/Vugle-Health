@@ -608,7 +608,12 @@ class StoreUserInputView(View):
 
             # For new_condition.json
             if input_type == "conditionType":
-                request.session['user_medical_condition_response'] = typed_text.strip()
+                if 'user_medical_condition_response' not in request.session:
+                    request.session['user_medical_condition_response'] = []
+                if not isinstance(request.session['user_medical_condition_response'], list):
+                    request.session['user_medical_condition_response'] = []
+
+                request.session['user_medical_condition_response'].append(typed_text.strip())
                 request.session.modified = True
                 # print(f"Session ID during POST: {request.session.session_key}")
                 # print(f"Session data after saving: {dict(request.session.items())}")

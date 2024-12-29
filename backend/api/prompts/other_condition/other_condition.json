@@ -48,7 +48,7 @@
   "options": [
     {
       "text": "Add more",
-      "next": "add_more"
+      "next": "new_condition"
     },
     {
       "text": "Not that I can think of",
