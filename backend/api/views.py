@@ -671,15 +671,11 @@ class StorePotentialConditions(View):
 
 
 class DexAnalysisResponse():
-    # This is for PotentialConditionsPage
     @staticmethod
     @csrf_exempt
-    def get_potential_conditions(request):
-        # print(f"user_medical_condition_response: {request.session.get('user_medical_condition_response')}")
-
+    def get_potential_conditions(request): 
+    # This is for PotentialConditionsPage
         if request.method == "GET":
-            print(f"Session ID during GET: {request.session.session_key}")
-            print(f"Session data during GET: {request.session.items()}")
             user_input = request.session.get('user_medical_condition_response', None)
             print("USER INPUT FROM request.session.get('user_medical_condition_response', None): ", user_input)
             if not user_input:

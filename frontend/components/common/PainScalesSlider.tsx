@@ -2,9 +2,9 @@ import React from "react";
 import { View, Text, StyleSheet, Button } from "react-native";
 import Slider from "@react-native-community/slider"; // Mobile slider
 import ReactSlider from "react-slider"; // Web slider
-import axios from "axios";
 import { useDevice } from "@/utils/hooks/useDevice";
 import reactSliderStyles from "../../styles/DexNavigationPagesStyles/PainScaleSlider.module.css";
+import { useAuthenticatedRequest } from "../../utils/hooks/useAuthenticatedRequest";
 
 interface PainScaleSliderProps {
   painScale: number;
@@ -17,6 +17,7 @@ const PainScaleSlider: React.FC<PainScaleSliderProps> = ({
   setPainScale,
   onSubmit,
 }) => {
+  const { makeRequest } = useAuthenticatedRequest();
   const { isDesktop } = useDevice();
 
   const getPainScaleColor = (value: number): string => {
@@ -29,19 +30,12 @@ const PainScaleSlider: React.FC<PainScaleSliderProps> = ({
 
   const handleSubmitPainSeverity = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/auth/store_user_input",
-        {
-            userInput: painScale,
-            inputType: "painSeverity",
-        }
-      );
-      if (response.status === 200) {
-        console.log("Pain severity submitted successfully:", painScale);
-        onSubmit(); 
-      } else {
-        console.error("Error submitting pain severity:", response.data);
-      }
+      await makeRequest("http://localhost:8000/api/auth/store_user_input", {
+        userInput: painScale,
+        inputType: "painSeverity",
+      });
+      console.log("Pain severity successfully sent to the backend.");
+      onSubmit();
     } catch (error) {
       console.error("Error sending pain severity:", error);
     }

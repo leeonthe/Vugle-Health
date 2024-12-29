@@ -5,28 +5,24 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  TextInput,
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import * as DocumentPicker from "expo-document-picker";
 import Logo from "../../../assets/images/logo/dexLogo.svg";
 import CheckMark from "../../../assets/images/postAuth/dexPage/checkMark.svg";
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
 import { ChatBubble } from "../../../utils/interfaces/promptTypes";
 import { PotentialCondition } from "../../../utils/interfaces/dexTypes";
 
-import { useDevice } from "@/utils/hooks/useDevice";
-import { useChat } from "../../../utils/hooks/useChat";
+// hooks 
+import { useDevice } from "../../../utils/hooks/useDevice";
 import { useAuthenticatedRequest } from "../../../utils/hooks/useAuthenticatedRequest";
+import { useKeyboardStatus } from "../../../utils/hooks/useKeyboardStatus";
+import fetchPotentialConditions from "../../../utils/hooks/fetchPotentialConditions";
 
-import { useKeyboardStatus } from "@/utils/hooks/useKeyboardStatus";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
 import TypeInput from "@/components/common/TypeInput";
 import PainScaleSlider from "@/components/common/PainScalesSlider";
-import fetchPotentialConditions from "@/utils/hooks/fetchPotentialConditions";
 // TODO:
 //      + Diplay different container if isHealthLoading and isHealthSuccessful
 //      + Display Keyboard when TextInput is focused
@@ -165,7 +161,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
     try {
       await makeRequest("http://localhost:8000/api/auth/store_user_input", {
         userInput: typedText,
-        inputType: "conditionType",
+        inputType: "painDuration",
       });
       console.log("Pain duration input successfully sent to the backend.");
       triggerOptionAction({ text: typedText, next: "pain_severity" });

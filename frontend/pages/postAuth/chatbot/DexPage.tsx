@@ -36,7 +36,7 @@ const DexPage: React.FC = () => {
   const icn = disabilityData?.disability_rating?.data?.id;
   const { isLoading: isHealthLoading, isSuccess: isHealthSuccess } =
     usePatientHealth(icn || "");
-// 1011537977V693883 -> ICN provided in the va.gov API docs 
+  // 1011537977V693883 -> ICN provided in the va.gov API docs
   // Add prompt data to chatHistory
   useEffect(() => {
     if (promptData) {
@@ -197,7 +197,6 @@ const styles = StyleSheet.create({
     marginBottom: -10,
     borderRadius: 24,
   },
-
   logo: {
     width: 24,
     height: 24,
