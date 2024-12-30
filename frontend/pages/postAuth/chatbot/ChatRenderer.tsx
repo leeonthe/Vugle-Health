@@ -73,7 +73,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
 
   const [userInput, setUserInput] = React.useState<string>("");
 
-  const [painScale, setPainScale] = useState<number>(0);
+  const [painScale, setPainScale] = useState<number>(1);
   const isKeyboardVisible = useKeyboardStatus();
 
   const { isDesktop } = useDevice();
@@ -356,7 +356,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
             const updatedSet = new Set(prev);
             updatedSet.add(index);
             console.log("IM CALLED");
-            triggerOptionSingleAction("upload_dd214");
+            triggerOptionSingleAction("pain_severity");
             // triggerOptionSingleAction("suitable_claim_type");
 
             return updatedSet;

@@ -94,7 +94,7 @@ const PainScaleSlider: React.FC<PainScaleSliderProps> = ({
           ) : (
             <Slider
               style={styles.slider}
-              minimumValue={0}
+              minimumValue={1}
               maximumValue={10}
               step={1}
               value={painScale}
