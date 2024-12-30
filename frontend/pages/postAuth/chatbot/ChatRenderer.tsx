@@ -55,7 +55,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
       setTimeout(() => {
         setLoadingStates((prev) => ({
           ...prev,
-          [groupIndex]: true, 
+          [groupIndex]: true,
         }));
 
         // Stop loading after another 3 seconds
@@ -98,7 +98,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
   };
 
   const handleFileUpload = async () => {
-    const accessToken = await AsyncStorage.getItem('access_token');
+    const accessToken = await AsyncStorage.getItem("access_token");
     try {
       if (isDesktop) {
         // Web/Desktop File Upload
@@ -119,7 +119,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
 
             /**
              * FOR ACTUAL USEAGE
-             * 
+             *
              */
             // try {
             //   // Send POST request to backend
@@ -165,7 +165,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
 
           /**
            * FOR ACUTAL USAGE
-           * 
+           *
            */
           //  try {
           //   // Send POST request to backend
@@ -184,7 +184,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
           // } catch (err) {
           //   console.error("Error uploading file:", err);
           // }
-
         }
       }
     } catch (err) {
@@ -330,12 +329,20 @@ const ChatRenderer: React.FC<ChatProps> = ({
   // };
 
   const handleGroupLogic = (groupIndex: number) => {
-    const currentSource = chatHistory[chatHistory.length - 1]?.source || "unknown";
-    const isStartBubble = chatHistory.some((chat) => chat.chat_bubbles_id === 1);
+    const currentSource =
+      chatHistory[chatHistory.length - 1]?.source || "unknown";
+    const isStartBubble = chatHistory.some(
+      (chat) => chat.chat_bubbles_id === 1
+    );
     const isLoading = handleLoadingState(groupIndex);
-    if (!isLoading && !triggeredGroups.has(groupIndex) && currentSource === "start" && isStartBubble) {
+    if (
+      !isLoading &&
+      !triggeredGroups.has(groupIndex) &&
+      currentSource === "start" &&
+      isStartBubble
+    ) {
       setTriggeredGroups((prev) => new Set([...prev, groupIndex]));
-      onOptionSelect("upload_dd214"); 
+      onOptionSelect("upload_dd214");
     }
   };
 
@@ -347,12 +354,12 @@ const ChatRenderer: React.FC<ChatProps> = ({
     const isLoading = handleLoadingState(groupIndex ?? index);
 
     switch (element.type) {
-
       /**
        * Need to update to support suitable_claim_type.json
        */
       case "group":
-        handleGroupLogic(index); 
+        handleGroupLogic(index);
+
         return (
           <View key={`group-${index}`} style={styles.groupContainer}>
             {element.content.map((childElement: any, childIndex: number) => {
@@ -360,14 +367,27 @@ const ChatRenderer: React.FC<ChatProps> = ({
                 return (
                   <View
                     key={`group-row-${childIndex}`}
-                    style={styles.rowContainer} 
+                    style={styles.rowContainer}
                   >
                     {/* Render the text on the left */}
                     <View style={styles.loadingMessageContainer}>
-                      <Text style={[styles.loadingMessageText]}>
-                        {isLoading
-                          ? childElement.content
-                          : childElement.updated}
+                      <Text
+                        style={[
+                          styles.loadingMessageText,
+                          childElement.style,
+                          { opacity: isLoading ? 1 : 0 },
+                        ]}
+                      >
+                        {childElement.content}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.loadingMessageText,
+                          childElement.style,
+                          { opacity: isLoading ? 0 : 1 },
+                        ]}
+                      >
+                        {childElement.updated}
                       </Text>
                     </View>
 
@@ -398,15 +418,11 @@ const ChatRenderer: React.FC<ChatProps> = ({
                 return null;
               }
 
-
-
               // Default rendering for other elements
               return renderElement(childElement, childIndex, index);
             })}
           </View>
         );
-
-        
 
       case "text":
         return (
@@ -446,14 +462,14 @@ const ChatRenderer: React.FC<ChatProps> = ({
   const renderOptions = (options: any[], chatIndex: number) => {
     return options.map((option, idx) => {
       const key = `${chatIndex}-option-${idx}`;
-      
+
       if (option.text === "NONE") {
         return null;
       }
 
       // TEST CASE
       if (option.tex === "I do not have it") {
-        onOptionSelect("suitable_claim_type")
+        onOptionSelect("suitable_claim_type");
       }
 
       if (option.text === "Upload DD214") {
@@ -521,7 +537,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
 
       // Handle this case: display no option field, but wait til data is fetched from backend.
       if (option.text === "TEST") {
-
         // triggerOptionAction
       }
 
@@ -547,7 +562,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
         >
           <View key={`user-response-${chatIndex}`}>
             <Text style={[styles.userText]}>{userResponse}</Text>
-          </View> 
+          </View>
         </Animatable.View>
       </View>
     </View>
@@ -699,31 +714,49 @@ const styles = StyleSheet.create({
     lineHeight: 28,
     textAlign: "center",
   },
-  loadingMessageContainer: {
-    flex: 1,
-    justifyContent: "center",
-  },
+  
   loadingMessageText: {
-    fontSize: 16,
     color: "#323D4C",
+    fontSize: 16,
+    fontFamily: "SF Pro",
+    fontWeight: "400",
+    lineHeight: 28,
   },
   groupContainer: {
-    marginBottom: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    backgroundColor: "#F5F6F8",
+    borderRadius: 16,
+    alignItems: "flex-start",
+    maxWidth: "90%",
+    width: "auto",
+
   },
   rowContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 8,
+    // marginBottom: 8,
+    width: "100%",
   },
+  loadingMessageContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "flex-start",
+    width: "100%",
+  },
+
   rightAlignedContainer: {
     justifyContent: "center",
     alignItems: "center",
-    flexDirection: "column",
-    width: 30,
+    paddingTop: 25, 
   },
   loadingIndicator: {
-    marginLeft: 12,
+    alignSelf: "center",
+  
+  },
+  checkMarkPosition: {
+    alignSelf: "center",
   },
   dataLoadingContainer: {
     backgroundColor: "#FFFAE5",

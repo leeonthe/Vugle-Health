@@ -220,7 +220,9 @@ const styles = StyleSheet.create({
     padding: 0,
     marginTop: -10,
     marginBottom: -10,
-    borderRadius: 24,
+    borderRadius: 16,
+    
+    width: "auto",
   },
   logo: {
     width: 24,
