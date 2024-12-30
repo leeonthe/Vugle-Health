@@ -1,5 +1,5 @@
 import { Platform, Dimensions } from 'react-native';
-import { DesktopOS, MobileOS } from '../enums/DeviceOS';
+import { DesktopOS, MobileOS } from '../../enums/DeviceOS';
 export const DeviceDetector = {
   isMobileDevice(): boolean {
     const { width } = Dimensions.get('window');

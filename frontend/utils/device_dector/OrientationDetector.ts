@@ -1,4 +1,4 @@
-import { OrientationType } from '../enums/OrientationType';
+import { OrientationType } from '../../enums/OrientationType';
 
 export const OrientationDetector = {
   getScreenOrientation(): OrientationType {

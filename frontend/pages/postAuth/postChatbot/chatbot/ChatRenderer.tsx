@@ -8,23 +8,24 @@ import {
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import * as DocumentPicker from "expo-document-picker";
-import Logo from "../../../assets/images/logo/dexLogo.svg";
-import CheckMark from "../../../assets/images/postAuth/dexPage/checkMark.svg";
+import Logo from "../../../../assets/images/logo/dexLogo.svg";
+import CheckMark from "../../../../assets/images/postAuth/dexPage/checkMark.svg";
 import { useNavigation } from "@react-navigation/native";
 
-import { ChatBubble } from "../../../utils/interfaces/promptTypes";
-import { PotentialCondition } from "../../../utils/interfaces/dexTypes";
+import { ChatBubble } from "../../../../utils/interfaces/promptTypes";
+import { PotentialCondition } from "../../../../utils/interfaces/dexTypes";
 
 // hooks
-import { useDevice } from "../../../utils/hooks/useDevice";
-import { useAuthenticatedRequest } from "../../../utils/hooks/useAuthenticatedRequest";
-import { useKeyboardStatus } from "../../../utils/hooks/useKeyboardStatus";
+import { useDevice } from "../../../../utils/hooks/global/useDevice";
+import { useAuthenticatedRequest } from "../../../../utils/hooks/dex_api/useAuthenticatedRequest";
+import { useKeyboardStatus } from "../../../../utils/hooks/global/useKeyboardStatus";
 
 import TypeInput from "@/components/common/TypeInput";
 import PainScaleSlider from "@/components/common/PainScalesSlider";
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import fetchPotentialConditions from "@/utils/hooks/fetchPotentialConditions";
+
+import fetchPotentialConditions from "../../../../utils/api_handler/fetchPotentialConditions";
+
 // TODO:
 //      + Diplay different container if isHealthLoading and isHealthSuccessful
 //      + Display Keyboard when TextInput is focused
@@ -222,11 +223,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
    */
   const handleNavigateToConditions = async () => {
     try {
-      // const response = await axios.get(
-      //   "http://localhost:8000/api/auth/potential_conditions_list/"
-      // );
-      // const potentialConditions = response.data.conditions;
-
       const data = await fetchPotentialConditions();
       const potentialConditions: PotentialCondition[] = data.conditions;
       console.log("Fetched potential conditions:", potentialConditions);

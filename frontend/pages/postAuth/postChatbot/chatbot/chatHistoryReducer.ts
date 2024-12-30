@@ -1,4 +1,4 @@
-import { ChatBubble } from "../../../utils/interfaces/promptTypes";
+import { ChatBubble } from "../../../../utils/interfaces/promptTypes";
 
 export type ChatHistoryAction =
   | { type: "ADD_USER_RESPONSE"; payload: ChatBubble }

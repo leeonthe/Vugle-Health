@@ -1,6 +1,6 @@
-import { DeviceDetector } from '../DeviceDetector';
-import { OrientationDetector } from '../OrientationDetector';
-import { DesktopOS, MobileOS } from '../../enums/DeviceOS';
+import { DeviceDetector } from '../../device_dector/DeviceDetector';
+import { OrientationDetector } from '../../device_dector/OrientationDetector';
+import { DesktopOS, MobileOS } from '../../../enums/DeviceOS';
 
 export interface DeviceState {
   isDesktop: boolean;

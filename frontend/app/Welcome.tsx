@@ -8,17 +8,15 @@ import {
   TouchableOpacity,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { NavigationContainer } from "@react-navigation/native";
 
 // hooks
-import { useDevice } from "../utils/hooks/useDevice";
-import { useUserFirstName } from "../utils/hooks/useUserFirstName";
-
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useDevice } from "../utils/hooks/global/useDevice";
+import { useUserFirstName } from "../utils/hooks/auth_api/useUserFirstName";
+import { useNavigation } from "@react-navigation/native";
 
 // SVG
 import DischargeStatus from "../assets/images/postAuth/WelcomePage/Discharge_status.svg";
@@ -29,15 +27,12 @@ import BenefitInfo from "../assets/images/postAuth/WelcomePage/Benefits_info.svg
 import Lock from "../assets/images/postAuth/WelcomePage/lock.svg";
 
 // Pages
-import HomePage from "@/pages/postAuth/HomePage";
-import DexStartPage from "@/pages/postAuth/DexStartPage";
-import DexPage from "../pages/postAuth/chatbot/DexPage";
-import PotentialConditionsPage from "../pages/postAuth/DexNavigationPages/PotentialConditionsPage";
-import MobileView from "@/components/deviceLayout/MobileView";
+import HomePage from "../pages/postAuth/preChatbot/HomePage";
+import DexStartPage from "../pages/postAuth/preChatbot/DexStartPage";
+import DexPage from "../pages/postAuth/postChatbot/chatbot/DexPage";
+import PotentialConditionsPage from "../pages/postAuth/postChatbot/DexNavigationPages/PotentialConditionsPage";
+import MobileView from "../components/deviceLayout/MobileView";
 
-
-import { usePatientHealth } from "@/utils/hooks/usePatientHealth";
-import { useDisabilityRating } from "@/utils/hooks/useDisabilityRating";
 type RootStackParamList = {
   HomePage: undefined;
 };
@@ -55,9 +50,6 @@ const queryClient = new QueryClient();
 
 const WelcomePage: React.FC<UserStartScreenProps> = ({ route }) => {
   const { isDesktop } = useDevice();
-  const { data: disabilityData } = useDisabilityRating();
-  const icn = disabilityData?.disability_rating?.data?.id;
-  const {data: patientData, isLoading: patientLoading, error: patientError} = usePatientHealth(icn || "");
 
   
 // 1011537977V693883
@@ -129,44 +121,10 @@ const WelcomePage: React.FC<UserStartScreenProps> = ({ route }) => {
     return <Text style={styles.errorText}>Failed to load information.</Text>;
   }
 
-  if (patientLoading){
-    return <Text> IS LOADING </Text>
-  }
-
-  if (patientError){
-    return <Text>IS ERROR </Text>
-  }
-
   // const disabilityAttributes = disabilityData?.disability_rating?.data?.attributes;
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* TESTING DATA FETCHING */}
-      <View>
-        <Text style={styles.header}>Patient Health Data</Text>
-        {patientData?.entry?.map((entry, index) => {
-          const resource = entry.resource || {};
-          const clinicalStatus = resource.clinicalStatus?.text || "N/A";
-          const verificationStatus = resource.verificationStatus?.text || "N/A";
-          const conditionCode = resource.code?.text || "N/A";
-          const onsetDate = resource.onsetDateTime || "N/A";
-          const recordedDate = resource.recordedDate || "N/A";
-          const recorder = resource.recorder?.display || "Unknown Recorder";
-          const asserter = resource.asserter?.display || "Unknown Asserter";
-
-          return (
-            <View key={index} style={styles.entryContainer}>
-              <Text style={styles.entryTitle}>Condition: {conditionCode}</Text>
-              <Text>Clinical Status: {clinicalStatus}</Text>
-              <Text>Verification Status: {verificationStatus}</Text>
-              <Text>Onset Date: {onsetDate}</Text>
-              <Text>Recorded Date: {recordedDate}</Text>
-              <Text>Recorder: {recorder}</Text>
-              <Text>Asserter: {asserter}</Text>
-            </View>
-          );
-        })}
-      </View>
       {/* Display Eligible Letters */}
 
       <Text style={styles.title}>

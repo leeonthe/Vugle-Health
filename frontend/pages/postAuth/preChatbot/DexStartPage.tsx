@@ -12,8 +12,8 @@ import {
 import * as Animatable from 'react-native-animatable';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import Back from '../../assets/images/logo/back.svg'; 
-import Logo from '../../assets/images/logo/dexLogo.svg'; 
+import Back from '../../../assets/images/logo/back.svg'; 
+import Logo from '../../../assets/images/logo/dexLogo.svg'; 
 
 const DexStartPage: React.FC = () => {
   const [firstName, setFirstName] = useState<string>('Guest');

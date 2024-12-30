@@ -10,10 +10,10 @@ import * as Animatable from "react-native-animatable";
 import ChatRenderer from "./ChatRenderer";
 import { chatHistoryReducer, ChatHistoryAction } from "./chatHistoryReducer";
 // hooks
-import { useChat } from "../../../utils/hooks/useChat";
-import { useDisabilityRating } from "../../../utils/hooks/useDisabilityRating";
-import { usePatientHealth } from "../../../utils/hooks/usePatientHealth";
-import { ChatBubble } from "../../../utils/interfaces/promptTypes";
+import { useChat } from "../../../../utils/hooks/dex_api/useChat";
+import { useDisabilityRating } from "../../../../utils/hooks/auth_api/useDisabilityRating";
+import { usePatientHealth } from "../../../../utils/hooks/auth_api/usePatientHealth";
+import { ChatBubble } from "../../../../utils/interfaces/promptTypes";
 
 const initialState = {
   chatHistory: [],

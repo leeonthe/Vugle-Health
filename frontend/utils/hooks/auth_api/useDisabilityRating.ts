@@ -35,8 +35,6 @@ type IndividualRating = {
     };
   };
   
-  
-
 // Fetch function to get disability rating
 const fetchDisabilityRating = async (): Promise<DisabilityRatingResponse> => {
     console.log('Attempting to fetch disability rating...');

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ChatBubble } from "../../utils/interfaces/promptTypes";
+import { ChatBubble } from "../../interfaces/promptTypes";
 
 export const useChat = () => {
   const queryClient = useQueryClient();

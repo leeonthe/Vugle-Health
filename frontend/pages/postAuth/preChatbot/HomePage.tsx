@@ -1,33 +1,31 @@
 import React from 'react';
-import styles from '../../styles/postAuthStyles/HomePageStyles';
+import styles from '../../../styles/postAuthStyles/HomePageStyles';
 
 import {
-
   Text,
   View,
   TouchableOpacity,
   Image,
   ScrollView,
-
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 // hooks
-import { useDisabilityRating } from '../../utils/hooks/useDisabilityRating';
-import { useEligibleLetter } from '../../utils/hooks/useEligibleLetter';
+import { useDisabilityRating } from '../../../utils/hooks/auth_api/useDisabilityRating';
+import { useEligibleLetter } from '../../../utils/hooks/auth_api/useEligibleLetter';
 
 
 // SVG for home 
-import DisabilityIcon from '../../assets/images/postAuth/homePage/disability_icon.svg';
-import CompensationIcon from '../../assets/images/postAuth/homePage/monthly_compensation.svg';
-import NotificationIcon from '../../assets/images/postAuth/homePage/notification_icon.svg';
+import DisabilityIcon from '../../../assets/images/postAuth/homePage/disability_icon.svg';
+import CompensationIcon from '../../../assets/images/postAuth/homePage/monthly_compensation.svg';
+import NotificationIcon from '../../../assets/images/postAuth/homePage/notification_icon.svg';
 
-import Document from '../../assets/images/postAuth/homePage/document-icon.svg';
-import CloseIcon from '../../assets/images/postAuth/homePage/closeIcon.svg';
-import Home from '../../assets/images/postAuth/homePage/home-icon.svg';
-import Explore from '../../assets/images/postAuth/homePage/explore_icon.svg';
-import Consult from '../../assets/images/postAuth/homePage/consult-icon.svg';
-import Loan from '../../assets/images/postAuth/homePage/loan-icon.svg';
+import Document from '../../../assets/images/postAuth/homePage/document-icon.svg';
+import CloseIcon from '../../../assets/images/postAuth/homePage/closeIcon.svg';
+import Home from '../../../assets/images/postAuth/homePage/home-icon.svg';
+import Explore from '../../../assets/images/postAuth/homePage/explore_icon.svg';
+import Consult from '../../../assets/images/postAuth/homePage/consult-icon.svg';
+import Loan from '../../../assets/images/postAuth/homePage/loan-icon.svg';
 
 
 function HomePage() {
@@ -46,7 +44,7 @@ function HomePage() {
     currency: monthlyAwardAmount.currency,
   }).format(monthlyAwardAmount.value);
 
-  const billImagePath = '../../assets/postAuth/homePage/giBill.png'
+  const billImagePath = '../../../assets/postAuth/homePage/giBill.png'
 
   if (isDisabilityLoading || isEligibleLoading) {
     return <Text style={styles.loadingText}>Loading...</Text>;
@@ -198,7 +196,7 @@ function HomePage() {
               <View style={styles.resourceRowContent}>
                 <Image
                   style={styles.resourceIcon}
-                  source={require('../../assets/images/postAuth/homePage/giBill.png')}
+                  source={require('../../../assets/images/postAuth/homePage/giBill.png')}
                     //  source={require(billImagePath)}
                 />
                 <View style={styles.resourceTextContainer}>
@@ -214,7 +212,7 @@ function HomePage() {
               <View style={styles.resourceRowContent}>
                 <Image
                   style={styles.resourceIcon}
-                  source={require('../../assets/images/postAuth/homePage/HomeLoan.png')}
+                  source={require('../../../assets/images/postAuth/homePage/HomeLoan.png')}
                 />
                 <View style={styles.resourceTextContainer}>
                   <Text style={styles.resourceTitle}>VA Home Loan Guaranty</Text>
@@ -229,7 +227,7 @@ function HomePage() {
               <View style={styles.resourceRowContent}>
                 <Image
                   style={styles.resourceIcon}
-                  source={require('../../assets/images/postAuth/homePage/Reimburse.png')}
+                  source={require('../../../assets/images/postAuth/homePage/Reimburse.png')}
                 />
                 <View style={styles.resourceTextContainer}>
                   <Text style={styles.resourceTitle}>Travel reimbursement</Text>

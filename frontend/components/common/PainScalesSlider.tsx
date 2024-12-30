@@ -2,9 +2,9 @@ import React from "react";
 import { View, Text, StyleSheet, Button } from "react-native";
 import Slider from "@react-native-community/slider"; // Mobile slider
 import ReactSlider from "react-slider"; // Web slider
-import { useDevice } from "@/utils/hooks/useDevice";
+import { useDevice } from "../../utils/hooks/global/useDevice";
 import reactSliderStyles from "../../styles/DexNavigationPagesStyles/PainScaleSlider.module.css";
-import { useAuthenticatedRequest } from "../../utils/hooks/useAuthenticatedRequest";
+import { useAuthenticatedRequest } from "../../utils/hooks/dex_api/useAuthenticatedRequest";
 
 interface PainScaleSliderProps {
   painScale: number;

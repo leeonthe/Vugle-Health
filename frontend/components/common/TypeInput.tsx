@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { SafeAreaView, TextInput, Text, StyleSheet } from "react-native";
-import { useKeyboardStatus } from "@/utils/hooks/useKeyboardStatus";
+import { useKeyboardStatus } from "../../utils/hooks/global/useKeyboardStatus";
 
 interface TypeInputProps {
   placeholder: string;

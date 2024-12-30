@@ -5,13 +5,12 @@ import StartPage from '../pages/preAuth/StartPage';
 import OnBoardingPage from '../pages/preAuth/OnBoardingPage';
 import LoginPage from '../pages/preAuth/LoginPage';
 import Welcome from '../app/Welcome'; 
-import HomePage from '../pages/postAuth/HomePage'
-
-import DexStartPage from '../pages/postAuth/DexStartPage'
-import DexPage from '../pages/postAuth/chatbot/DexPage';
-import PotentialConditionsPage from '../pages/postAuth/DexNavigationPages/PotentialConditionsPage';
-import HospitalPageScreen from '@/pages/postAuth/DexNavigationPages/HospitalPageScreen';
-import HospitalDetailScreen from '@/pages/postAuth/DexNavigationPages/HospitalDetailScreen';
+import HomePage from '../pages/postAuth/preChatbot/HomePage'
+import DexStartPage from '../pages/postAuth/preChatbot/DexStartPage'
+import DexPage from '../pages/postAuth/postChatbot/chatbot/DexPage';
+import PotentialConditionsPage from '../pages/postAuth/postChatbot/DexNavigationPages/PotentialConditionsPage';
+import HospitalPageScreen from '../pages/postAuth/postChatbot/DexNavigationPages/HospitalPageScreen';
+import HospitalDetailScreen from '../pages/postAuth/postChatbot/DexNavigationPages/HospitalDetailScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,8 +19,8 @@ const Router: React.FC = () => {
     <Stack.Navigator initialRouteName="Start"> 
       {/* PreAuth Pages */}
       <Stack.Screen name="Start" component={StartPage} options={{ headerShown: false }} />
-      <Stack.Screen name="HospitalPageScreen" component={HospitalPageScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="HospitalDetailScreen" component={HospitalDetailScreen} options={{ headerShown: false }} />
+      {/* <Stack.Screen name="HospitalPageScreen" component={HospitalPageScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="HospitalDetailScreen" component={HospitalDetailScreen} options={{ headerShown: false }} /> */}
 
       <Stack.Screen name="OnBoarding" component={OnBoardingPage} options={{ headerShown: false }}/>
       <Stack.Screen name="Login" component={LoginPage} options={{ headerShown: false }}/>
