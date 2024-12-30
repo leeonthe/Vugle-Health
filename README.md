@@ -45,3 +45,6 @@ The system is designed with a **cohesive yet decoupled architecture** for scalab
 
 #### Frontend
 - Developed with **React Native Expo** for cross-platform development.
+
+
+## Getting Started
