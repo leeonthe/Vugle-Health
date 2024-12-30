@@ -50,7 +50,7 @@
     },
     {
       "text": "I do not have it",
-      "next": "TODO"
+      "next": "suitable_claim_type"
     }
   ]
 }

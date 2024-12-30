@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import {
   View,
   ActivityIndicator,
@@ -8,17 +8,24 @@ import {
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import ChatRenderer from "./ChatRenderer";
-
+import { chatHistoryReducer, ChatHistoryAction } from "./chatHistoryReducer";
 // hooks
 import { useChat } from "../../../utils/hooks/useChat";
 import { useDisabilityRating } from "../../../utils/hooks/useDisabilityRating";
 import { usePatientHealth } from "../../../utils/hooks/usePatientHealth";
 import { ChatBubble } from "../../../utils/interfaces/promptTypes";
 
+const initialState = {
+  chatHistory: [],
+  actionTriggered: false,
+};
+
 const DexPage: React.FC = () => {
   const { useFetchPrompt, useSendSelection } = useChat();
   const [currentStep, setCurrentStep] = useState<string>("start");
-  const [chatHistory, setChatHistory] = useState<ChatBubble[]>([]);
+  // const [chatHistory, setChatHistory] = useState<ChatBubble[]>([]);
+  const [state, dispatch] = useReducer(chatHistoryReducer, initialState);
+
   const [actionTriggered, setActionTriggered] = useState(false);
 
   const [loadingState, setLoadingState] = useState({
@@ -38,25 +45,25 @@ const DexPage: React.FC = () => {
   const icn = disabilityData?.disability_rating?.data?.id;
   const { isLoading: isHealthLoading, isSuccess: isHealthSuccess } =
     usePatientHealth(icn || "");
-  // 1011537977V693883 -> ICN provided in the va.gov API docs
+
   // Add prompt data to chatHistory
   useEffect(() => {
     if (promptData) {
-      const isAlreadyAdded = chatHistory.some(
+      const isAlreadyAdded = state.chatHistory.some(
         (chat) => chat.chat_bubbles_id === promptData.chat_bubbles_id
       );
 
       if (!isAlreadyAdded) {
-        setChatHistory((prevHistory) => [
-          ...prevHistory,
-          {
+        dispatch({
+          type: "ADD_PROMPT_DATA",
+          payload: {
             ...promptData,
-            source: currentStep === "suitable_claim_type" ? "suitable_claim_type" : "start", // Dynamically set the source
+            source: currentStep === "suitable_claim_type" ? "suitable_claim_type" : "start",
           },
-        ]);
+        });
       }
     }
-  }, [promptData]);
+  }, [promptData, state.chatHistory]);
 
   /**
    *   ExpandingDot & LoadingAnimation
@@ -91,93 +98,89 @@ const DexPage: React.FC = () => {
     userResponse?: string
   ) => {
     // Prevent duplicate calls
-    if (actionTriggered) {
+    if (state.actionTriggered) {
       console.log("Action already triggered. Skipping...");
-      return; 
+      return;
     }
-    setActionTriggered(true);
+    dispatch({ type: "SET_ACTION_TRIGGERED", payload: true });
 
     console.log("Option selected:", nextStep, "User Response:", userResponse);
 
-    // Append user response to chatHistory
     if (userResponse) {
-      setChatHistory((prevHistory) => [
-        ...prevHistory,
-        {
+      dispatch({
+        type: "ADD_USER_RESPONSE",
+        payload: {
           chat_bubbles_id: -1,
           chat_bubbles: [],
           options_id: -1,
           options: [],
           userResponse,
         },
-      ]);
+      });
     }
 
     /**
      * Adding a temporary loading message with a logo and animation to the chatHistory.
      * Specified loadingId = 0, to display both logo & loading message simultaneously
      */
-    const loadingId = 0;
-    setChatHistory((prevHistory) => [
-      ...prevHistory,
-      {
-        chat_bubbles_id: 0,
-        options_id: 0,
-        chat_bubbles: [
-          {
-            container: [
-              {
-                type: "image",
-                content: "app_logo",
-                style: {
-                  width: 24,
-                  height: 24,
-                },
+    const loadingMessage = {
+      chat_bubbles_id: 0,
+      options_id: 0,
+      chat_bubbles: [
+        {
+          container: [
+            {
+              type: "image",
+              content: "app_logo",
+              style: {
+                width: 24,
+                height: 24,
               },
-            ],
-          },
-          {
-            container: [
-              {
-                type: "custom",
-                content: <LoadingAnimation />,
-              },
-            ],
-          },
-        ],
-        options: [],
-      },
-    ]);
+            },
+          ],
+        },
+        {
+          container: [
+            {
+              type: "custom",
+              content: <LoadingAnimation />,
+            },
+          ],
+        },
+      ],
+      options: [],
+    };
+
+    dispatch({ type: "ADD_LOADING_MESSAGE", payload: loadingMessage });
+
 
     setTimeout(() => {
-      // Removing loading message
-      setChatHistory((prevHistory) =>
-        prevHistory.filter((chat) => chat.chat_bubbles_id !== loadingId)
-      );
+      dispatch({ type: "REMOVE_LOADING_MESSAGE", payload: 0 });
 
-      // Navigate to next step
       mutation.mutate(
         { currentFile: currentStep, userSelection: nextStep },
         {
           onSuccess: (data) => {
             if (data.next) {
               setCurrentStep(data.next);
-            } else if (data.source === "suitable_claim_type"){
-              setChatHistory((prevHistory) => [...prevHistory, data]);
-            } else{
-              setChatHistory((prevHistory) => [...prevHistory, data]);
+            }             
+            else {
+              console.log("HERE IS CALLED: ")
+              // THIS IS FOR RETRIEVING GPT RESPONSE FROM BACKEND WHICH IS FORMATTED IN JSON, SINCE SUITABLE_CLAIM_TPYE.JSON DOES NOT HAVE NEXT FILED. 
+              dispatch({ type: "ADD_PROMPT_DATA", payload: data });
             }
-            setActionTriggered(false);
+            dispatch({ type: "SET_ACTION_TRIGGERED", payload: false });
+
           },
           onError: (error) => {
             console.error("Error during mutation:", error);
-            setActionTriggered(false);
+            dispatch({ type: "SET_ACTION_TRIGGERED", payload: false });
+
           },
         }
       );
     }, 2000);
   };
-
 
   if (isPromptLoading) {
     return <ActivityIndicator size="large" color="#3182F6" />;
@@ -190,9 +193,9 @@ const DexPage: React.FC = () => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View>
-        {chatHistory.length > 0 && (
+        {state.chatHistory.length > 0 && (
           <ChatRenderer
-            chatHistory={chatHistory}
+            chatHistory={state.chatHistory}
             onOptionSelect={handleOptionSelect}
             isHealthLoading={false}
             isHealthSuccess={false}

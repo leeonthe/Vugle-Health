@@ -115,32 +115,31 @@ const ChatRenderer: React.FC<ChatProps> = ({
             const formData = new FormData();
             formData.append("file", file);
 
-            // triggerOptionAction({ text: file.name, next: "choose_your_claim" });
+            triggerOptionAction({ text: file.name, next: "choose_your_claim" });
 
             /**
              * FOR ACTUAL USEAGE
              * 
              */
+            // try {
+            //   // Send POST request to backend
+            //   const response = await axios.post(
+            //                 "http://localhost:8000/api/auth/upload_dd214/",
+            //                 formData,
+            //                 {
+            //                     headers: {
+            //                         "Content-Type": "multipart/form-data",
+            //                         ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+            //                     },
+            //                 }
+            //             );
 
-            try {
-              // Send POST request to backend
-              const response = await axios.post(
-                            "http://localhost:8000/api/auth/upload_dd214/",
-                            formData,
-                            {
-                                headers: {
-                                    "Content-Type": "multipart/form-data",
-                                    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-                                },
-                            }
-                        );
+            //   console.log("File uploaded successfully:", response.data);
+            //   triggerOptionAction({ text: file.name, next: "choose_your_claim" });
 
-              console.log("File uploaded successfully:", response.data);
-              triggerOptionAction({ text: file.name, next: "choose_your_claim" });
-
-            } catch (err) {
-              console.error("Error uploading file:", err);
-            }
+            // } catch (err) {
+            //   console.error("Error uploading file:", err);
+            // }
           }
         };
         fileInput.click();
@@ -162,27 +161,29 @@ const ChatRenderer: React.FC<ChatProps> = ({
             name: fileName,
             type: file.mimeType || "application/pdf",
           });
+          triggerOptionAction({ text: file.name, next: "choose_your_claim" });
+
           /**
            * FOR ACUTAL USAGE
            * 
            */
-           try {
-            // Send POST request to backend
-            const response = await axios.post(
-              "http://localhost:8000/api/auth/upload_dd214/",
-              formData,
-              {
-                  headers: {
-                      "Content-Type": "multipart/form-data",
-                      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-                  },
-              }
-          );
-            console.log("[MOBILE] File uploaded successfully to backend");
-            triggerOptionAction({ text: fileName, next: "choose_your_claim" });
-          } catch (err) {
-            console.error("Error uploading file:", err);
-          }
+          //  try {
+          //   // Send POST request to backend
+          //   const response = await axios.post(
+          //     "http://localhost:8000/api/auth/upload_dd214/",
+          //     formData,
+          //     {
+          //         headers: {
+          //             "Content-Type": "multipart/form-data",
+          //             ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          //         },
+          //     }
+          // );
+          //   console.log("[MOBILE] File uploaded successfully to backend");
+          //   triggerOptionAction({ text: fileName, next: "choose_your_claim" });
+          // } catch (err) {
+          //   console.error("Error uploading file:", err);
+          // }
 
         }
       }
@@ -328,16 +329,21 @@ const ChatRenderer: React.FC<ChatProps> = ({
   //   }
   // };
 
+  const handleGroupLogic = (groupIndex: number) => {
+    const currentSource = chatHistory[chatHistory.length - 1]?.source || "unknown";
+    const isStartBubble = chatHistory.some((chat) => chat.chat_bubbles_id === 1);
+    const isLoading = handleLoadingState(groupIndex);
+    if (!isLoading && !triggeredGroups.has(groupIndex) && currentSource === "start" && isStartBubble) {
+      setTriggeredGroups((prev) => new Set([...prev, groupIndex]));
+      onOptionSelect("upload_dd214"); 
+    }
+  };
+
   const renderElement = (
     element: ChatBubble["chat_bubbles"][number]["container"][number],
     index: number,
     groupIndex: number | null = null
   ) => {
-    const currentSource =
-    chatHistory[chatHistory.length - 1]?.source || "unknown";
-    const isStartBubble = chatHistory.some(
-      (chat) => chat.chat_bubbles_id === 1 
-    );
     const isLoading = handleLoadingState(groupIndex ?? index);
 
     switch (element.type) {
@@ -346,23 +352,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
        * Need to update to support suitable_claim_type.json
        */
       case "group":
-        // console.log("groupIndex", groupIndex);
-        // console.log("index", index);
-        // console.log("isLoading:", isLoading);
-
-        if (!isLoading && isStartBubble && currentSource === "start" && !triggeredGroups.has(index)) {
-          setTriggeredGroups((prev) => {
-            if (prev.has(index)) return prev; 
-            const updatedSet = new Set(prev);
-            updatedSet.add(index);
-            console.log("IM CALLED");
-            triggerOptionSingleAction("pain_severity");
-            // triggerOptionSingleAction("suitable_claim_type");
-
-            return updatedSet;
-          });
-        }
-
+        handleGroupLogic(index); 
         return (
           <View key={`group-${index}`} style={styles.groupContainer}>
             {element.content.map((childElement: any, childIndex: number) => {
@@ -459,6 +449,11 @@ const ChatRenderer: React.FC<ChatProps> = ({
       
       if (option.text === "NONE") {
         return null;
+      }
+
+      // TEST CASE
+      if (option.tex === "I do not have it") {
+        onOptionSelect("suitable_claim_type")
       }
 
       if (option.text === "Upload DD214") {

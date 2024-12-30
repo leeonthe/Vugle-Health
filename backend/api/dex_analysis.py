@@ -185,7 +185,7 @@ def test_generate_most_suitable_claim_type():
     
     testResponse = f"""
     Type of claim: New Claim
-    Description: THiS IS FOR TESTING PURPOSE 
+    Description: The veteran has not reported any service-connected disabilities, and there is no information on existing conditions. Therefore, a new claim is appropriate for any potential medical conditions that may not be associated with prior service-connected issues. 
     """
 
     return testResponse
