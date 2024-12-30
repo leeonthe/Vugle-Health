@@ -1,6 +1,7 @@
 {
   "chat_bubbles_id": 9,
   "options_id": 9,
+  "source": "suitable_claim_type",
   "chat_bubbles": [
     {
       "container": [

@@ -47,7 +47,13 @@ const DexPage: React.FC = () => {
       );
 
       if (!isAlreadyAdded) {
-        setChatHistory((prevHistory) => [...prevHistory, promptData]);
+        setChatHistory((prevHistory) => [
+          ...prevHistory,
+          {
+            ...promptData,
+            source: currentStep === "suitable_claim_type" ? "suitable_claim_type" : "start", // Dynamically set the source
+          },
+        ]);
       }
     }
   }, [promptData]);
@@ -156,6 +162,8 @@ const DexPage: React.FC = () => {
           onSuccess: (data) => {
             if (data.next) {
               setCurrentStep(data.next);
+            } else if (data.source === "suitable_claim_type"){
+              setChatHistory((prevHistory) => [...prevHistory, data]);
             } else{
               setChatHistory((prevHistory) => [...prevHistory, data]);
             }

@@ -132,7 +132,10 @@ class OAuthHandler:
         id_token = token_data.get('id_token')
         access_token = token_data.get('access_token')
         # TODO: Store access_token in session if needed -> This is for disability_rating fetching.
+
         request.session['access_token'] = access_token
+        saved_accesstk = request.session.get("access_token")
+        print("AFTER ACCESS TOKEN SAVED IN SESSION: ", saved_accesstk)
         # Validate the ID token
         try:
             signing_key = self.get_signing_key(id_token)
@@ -453,13 +456,14 @@ class PatientHealthView(View):
 
             if response.status_code == 200:
                 data = response.json()
+                # print("FULL PATIENT DATA: ", data)
                 extracted_data = {
                     "device_requests": [
                         {
-                            "type": entry["resource"].get("codeCodeableConcept", {}).get("text", None),
-                            "reason": entry["resource"].get("reasonCode", [{}])[0].get("text", None),
-                            "status": entry["resource"].get("status", None),
-                            "last_updated": entry["resource"]["meta"].get("lastUpdated", None)
+                            "type": entry["resource"].get("code", {}).get("text", None),  # Extract main condition name
+                            "reason": entry["resource"].get("category", [{}])[0].get("text", None),  # Extract category text
+                            "status": entry["resource"].get("clinicalStatus", {}).get("text", None),  # Extract clinical status
+                            "last_updated": entry["resource"]["meta"].get("lastUpdated", None)  # Extract last updated date
                         }
                         for entry in data.get("entry", [])[:10]  # Limit to the first 10 entries
                     ]
@@ -804,12 +808,33 @@ class DexAnalysisResponse():
     @csrf_exempt
     def generate_most_suitable_claim_response(request):
         try:
-            gpt_response = generate_most_suitable_claim_type()
+            print("Generating GPT response for suitable claim type...")
+            gpt_response = generate_most_suitable_claim_type(request)
             # gpt_response = test_generate_most_suitable_claim_type()
+            print("GPT Response:", gpt_response)
 
+            # Validate GPT response
+            if not gpt_response or "Type of claim:" not in gpt_response or "Description:" not in gpt_response:
+                return JsonResponse({"error": "Invalid GPT response format"}, status=500)
+
+            # Split GPT response into lines
             lines = gpt_response.split('\n')
-            claim_type = lines[1].split(":")[1].strip()
-            description = lines[2].split(":")[1].strip()
+            print("Parsed GPT response lines:", lines)
+
+            claim_type = None
+            description = None
+
+            for line in lines:
+                stripped_line = line.strip()  # Remove leading and trailing spaces
+                if stripped_line.startswith("Type of claim:"):
+                    claim_type = stripped_line.split(":", 1)[1].strip()
+                elif stripped_line.startswith("Description:"):
+                    description = stripped_line.split(":", 1)[1].strip()
+
+            if not claim_type or not description:
+                print("Invalid GPT response format:", lines)
+                return JsonResponse({"error": "Invalid GPT response: Missing 'Type of claim' or 'Description'."}, status=500)
+
 
             # Format GPT response into the chat bubble structure
             data = {

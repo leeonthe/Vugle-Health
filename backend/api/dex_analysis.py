@@ -71,7 +71,7 @@ def generate_potential_conditions(user_input):
     potential_conditions = query_gpt(prompt, context_type="generate_potential_conditions")
     return potential_conditions.split('\n\n')
 
-def generate_most_suitable_claim_type():
+def generate_most_suitable_claim_type(request):
     """
     Generate the most suitable claim type based on stored user data:
         - disability_rating_data
@@ -83,75 +83,97 @@ def generate_most_suitable_claim_type():
         - user_pain_severity
         - potential_conditions
     """
+    # Fetch required session data
+    disability_rating_data = request.session.get('disability_rating_data', {})
+    eligible_letter_data = request.session.get('eligible_letter_data', {})
+    patient_health_data = request.session.get('patient_health_data', {})
+    parsed_dd214_data = request.session.get('parsed_dd214_data', {})
+    user_medical_condition_response = request.session.get('user_medical_condition_response', [])
+    user_pain_duration = request.session.get('user_pain_duration', 'NONE')
+    user_pain_severity = request.session.get('user_pain_severity', 'NONE')
+
     prompt = f"""
     Based on the following veteran's data:
 
     1. **Disability Rating Data**:
-    - Combined Disability Rating: {request.session.get('disability_rating_data', {}).get('combined_disability_rating')}
+    - Combined Disability Rating: {disability_rating_data.get('combined_disability_rating')}
     - Individual Ratings:
         {[
-            f"""
-            Condition: {rating.get('condition')}
-            Rating: {rating.get('rating')}%
-            Effective Date: {rating.get('effective_date')}
-            Service Connection: {'Yes' if rating.get('service_connection') else 'No'}
-            Static Condition: {'Yes' if rating.get('static_condition') else 'No'}
-            """
-            for rating in request.session.get('disability_rating_data', {}).get('individual_ratings', [])
+            f"Condition: {rating.get('condition')}, Rating: {rating.get('rating')}%, Effective Date: {rating.get('effective_date')}, "
+            f"Service Connection: {'Yes' if rating.get('service_connection') else 'No'}, "
+            f"Static Condition: {'Yes' if rating.get('static_condition') else 'No'}"
+            for rating in disability_rating_data.get('individual_ratings', [])
         ]}
-    
+
     2. **Eligible Letter Data**:
     - Service Information:
         {[
-            f"""
-            Branch: {service.get('branch')}
-            Character of Service: {service.get('character_of_service')}
-            Service Period: From {service.get('service_period', {}).get('entered_date')} to {service.get('service_period', {}).get('released_date')}
-            """
-            for service in request.session.get('eligible_letter_data', {}).get('service_information', [])
+            f"Branch: {service.get('branch')}, Character of Service: {service.get('character_of_service')}, "
+            f"Service Period: From {service.get('service_period', {}).get('entered_date')} to {service.get('service_period', {}).get('released_date')}"
+            for service in eligible_letter_data.get('service_information', [])
         ]}
     - Benefits:
-        Monthly Award: ${request.session.get('eligible_letter_data', {}).get('benefits', {}).get('monthly_award')}
-        Service-Connected Disabilities: {'Yes' if request.session.get('eligible_letter_data', {}).get('benefits', {}).get('service_connected_disabilities') else 'No'}
-        Chapter 35 Eligibility: {'Yes' if request.session.get('eligible_letter_data', {}).get('benefits', {}).get('chapter_35_eligibility') else 'No'}
+        Monthly Award: ${eligible_letter_data.get('benefits', {}).get('monthly_award')}
+        Service-Connected Disabilities: {'Yes' if eligible_letter_data.get('benefits', {}).get('service_connected_disabilities') else 'No'}
+        Chapter 35 Eligibility: {'Yes' if eligible_letter_data.get('benefits', {}).get('chapter_35_eligibility') else 'No'}
 
     3. **Patient Health Data**:
     - Device Requests:
         {[
-            f"""
-            Type: {request.get('type', 'NONE')}
-            Reason: {request.get('reason', 'NONE')}
-            Status: {request.get('status', 'NONE')}
-            Last Updated: {request.get('last_updated', 'NONE')}
-            """
-            for request in request.session.get('patient_health_data', {}).get('device_requests', [])
+            f"Type: {device.get('type', 'NONE')}, Reason: {device.get('reason', 'NONE')}, Status: {device.get('status', 'NONE')}, "
+            f"Last Updated: {device.get('last_updated', 'NONE')}"
+            for device in patient_health_data.get('device_requests', [])
         ]}
-    
-    4. **Additional Service Details from DD214**:
-    - Net Active Service: {request.session.get('parsed_dd214_data', {}).get('net_active_service', 'NONE')}
-    - Total Foreign Service: {request.session.get('parsed_dd214_data', {}).get('total_foreign_service', 'NONE')}
-    - Decorations, Medals, and Awards: {request.session.get('parsed_dd214_data', {}).get('decorations_and_awards', 'NONE')}
-    - Remarks: {request.session.get('parsed_dd214_data', {}).get('remarks', 'NONE')}
 
+    4. **Additional Service Details from DD214**:
+    - Net Active Service: {parsed_dd214_data.get('net_active_service', 'NONE')}
+    - Total Foreign Service: {parsed_dd214_data.get('total_foreign_service', 'NONE')}
+    - Decorations, Medals, and Awards: {parsed_dd214_data.get('decorations_and_awards', 'NONE')}
+    - Remarks: {parsed_dd214_data.get('remarks', 'NONE')}
 
     5. **User-Reported Medical Details**:
-    - Medical Conditions: {', '.join(request.session.get('user_medical_condition_response', []))}
-    - Pain Duration: {request.session.get('user_pain_duration', 'NONE')}
-    - Pain Severity: {request.session.get('user_pain_severity', 'NONE')}
+    - Medical Conditions: {', '.join(user_medical_condition_response)}
+    - Pain Duration: {user_pain_duration}
+    - Pain Severity: {user_pain_severity}
 
-    Determine the most suitable type of VA claim for this veteran based on the options below:
-        1. **New Claim**: A claim for a new sevice-connected condition not previously submitted to or recognized by the VA, i.e. if there is an existing disability rating, it should not be because of this new condition.
-        2. **Increased Claim**: A claim indicating that an existing service-connected condition has worsened.
-        3. **Secondary Service-Connected Claim**: A claim for a new condition that is caused or aggravated by an existing service-connected disability, or other health conditions found in the user's medical history: {medical_record}.        
-    
-    Your response must be provided in the following format:
+    Using the information above, determine the most suitable VA claim type for this veteran. Follow these **guidelines**:
 
-    Type of claim: <Name of claim>
-    Description: <One ~ two sentence description why this type of claim is best suited for this user given user input and data>
+    ### Guidelines:
+    1. **New Claim**:
+        - Use this if the veteran has reported a new condition that is not associated with any previously service-connected conditions or disability ratings.
+        - Example Response:
+        ```
+        Type of claim: New Claim
+        Description: The reported medical condition `{', '.join(user_medical_condition_response)}` is a newly identified issue and has no prior association with existing service-connected conditions. 
+        ```
 
-    Ensure seperate Type of claim and Description with a blank line. Provide a concise description that fits within the token limit of 500. 
+    2. **Increased Claim**:
+        - Use this if the veteran has a service-connected condition with an existing disability rating and their reported condition or data suggests a worsening of that condition.
+        - Example Response:
+        ```
+        Type of claim: Increased Claim
+        Description: Your condition `{disability_rating_data.get('individual_ratings', [{}])[0].get('condition', 'N/A')}` appears to have worsened, requiring a reevaluation of your existing disability rating of `{disability_rating_data.get('individual_ratings', [{}])[0].get('rating', 'N/A')}%`.
+        ```
+
+    3. **Secondary Service-Connected Claim**:
+        - Use this if the veteran's reported condition is likely caused or aggravated by an existing service-connected condition.
+        - Example Response:
+        ```
+        Type of claim: Secondary Service-Connected Claim
+        Description: Your condition `{user_medical_condition_response[0] if user_medical_condition_response else 'N/A'}` might be affected by your existing service-connected condition `{disability_rating_data.get('individual_ratings', [{}])[0].get('condition', 'N/A')}`, which has a disability rating of `{disability_rating_data.get('individual_ratings', [{}])[0].get('rating', 'N/A')}%`.
+        ```
+
+    **Response Format**:
+    - Type of claim: <Name of claim>
+    - Description: <One ~ two sentence description explaining why this claim is best suited for this user given user input and data. Provide a concise description that fits within the token limit of 500.>
+
+
+    Provide your response in this **Response Format** with **no additional information**. 
     """
-    return query_gpt(prompt, context_type="generate_most_suitable_claim_type")
+
+    response = query_gpt(prompt, context_type="generate_most_suitable_claim_type")
+    print("GPT RESPONSE READY: ", response)
+    return response
 
 def test_generate_most_suitable_claim_type():
     

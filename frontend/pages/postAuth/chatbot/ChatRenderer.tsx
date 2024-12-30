@@ -157,10 +157,10 @@ const ChatRenderer: React.FC<ChatProps> = ({
 
           // Create FormData to send the file
           const formData = new FormData();
-          formData.append("DD214", {
+          formData.append("file", {
             uri: file.uri,
             name: fileName,
-            type: file.mimeType,
+            type: file.mimeType || "application/pdf",
           });
           /**
            * FOR ACUTAL USAGE
@@ -333,6 +333,8 @@ const ChatRenderer: React.FC<ChatProps> = ({
     index: number,
     groupIndex: number | null = null
   ) => {
+    const currentSource =
+    chatHistory[chatHistory.length - 1]?.source || "unknown";
     const isStartBubble = chatHistory.some(
       (chat) => chat.chat_bubbles_id === 1 
     );
@@ -344,17 +346,19 @@ const ChatRenderer: React.FC<ChatProps> = ({
        * Need to update to support suitable_claim_type.json
        */
       case "group":
-        console.log("groupIndex", groupIndex);
-        console.log("index", index);
-        console.log("isLoading:", isLoading);
+        // console.log("groupIndex", groupIndex);
+        // console.log("index", index);
+        // console.log("isLoading:", isLoading);
 
-        if (!isLoading && isStartBubble && !triggeredGroups.has(index)) {
+        if (!isLoading && isStartBubble && currentSource === "start" && !triggeredGroups.has(index)) {
           setTriggeredGroups((prev) => {
             if (prev.has(index)) return prev; 
             const updatedSet = new Set(prev);
             updatedSet.add(index);
             console.log("IM CALLED");
             triggerOptionSingleAction("upload_dd214");
+            // triggerOptionSingleAction("suitable_claim_type");
+
             return updatedSet;
           });
         }
@@ -403,6 +407,8 @@ const ChatRenderer: React.FC<ChatProps> = ({
               ) {
                 return null;
               }
+
+
 
               // Default rendering for other elements
               return renderElement(childElement, childIndex, index);
@@ -546,7 +552,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
         >
           <View key={`user-response-${chatIndex}`}>
             <Text style={[styles.userText]}>{userResponse}</Text>
-          </View>
+          </View> 
         </Animatable.View>
       </View>
     </View>

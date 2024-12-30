@@ -81,6 +81,7 @@ export interface ChatBubble {
   chat_bubbles_id: number;
   chat_bubbles: Container[];
   options_id: number;
+  source?: string;
   options: { text: string; inputType?: string; next: string }[];
   next?: string;
   userResponse?: string;
