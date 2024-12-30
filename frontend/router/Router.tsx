@@ -10,6 +10,8 @@ import HomePage from '../pages/postAuth/HomePage'
 import DexStartPage from '../pages/postAuth/DexStartPage'
 import DexPage from '../pages/postAuth/chatbot/DexPage';
 import PotentialConditionsPage from '../pages/postAuth/DexNavigationPages/PotentialConditionsPage';
+import HospitalPageScreen from '@/pages/postAuth/DexNavigationPages/HospitalPageScreen';
+import HospitalDetailScreen from '@/pages/postAuth/DexNavigationPages/HospitalDetailScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -18,6 +20,9 @@ const Router: React.FC = () => {
     <Stack.Navigator initialRouteName="Start"> 
       {/* PreAuth Pages */}
       <Stack.Screen name="Start" component={StartPage} options={{ headerShown: false }} />
+      <Stack.Screen name="HospitalPageScreen" component={HospitalPageScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="HospitalDetailScreen" component={HospitalDetailScreen} options={{ headerShown: false }} />
+
       <Stack.Screen name="OnBoarding" component={OnBoardingPage} options={{ headerShown: false }}/>
       <Stack.Screen name="Login" component={LoginPage} options={{ headerShown: false }}/>
 

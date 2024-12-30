@@ -10,7 +10,8 @@ const StartPage: React.FC<StartPageProps> = ({ navigation }) => {
     const timeout = setTimeout(() => {
       const shouldNavigate = true;
       if (shouldNavigate) {
-        navigation.navigate('OnBoarding');
+        // navigation.navigate('OnBoarding');
+        navigation.navigate('HospitalPageScreen');
       }
     }, 2000);
   

@@ -119,22 +119,25 @@ const DexStartPage: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  header: {
+    width: '100%',
+    height: 54,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 10, 
+  } as ViewStyle,
     container: {
       flexGrow: 1,
       backgroundColor: '#ffffff',
       padding: 16,
+      marginTop: -18, 
     } as ViewStyle, 
     back: {
       marginTop: 80,
       marginLeft: 10,
     } as ViewStyle,
-    header: {
-      width: '100%',
-      height: 54,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    } as ViewStyle,
+   
     titleContainer: {
       width: '100%',
       flexDirection: 'row',
@@ -149,7 +152,7 @@ const styles = StyleSheet.create({
       fontFamily: 'SF Pro Display',
       fontWeight: '600',
       lineHeight: 38,
-    } as TextStyle, // Explicitly typed as TextStyle
+    } as TextStyle, 
     titleHighlight: {
       color: '#3182F6',
       fontSize: 24,
@@ -180,7 +183,7 @@ const styles = StyleSheet.create({
       flexDirection: 'column',
       alignItems: 'flex-start',
       gap: 2,
-      marginBottom: 150,
+      marginBottom: 130,
       marginLeft: 10,
     } as ViewStyle,
     messageContainer: {
@@ -202,7 +205,7 @@ const styles = StyleSheet.create({
       wordWrap: 'break-word',
     } as TextStyle,
     buttonContainer: {
-      marginTop: 16,
+      marginBottom: 20,
       alignItems: 'center',
     } as ViewStyle,
     button: {
@@ -212,6 +215,7 @@ const styles = StyleSheet.create({
       borderRadius: 8,
       justifyContent: 'center',
       alignItems: 'center',
+
     } as ViewStyle,
     buttonText: {
       color: 'white',

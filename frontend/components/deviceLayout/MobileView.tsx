@@ -7,7 +7,8 @@ const MobileView: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   
   const styles = StyleSheet.create({
     container: {
-        flex: 1, // Ensure the container still fills the screen
+        flex: 1, 
+        // paddingTop: 50,
     },
   });
   

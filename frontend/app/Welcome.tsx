@@ -380,6 +380,7 @@ const Welcome: React.FC = () => {
           >
             <Stack.Screen name="WelcomePage" component={WelcomePage} />
             <Stack.Screen name="HomePage" component={HomePage} />
+            <Stack.Screen name="DexStartPage" component={DexStartPage} />
             <Stack.Screen name="DexPage" component={DexPage} />
           </Stack.Navigator>
         </MobileView>
