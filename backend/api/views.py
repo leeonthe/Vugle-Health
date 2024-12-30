@@ -288,8 +288,22 @@ class DisabilityRatingView(View):
             response = requests.get(api_url, headers=headers)
             if response.status_code == 200:
                 data = response.json()
-                print("DISABILITY RATING DATA: ", data)
-                request.session["disability_rating_data"] = data
+                extracted_data = {
+                    "combined_disability_rating": data.get("data", {}).get("attributes", {}).get("combined_disability_rating", None),
+                    "individual_ratings": [
+                        {
+                            "condition": rating.get("diagnostic_type_name", None),
+                            "rating": rating.get("rating_percentage", None),
+                            "effective_date": rating.get("effective_date", None),
+                            "service_connection": rating.get("decision") == "Service Connected" if rating.get("decision") else None,
+                            "static_condition": rating.get("static_ind", None)
+                        }
+                        for rating in data.get("data", {}).get("attributes", {}).get("individual_ratings", [])
+                    ] if data.get("data", {}).get("attributes", {}).get("individual_ratings") else None
+                }
+
+                print("Extracted disability rating data: ", extracted_data)
+                request.session["disability_rating_data"] = extracted_data
                 return JsonResponse({"disability_rating": data})
             else:
                 return JsonResponse({"error": "Failed to fetch disability rating.", "details": response.text}, status=response.status_code)
@@ -327,8 +341,28 @@ class EligibleLettersView(View):
 
             if response.status_code == 200:
                 data = response.json()
-                # Store eligible letter data in session
-                request.session["eligible_letter_data"] = data
+                extracted_data = {
+                    "service_information": [
+                        {
+                            "branch": service.get("branch", None),
+                            "character_of_service": service.get("characterOfService", None),
+                            "service_period": {
+                                "entered_date": service.get("enteredDateTime", None),
+                                "released_date": service.get("releasedDateTime", None),
+                            }
+                        }
+                        for service in data.get("militaryServices", [])
+                    ] if data.get("militaryServices") else None,
+                    "benefits": {
+                        "monthly_award": data.get("benefitInformation", {}).get("monthlyAwardAmount", {}).get("value", None),
+                        "service_connected_disabilities": data.get("benefitInformation", {}).get("serviceConnectedDisabilities", None),
+                        "chapter_35_eligibility": data.get("benefitInformation", {}).get("chapter35Eligibility", None),
+                    } if data.get("benefitInformation") else None
+                }
+
+
+                print("Extracted eligible letter data: ", extracted_data)
+                request.session["eligible_letter_data"] = extracted_data
                 print("ELIGIBLE LETTER DATA", data)
                 return JsonResponse(data, status=200)
             else:
@@ -419,8 +453,19 @@ class PatientHealthView(View):
 
             if response.status_code == 200:
                 data = response.json()
-                print("PATIENT MEDICAL CONDITION DATA", data)
-                request.session["patient_health_data"] = data
+                extracted_data = {
+                    "device_requests": [
+                        {
+                            "type": entry["resource"].get("codeCodeableConcept", {}).get("text", None),
+                            "reason": entry["resource"].get("reasonCode", [{}])[0].get("text", None),
+                            "status": entry["resource"].get("status", None),
+                            "last_updated": entry["resource"]["meta"].get("lastUpdated", None)
+                        }
+                        for entry in data.get("entry", [])[:10]  # Limit to the first 10 entries
+                    ]
+                }
+                print("Extracted patient health data: ", extracted_data)
+                request.session["patient_health_data"] = extracted_data
                 return JsonResponse(data, status=200)
             else:
                 return JsonResponse({"error": "Failed to fetch eligible letters", "details": response.text}, status=response.status_code)
@@ -568,9 +613,22 @@ class ParsingDD214(APIView):
             # Call the parsing function
             parsed_data = parse_dd214_text(file_path, processor_name="document_ocr")
             print("Parsed PDF:", parsed_data)
+            processed_data = {
+                "branch_of_service": parsed_data.get("Department, Component, and Branch", "NONE"),
+                "grade_or_rank": parsed_data.get("Grade, Rate, or Rank", "NONE"),
+                "pay_grade": parsed_data.get("Pay Grade", "NONE"),
+                "active_duty_service_period": {
+                    "date_entered": parsed_data.get("Date Entered Active Duty", "NONE"),
+                    "date_separated": parsed_data.get("Separation Date", "NONE")
+                },
+                "net_active_service": parsed_data.get("Net Active Service", "NONE"),
+                "total_foreign_service": parsed_data.get("Total Foreign Service", "NONE"),
+                "decorations_and_awards": parsed_data.get("Decorations, Medals, and Awards", "NONE"),
+                "remarks": parsed_data.get("Remarks", "NONE"),
+            }
             
             # Save parsed data in session
-            request.session["parsed_dd214_data"] = parsed_data
+            request.session["parsed_dd214_data"] = processed_data
            
             # Delete temporary file
             if os.path.exists(file_path):
@@ -729,22 +787,12 @@ class DexAnalysisResponse():
     @csrf_exempt
     def generate_most_suitable_claim_response(request):
         try:
-            # Placeholder: Extract user data from session or request
-            # stored_user_data = request.session.get('user_data', {})
-
-            # Call the GPT-based function to generate the response
-            # gpt_response = generate_most_suitable_claim_type(stored_user_data)
-
-            gpt_response = test_generate_most_suitable_claim_type()
+            gpt_response = generate_most_suitable_claim_type()
+            # gpt_response = test_generate_most_suitable_claim_type()
 
             lines = gpt_response.split('\n')
             claim_type = lines[1].split(":")[1].strip()
             description = lines[2].split(":")[1].strip()
-
-            # claim_type = gpt_response.get("Type of claim")
-            # description = gpt_response.get(
-            #     "Description"
-            # )
 
             # Format GPT response into the chat bubble structure
             data = {

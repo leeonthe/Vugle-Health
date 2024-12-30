@@ -80,7 +80,7 @@ const fetchEligibleLetters = async (icn: string): Promise<EligibleLettersRespons
   const response = await fetch(`http://localhost:8000/api/auth/eligible-letters/?icn=${icn}`, {
     method: 'GET',
     headers: {
-        Authorization: `Bearer ${accessToken}`,
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         'Content-Type': 'application/json',
     },
   });
