@@ -50,7 +50,7 @@
     },
     {
       "text": "I do not have it",
-      "next": "suitable_claim_type"
+      "next": "no_dd214"
     }
   ]
 }

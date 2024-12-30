@@ -82,11 +82,11 @@
     },
     {
       "text": "Existing condition",
-      "next": "existing_condition"
+      "next": "new_condition"
     },
     {
       "text": "Both",
-      "next": "both_conditions"
+      "next": "new_condition"
     }
   ]
 }

@@ -600,6 +600,14 @@ class ChatPromptView(APIView):
                     return DexAnalysisResponse.generate_most_suitable_claim_response(request)
                 return Response({"error": "No next file specified and no dynamic handler available."}, status=status.HTTP_400_BAD_REQUEST)
 
+            # Special handling for iterative flow
+            if next_file == "add_more_conditions":
+                # Provide the `add_more_conditions` prompt
+                return self._get_json_response("add_more_conditions")
+            elif next_file == "other_condition":
+                # Cycle back to `other_condition` prompt
+                return self._get_json_response("other_condition")
+
             # Resolve the next file path
             nested_file_path = os.path.join(next_file, next_file + ".json")
             next_file_path = os.path.join(PROMPTS_DIR, nested_file_path)
@@ -622,6 +630,32 @@ class ChatPromptView(APIView):
         except Exception as e:
             print("Error:", str(e))
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def _get_json_response(self, file_name):
+        """
+        Utility method to fetch a JSON prompt file.
+        """
+        try:
+            nested_file_path = os.path.join(file_name, f"{file_name}.json")
+            file_path = os.path.join(PROMPTS_DIR, nested_file_path)
+
+            print(f"Resolving JSON file path: {file_path}")
+
+            if not os.path.exists(file_path):
+                return Response({"error": f"File {file_name} not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            # Load JSON data
+            with open(file_path, "r") as json_file:
+                data = json.load(json_file)
+
+            # Include the next step reference for the frontend
+            data["next"] = file_name
+            return Response(data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print("Error fetching JSON response:", str(e))
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 # Store parsed dd214 in session

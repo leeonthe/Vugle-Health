@@ -9,12 +9,14 @@ export type ChatHistoryAction =
 
 export const chatHistoryReducer = (state: { chatHistory: ChatBubble[]; actionTriggered: boolean }, action: ChatHistoryAction) => {
   switch (action.type) {
+    // Append user response to history
     case "ADD_USER_RESPONSE":
       return { ...state, chatHistory: [...state.chatHistory, action.payload] };
     case "ADD_LOADING_MESSAGE":
       return { ...state, chatHistory: [...state.chatHistory, action.payload] };
     case "REMOVE_LOADING_MESSAGE":
       return { ...state, chatHistory: state.chatHistory.filter((chat) => chat.chat_bubbles_id !== action.payload) };
+    // Append new prompts
     case "ADD_PROMPT_DATA":
       return { ...state, chatHistory: [...state.chatHistory, action.payload] };
     case "SET_ACTION_TRIGGERED":

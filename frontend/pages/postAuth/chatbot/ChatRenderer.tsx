@@ -479,10 +479,11 @@ const ChatRenderer: React.FC<ChatProps> = ({
             onPress={handleFileUpload}
             style={styles.optionButton}
           >
+
             <Text style={styles.optionText}>{option.text}</Text>
           </TouchableOpacity>
         );
-      }
+      } 
 
       if (option.text === "TYPE") {
         if (option.inputType === "conditionType") {

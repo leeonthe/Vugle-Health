@@ -58,7 +58,10 @@ const DexPage: React.FC = () => {
           type: "ADD_PROMPT_DATA",
           payload: {
             ...promptData,
-            source: currentStep === "suitable_claim_type" ? "suitable_claim_type" : "start",
+            source:
+              currentStep === "suitable_claim_type"
+                ? "suitable_claim_type"
+                : "start",
           },
         });
       }
@@ -153,7 +156,6 @@ const DexPage: React.FC = () => {
 
     dispatch({ type: "ADD_LOADING_MESSAGE", payload: loadingMessage });
 
-
     setTimeout(() => {
       dispatch({ type: "REMOVE_LOADING_MESSAGE", payload: 0 });
 
@@ -161,21 +163,38 @@ const DexPage: React.FC = () => {
         { currentFile: currentStep, userSelection: nextStep },
         {
           onSuccess: (data) => {
-            if (data.next) {
+            if (nextStep === "add_more_conditions") {
+              // Check if the user clicked "Add more"
+              dispatch({
+                type: "ADD_PROMPT_DATA",
+                payload: {
+                  ...data,
+                  source: "add_more_conditions",
+                },
+              });
+              // Set step to re-display other_conditions
+              setCurrentStep("other_condition");
+            } else if (nextStep === "other_condition") {
+              dispatch({
+                type: "ADD_PROMPT_DATA",
+                payload: {
+                  ...data,
+                  source: "other_condition",
+                },
+              });
+            } else if (data.next) {
               setCurrentStep(data.next);
-            }             
-            else {
-              console.log("HERE IS CALLED: ")
-              // THIS IS FOR RETRIEVING GPT RESPONSE FROM BACKEND WHICH IS FORMATTED IN JSON, SINCE SUITABLE_CLAIM_TPYE.JSON DOES NOT HAVE NEXT FILED. 
+            } else {
+              console.log("HERE IS CALLED: ");
+              // Handle steps with no `next` field
+              // THIS IS FOR RETRIEVING GPT RESPONSE FROM BACKEND WHICH IS FORMATTED IN JSON, SINCE SUITABLE_CLAIM_TPYE.JSON DOES NOT HAVE NEXT FILED.
               dispatch({ type: "ADD_PROMPT_DATA", payload: data });
             }
             dispatch({ type: "SET_ACTION_TRIGGERED", payload: false });
-
           },
           onError: (error) => {
             console.error("Error during mutation:", error);
             dispatch({ type: "SET_ACTION_TRIGGERED", payload: false });
-
           },
         }
       );
@@ -221,7 +240,6 @@ const styles = StyleSheet.create({
     marginTop: -10,
     marginBottom: -10,
     borderRadius: 16,
-    
     width: "auto",
   },
   logo: {
