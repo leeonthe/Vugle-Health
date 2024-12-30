@@ -22,6 +22,9 @@ import { useKeyboardStatus } from "../../../utils/hooks/useKeyboardStatus";
 
 import TypeInput from "@/components/common/TypeInput";
 import PainScaleSlider from "@/components/common/PainScalesSlider";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import fetchPotentialConditions from "@/utils/hooks/fetchPotentialConditions";
 // TODO:
 //      + Diplay different container if isHealthLoading and isHealthSuccessful
 //      + Display Keyboard when TextInput is focused
@@ -95,12 +98,14 @@ const ChatRenderer: React.FC<ChatProps> = ({
   };
 
   const handleFileUpload = async () => {
+    const accessToken = await AsyncStorage.getItem('access_token');
     try {
       if (isDesktop) {
         // Web/Desktop File Upload
         const fileInput = document.createElement("input");
         fileInput.type = "file";
         fileInput.accept = ".pdf,.jpg,.png";
+
         fileInput.onchange = async (event) => {
           const file = (event.target as HTMLInputElement).files?.[0];
           if (file) {
@@ -110,36 +115,39 @@ const ChatRenderer: React.FC<ChatProps> = ({
             const formData = new FormData();
             formData.append("file", file);
 
-            triggerOptionAction({ text: file.name, next: "choose_your_claim" });
+            // triggerOptionAction({ text: file.name, next: "choose_your_claim" });
 
             /**
              * FOR ACTUAL USEAGE
              * 
-             * try {
+             */
+
+            try {
               // Send POST request to backend
               const response = await axios.post(
-                "http://localhost:8000/api/auth/upload_dd214/",
-                formData,
-                {
-                  headers: {
-                    "Content-Type": "multipart/form-data",
-                  },
-                }
-              );
+                            "http://localhost:8000/api/auth/upload_dd214/",
+                            formData,
+                            {
+                                headers: {
+                                    "Content-Type": "multipart/form-data",
+                                    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+                                },
+                            }
+                        );
+
               console.log("File uploaded successfully:", response.data);
               triggerOptionAction({ text: file.name, next: "choose_your_claim" });
 
             } catch (err) {
               console.error("Error uploading file:", err);
             }
-             */
           }
         };
         fileInput.click();
       } else {
         // Mobile File Upload
         const res = await DocumentPicker.getDocumentAsync({
-          // type: ["application/pdf", "image/jpeg", "image/png"],
+          type: ["application/pdf", "image/jpeg", "image/png"],
         });
 
         if (!res.canceled && res.assets && res.assets.length > 0) {
@@ -148,34 +156,34 @@ const ChatRenderer: React.FC<ChatProps> = ({
           console.log("Selected file:", fileName);
 
           // Create FormData to send the file
-          // const formData = new FormData();
-          // formData.append("DD214", {
-          //   uri: file.uri,
-          //   name: fileName,
-          //   type: file.mimeType,
-          // });
-
-          triggerOptionAction({ text: fileName, next: "choose_your_claim" });
-
+          const formData = new FormData();
+          formData.append("DD214", {
+            uri: file.uri,
+            name: fileName,
+            type: file.mimeType,
+          });
           /**
            * FOR ACUTAL USAGE
-           * try {
+           * 
+           */
+           try {
             // Send POST request to backend
             const response = await axios.post(
               "http://localhost:8000/api/auth/upload_dd214/",
               formData,
               {
-                headers: {
-                  "Content-Type": "multipart/form-data",
-                },
+                  headers: {
+                      "Content-Type": "multipart/form-data",
+                      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+                  },
               }
-            );
-            console.log("File uploaded successfully:", response.data);
+          );
+            console.log("[MOBILE] File uploaded successfully to backend");
             triggerOptionAction({ text: fileName, next: "choose_your_claim" });
           } catch (err) {
             console.error("Error uploading file:", err);
           }
-           */
+
         }
       }
     } catch (err) {
@@ -212,94 +220,16 @@ const ChatRenderer: React.FC<ChatProps> = ({
   /**
    * Below handleNavigateToConditions is actual method.
    */
-  // const handleNavigateToConditions = async () => {
-  //   try {
-  //     // const response = await axios.get(
-  //     //   "http://localhost:8000/api/auth/potential_conditions_list/"
-  //     // );
-  //     // const potentialConditions = response.data.conditions;
-
-  //     const data = await fetchPotentialConditions();
-  //     const potentialConditions: PotentialCondition[] = data.conditions;
-  //     console.log("Fetched potential conditions:", potentialConditions);
-
-  //     navigation.navigate("PotentialConditionsPage", {
-  //       potentialConditions,
-  //       onReturn: (formattedConditions: string[] | string) => {
-  //         console.log("Selected conditions:", formattedConditions);
-  //         const conditionsArray = Array.isArray(formattedConditions)
-  //           ? formattedConditions
-  //           : [formattedConditions];
-  //         triggerOptionAction({
-  //           // Convert selected conditions to string
-  //           text: conditionsArray.join(", "),
-  //           next: "pain_duration",
-  //         });
-  //       },
-  //     });
-  //   } catch (error) {
-  //     console.error("ERROR FETCHING POTENTIAL CONDITONS ", error);
-  //   }
-  // };
-
-  /**
-   * Below handleNavigateToConditions is for testing purpose.
-   * -> it does not call gpt api.
-   */
   const handleNavigateToConditions = async () => {
     try {
-      // Mock data for potential conditions
-      const potentialConditions = [
-        {
-          name: "Condition A",
-          risk: "High",
-          riskColor: "red",
-          description:
-            "DTo display the + icon on the right side, you can adjust the layout of the button to use flexDirection: This way, the Icon will be positioned after the Text.",
-        },
-        {
-          name: "Condition B",
-          risk: "Medium",
-          riskColor: "orange",
-          description: "Description for Condition B",
-        },
-        {
-          name: "Condition A",
-          risk: "High",
-          riskColor: "red",
-          description: "Description for Condition A",
-        },
-        {
-          name: "Condition B",
-          risk: "Medium",
-          riskColor: "orange",
-          description: "Description for Condition B",
-        },
-        // {
-        //   name: "Condition A",
-        //   risk: "High",
-        //   riskColor: "red",
-        //   description: "Description for Condition A",
-        // },
-        // {
-        //   name: "Condition B",
-        //   risk: "Medium",
-        //   riskColor: "orange",
-        //   description: "Description for Condition B",
-        // },
-        // {
-        //   name: "Condition A",
-        //   risk: "High",
-        //   riskColor: "red",
-        //   description: "Description for Condition A",
-        // },
-        // {
-        //   name: "Condition B",
-        //   risk: "Medium",
-        //   riskColor: "orange",
-        //   description: "Description for Condition B",
-        // },
-      ];
+      // const response = await axios.get(
+      //   "http://localhost:8000/api/auth/potential_conditions_list/"
+      // );
+      // const potentialConditions = response.data.conditions;
+
+      const data = await fetchPotentialConditions();
+      const potentialConditions: PotentialCondition[] = data.conditions;
+      console.log("Fetched potential conditions:", potentialConditions);
 
       navigation.navigate("PotentialConditionsPage", {
         potentialConditions,
@@ -319,6 +249,84 @@ const ChatRenderer: React.FC<ChatProps> = ({
       console.error("ERROR FETCHING POTENTIAL CONDITONS ", error);
     }
   };
+
+  /**
+   * Below handleNavigateToConditions is for testing purpose.
+   * -> it does not call gpt api.
+   */
+  // const handleNavigateToConditions = async () => {
+  //   try {
+  //     // Mock data for potential conditions
+  //     const potentialConditions = [
+  //       {
+  //         name: "Condition A",
+  //         risk: "High",
+  //         riskColor: "red",
+  //         description:
+  //           "DTo display the + icon on the right side, you can adjust the layout of the button to use flexDirection: This way, the Icon will be positioned after the Text.",
+  //       },
+  //       {
+  //         name: "Condition B",
+  //         risk: "Medium",
+  //         riskColor: "orange",
+  //         description: "Description for Condition B",
+  //       },
+  //       {
+  //         name: "Condition A",
+  //         risk: "High",
+  //         riskColor: "red",
+  //         description: "Description for Condition A",
+  //       },
+  //       {
+  //         name: "Condition B",
+  //         risk: "Medium",
+  //         riskColor: "orange",
+  //         description: "Description for Condition B",
+  //       },
+  //       // {
+  //       //   name: "Condition A",
+  //       //   risk: "High",
+  //       //   riskColor: "red",
+  //       //   description: "Description for Condition A",
+  //       // },
+  //       // {
+  //       //   name: "Condition B",
+  //       //   risk: "Medium",
+  //       //   riskColor: "orange",
+  //       //   description: "Description for Condition B",
+  //       // },
+  //       // {
+  //       //   name: "Condition A",
+  //       //   risk: "High",
+  //       //   riskColor: "red",
+  //       //   description: "Description for Condition A",
+  //       // },
+  //       // {
+  //       //   name: "Condition B",
+  //       //   risk: "Medium",
+  //       //   riskColor: "orange",
+  //       //   description: "Description for Condition B",
+  //       // },
+  //     ];
+
+  //     navigation.navigate("PotentialConditionsPage", {
+  //       potentialConditions,
+  //       onReturn: (formattedConditions: string[] | string) => {
+  //         console.log("Selected conditions:", formattedConditions);
+  //         const conditionsArray = Array.isArray(formattedConditions)
+  //           ? formattedConditions
+  //           : [formattedConditions];
+  //         triggerOptionAction({
+  //           // Convert selected conditions to string
+  //           text: conditionsArray.join(", "),
+  //           next: "pain_duration",
+  //         });
+  //       },
+  //     });
+  //   } catch (error) {
+  //     console.error("ERROR FETCHING POTENTIAL CONDITONS ", error);
+  //   }
+  // };
 
   const renderElement = (
     element: ChatBubble["chat_bubbles"][number]["container"][number],
@@ -401,6 +409,8 @@ const ChatRenderer: React.FC<ChatProps> = ({
             })}
           </View>
         );
+
+        
 
       case "text":
         return (

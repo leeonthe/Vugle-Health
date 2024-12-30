@@ -605,9 +605,26 @@ class ChatPromptView(APIView):
 class ParsingDD214(APIView):
     def post(self, request):
         try:
-            print("FILES:", request.FILES)
+            auth_header = request.headers.get("Authorization")
+            if auth_header and auth_header.startswith("Bearer "):
+                access_token = auth_header.split(" ")[1]
+                print(f"Access Token Received: {access_token}")
+            else:
+                access_token = request.session.get("access_token")
+                print(f"Session Access Token: {access_token}")
             # Save uploaded file temporarily
-            uploaded_file = request.FILES["file"]
+            print("FILES:", request.FILES)
+            # uploaded_file = request.FILES["file"]
+            uploaded_file = request.FILES.get("file")
+
+            if not uploaded_file:
+                return JsonResponse({"error": "No file uploaded."}, status=400)
+
+            allowed_file_types = ["application/pdf", "image/jpeg", "image/png"]
+            if uploaded_file.content_type not in allowed_file_types:
+                return JsonResponse({"error": "Unsupported file type."}, status=400)
+
+
             file_path = default_storage.save(uploaded_file.name, ContentFile(uploaded_file.read()))
             
             # Call the parsing function
