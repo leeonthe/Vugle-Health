@@ -28,5 +28,20 @@ Vugle-Health offers a robust suite of tools designed to assist veterans in navig
 4. **Web & Mobile Compatibility**
  - The platform detects the user’s device type and dynamically adjusts the interface for optimal usability. Vugle-Health provides a seamless mobile experience, ensuring veterans can easily manage their disability claims from their phones. The mobile UI is designed to provide the same comprehensive functionality as the web version, while maintaining a user-friendly experience tailored to smaller screens.
 
+## Technical Details
+
+### Tech Stack
+- **Backend:** Django (Python)
+- **Frontend:** React Native Expo (TypeScript)
 
 
+### System Architecture
+The system is designed with a **cohesive yet decoupled architecture** for scalability, maintainability, and a clear separation of concerns.
+
+#### Backend
+- Built with **Django** and **Django REST Framework (DRF)** to provide RESTful APIs.
+- **OAuth2 and OpenID Connect Integration**: Secure login implemented through VA.gov using the Authorization Code Grant flow.
+- **Document Parsing**: Processes DD214 forms using `Google Cloud's Document AI` to extract relevant data for claims analysis.
+
+#### Frontend
+- Developed with **React Native Expo** for cross-platform development.
