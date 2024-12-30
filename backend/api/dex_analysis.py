@@ -96,43 +96,43 @@ def generate_most_suitable_claim_type(request):
     Based on the following veteran's data:
 
     1. **Disability Rating Data**:
-    - Combined Disability Rating: {disability_rating_data.get('combined_disability_rating')}
+    - Combined Disability Rating: {disability_rating_data.get('combined_disability_rating', 'N/A')}
     - Individual Ratings:
         {[
-            f"Condition: {rating.get('condition')}, Rating: {rating.get('rating')}%, Effective Date: {rating.get('effective_date')}, "
-            f"Service Connection: {'Yes' if rating.get('service_connection') else 'No'}, "
-            f"Static Condition: {'Yes' if rating.get('static_condition') else 'No'}"
+            f"Condition: {rating.get('condition', 'N/A')}, Rating: {rating.get('rating', 'N/A')}%, Effective Date: {rating.get('effective_date', 'N/A')}, "
+            f"Service Connection: {'Yes' if rating.get('service_connection', False) else 'No'}, "
+            f"Static Condition: {'Yes' if rating.get('static_condition', False) else 'No'}"
             for rating in disability_rating_data.get('individual_ratings', [])
-        ]}
+        ] or 'No individual ratings available'}
 
     2. **Eligible Letter Data**:
     - Service Information:
         {[
-            f"Branch: {service.get('branch')}, Character of Service: {service.get('character_of_service')}, "
-            f"Service Period: From {service.get('service_period', {}).get('entered_date')} to {service.get('service_period', {}).get('released_date')}"
+            f"Branch: {service.get('branch', 'N/A')}, Character of Service: {service.get('character_of_service', 'N/A')}, "
+            f"Service Period: From {service.get('service_period', {}).get('entered_date', 'N/A')} to {service.get('service_period', {}).get('released_date', 'N/A')}"
             for service in eligible_letter_data.get('service_information', [])
-        ]}
+        ] or 'No service information available'}
     - Benefits:
-        Monthly Award: ${eligible_letter_data.get('benefits', {}).get('monthly_award')}
-        Service-Connected Disabilities: {'Yes' if eligible_letter_data.get('benefits', {}).get('service_connected_disabilities') else 'No'}
-        Chapter 35 Eligibility: {'Yes' if eligible_letter_data.get('benefits', {}).get('chapter_35_eligibility') else 'No'}
+        Monthly Award: ${eligible_letter_data.get('benefits', {}).get('monthly_award', 'N/A')}
+        Service-Connected Disabilities: {'Yes' if eligible_letter_data.get('benefits', {}).get('service_connected_disabilities', False) else 'No'}
+        Chapter 35 Eligibility: {'Yes' if eligible_letter_data.get('benefits', {}).get('chapter_35_eligibility', False) else 'No'}
 
     3. **Patient Health Data**:
     - Device Requests:
         {[
-            f"Type: {device.get('type', 'NONE')}, Reason: {device.get('reason', 'NONE')}, Status: {device.get('status', 'NONE')}, "
-            f"Last Updated: {device.get('last_updated', 'NONE')}"
+            f"Type: {device.get('type', 'N/A')}, Reason: {device.get('reason', 'N/A')}, Status: {device.get('status', 'N/A')}, "
+            f"Last Updated: {device.get('last_updated', 'N/A')}"
             for device in patient_health_data.get('device_requests', [])
-        ]}
+        ] or 'No device requests available'}
 
     4. **Additional Service Details from DD214**:
-    - Net Active Service: {parsed_dd214_data.get('net_active_service', 'NONE')}
-    - Total Foreign Service: {parsed_dd214_data.get('total_foreign_service', 'NONE')}
-    - Decorations, Medals, and Awards: {parsed_dd214_data.get('decorations_and_awards', 'NONE')}
-    - Remarks: {parsed_dd214_data.get('remarks', 'NONE')}
+    - Net Active Service: {parsed_dd214_data.get('net_active_service', 'N/A')}
+    - Total Foreign Service: {parsed_dd214_data.get('total_foreign_service', 'N/A')}
+    - Decorations, Medals, and Awards: {parsed_dd214_data.get('decorations_and_awards', 'N/A')}
+    - Remarks: {parsed_dd214_data.get('remarks', 'N/A')}
 
     5. **User-Reported Medical Details**:
-    - Medical Conditions: {', '.join(user_medical_condition_response)}
+    - Medical Conditions: {', '.join(user_medical_condition_response) or 'None provided'}
     - Pain Duration: {user_pain_duration}
     - Pain Severity: {user_pain_severity}
 
@@ -162,6 +162,12 @@ def generate_most_suitable_claim_type(request):
         Type of claim: Secondary Service-Connected Claim
         Description: Your condition `{user_medical_condition_response[0] if user_medical_condition_response else 'N/A'}` might be affected by your existing service-connected condition `{disability_rating_data.get('individual_ratings', [{}])[0].get('condition', 'N/A')}`, which has a disability rating of `{disability_rating_data.get('individual_ratings', [{}])[0].get('rating', 'N/A')}%`.
         ```
+
+    ### Fallback Guidelines:
+    - If session data for any section is missing, explicitly note "Data unavailable" in that section and proceed with available data.
+    - If no data is available for **Eligible Letter Data**, **Disability Rating Data**, **Patient Health Data**, or **Additional Service Details from DD214**, prioritize the information provided in **User-Reported Medical Details** or any other available fields.
+    - Provide a logical assumption based on the limited data for selecting the most suitable claim type.
+
 
     **Response Format**:
     - Type of claim: <Name of claim>

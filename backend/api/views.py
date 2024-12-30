@@ -71,6 +71,15 @@ class OAuthHandler:
 
     def oauth_login(self, request):
         """Redirect to VA.gov authorization URL."""
+
+        # Clear session to prevent stale data
+        print("CLEARING SESSION.. ")
+        # request.session.flush()  # Clears all session data and regenerates the session ID
+        for key in list(request.session.keys()):
+            del request.session[key]
+        request.session.save()
+        print("ALL SESSION Data after clearing specific keys:", dict(request.session.items()))
+
         platform = request.GET.get('platform', 'web')
         nonce = self.generate_nonce()
         state = f"{self.generate_state()}|{platform}"
@@ -81,6 +90,8 @@ class OAuthHandler:
         request.session['platform'] = platform
         request.session.save()
 
+
+
         params = {
             'client_id': self.client_id,
             'redirect_uri': self.redirect_uri,
@@ -90,21 +101,30 @@ class OAuthHandler:
             'nonce': nonce,
         }
         oauth_url = f"{self.authorization_url}?{urlencode(params)}"
+        print("Session data stored after oauth_login:", dict(request.session.items()))
+
         return redirect(f"{self.authorization_url}?{urlencode(params)}")
 
     def oauth_callback(self, request):
+        print("Session data in callback:", dict(request.session.items()))
+
         """Handle the callback and exchange the code for tokens."""
         code = request.GET.get('code')
         state = request.GET.get('state', '')
+        print("CODE IN CALLBACK", code)
+        print("STATE IN CALLBACK", state)
+
 
         state_parts = state.split('|')
         platform = state_parts[1] if len(state_parts) > 1 else None
 
         saved_state = request.session.get('oauth_state')
         saved_nonce = request.session.get('oauth_nonce')
+        print("SAVED_STATE", saved_state)
+        print("SAVED_NONCE", saved_nonce)
 
-        # if not code or not state or state != saved_state:
-        #     return redirect('/error')
+
+        print("Stored session data: ", dict(request.session.items()))
 
         # Validate state
         if not code or not state or state_parts[0] != saved_state:
