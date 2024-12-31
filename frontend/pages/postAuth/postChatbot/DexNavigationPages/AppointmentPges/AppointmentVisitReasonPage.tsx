@@ -11,47 +11,66 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Back from '../../../../../assets/images/logo/back.svg'; 
+import fetchAppointmentInfo from "@/utils/api_handler/fetchAppointmentInfo";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AppointmentVisitReasonPage: React.FC = () => {
-  const navigation = useNavigation();
-
-
-  const navigateToHomePage = () => {
-    navigation.goBack();
-  };
-
-  const handleNavigation = () => {
-    navigation.navigate("AppointmentDatePage");
-  };
-
-  return (
-    
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.back}>
-        <TouchableOpacity onPress={navigateToHomePage}>
-          <Back width={24} height={24} />
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.header}></View>
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>Visit Reason </Text>
-      </View>
-
-      <View style={styles.infoBox}>
-        <Text>
-            sdad
-        </Text>
+    const [branchOfMedicine, setBranchOfMedicine] = useState<string>("Loading...");
+    const navigation = useNavigation();
+  
+    useEffect(() => {
+      const getAppointmentInfo = async () => {
+        try {
+          const data = await fetchAppointmentInfo(); // Fetches branch_of_medicine and appointment_message
+          const { branch_of_medicine, appointment_message } = data;
+  
+          if (branch_of_medicine) setBranchOfMedicine(branch_of_medicine);
+  
+          // Store in AsyncStorage
+          await AsyncStorage.setItem("branchOfMedicine", branch_of_medicine || "General");
+          await AsyncStorage.setItem("appointmentMessage", appointment_message || "");
+        } catch (error) {
+          console.error("Error fetching appointment information:", error);
+          setBranchOfMedicine("General");
+        }
+      };
+  
+      getAppointmentInfo();
+    }, []);
+  
+    const navigateToHomePage = () => {
+      navigation.goBack();
+    };
+  
+    const handleNavigation = () => {
+      navigation.navigate("AppointmentDatePage");
+    };
+  
+    return (
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.back}>
+          <TouchableOpacity onPress={navigateToHomePage}>
+            <Back width={24} height={24} />
+          </TouchableOpacity>
         </View>
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={handleNavigation}>
-          <Text style={styles.buttonText}>Continue</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
-  );
-};
+  
+        <View style={styles.header}></View>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Visit Reason</Text>
+        </View>
+  
+        <View style={styles.infoBox}>
+          <Text style={styles.infoText}>{branchOfMedicine}</Text>
+        </View>
+  
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={handleNavigation}>
+            <Text style={styles.buttonText}>Continue</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    );
+  };
 
 const styles = StyleSheet.create({
     header: {

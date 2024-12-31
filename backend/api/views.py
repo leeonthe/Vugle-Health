@@ -593,12 +593,17 @@ class ChatPromptView(APIView):
             print("POST endpoint hit! URL:", request.build_absolute_uri())
             print("Current File:", current_file)
             print("Next File:", next_file)
-
+            
             if not next_file:
-                if current_file == "suitable_claim_type":
-                    print("CALLING DexAnalysisResponse.generate_most_suitable_claim_response(request) [ChatPromptView]")
-                    return DexAnalysisResponse.generate_most_suitable_claim_response(request)
-                return Response({"error": "No next file specified and no dynamic handler available."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "No next file specified and no dynamic handler available."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            # if not next_file:
+            #     if current_file == "suitable_claim_type":
+            #         print("CALLING DexAnalysisResponse.generate_most_suitable_claim_response(request) [ChatPromptView]")
+            #         return DexAnalysisResponse.generate_most_suitable_claim_response(request)
+            #     return Response({"error": "No next file specified and no dynamic handler available."}, status=status.HTTP_400_BAD_REQUEST)
 
             # Special handling for iterative flow
             if next_file == "add_more_conditions":
@@ -863,8 +868,8 @@ class DexAnalysisResponse():
     def generate_most_suitable_claim_response(request):
         try:
             print("Generating GPT response for suitable claim type...")
-            # gpt_response = generate_most_suitable_claim_type(request)
-            gpt_response = test_generate_most_suitable_claim_type()
+            gpt_response = generate_most_suitable_claim_type(request)
+            # gpt_response = test_generate_most_suitable_claim_type()
             print("GPT Response:", gpt_response)
 
             # Validate GPT response
@@ -877,19 +882,33 @@ class DexAnalysisResponse():
 
             claim_type = None
             description = None
+            branch_of_medicine = "General"
+            appointment_message = None
 
             for line in lines:
-                stripped_line = line.strip()  # Remove leading and trailing spaces
+                stripped_line = line.strip()
                 if stripped_line.startswith("Type of claim:"):
                     claim_type = stripped_line.split(":", 1)[1].strip()
                 elif stripped_line.startswith("Description:"):
                     description = stripped_line.split(":", 1)[1].strip()
+                elif stripped_line.startswith("Branch of Medicine:"):
+                    branch_of_medicine = stripped_line.split(":", 1)[1].strip()
+                elif stripped_line.startswith("Appointment Message:"):
+                    appointment_message = stripped_line.split(":", 1)[1].strip()
+
 
             if not claim_type or not description:
                 print("Invalid GPT response format:", lines)
                 return JsonResponse({"error": "Invalid GPT response: Missing 'Type of claim' or 'Description'."}, status=500)
 
+            print(f"Parsed claim_type: {claim_type}")
+            print(f"Parsed description: {description}")
+            print(f"Parsed branch_of_medicine: {branch_of_medicine}")
+            print(f"Parsed appointment_message: {appointment_message}")
 
+            request.session['branch_of_medicine'] = branch_of_medicine
+            request.session['appointment_message'] = appointment_message
+            request.session.modified = True 
             # Format GPT response into the chat bubble structure
             data = {
                 "chat_bubbles_id": 10,
@@ -966,6 +985,33 @@ class DexAnalysisResponse():
                 status=500
             )
         except Exception as e:
+            return JsonResponse(
+                {"error": f"An unexpected error occurred: {str(e)}"},
+                status=500
+            )
+
+    @staticmethod
+    @csrf_exempt
+    def get_branch_of_medicine_and_appointment_message(request):
+        try:
+            # Retrieve `branch_of_medicine` and `appointment_message` from the session
+            branch_of_medicine = request.session.get('branch_of_medicine', None)
+            appointment_message = request.session.get('appointment_message', None)
+
+            # Check if the data exists in the session
+            if not branch_of_medicine or not appointment_message:
+                return JsonResponse({
+                    "error": "Data not found in the session. Please generate it first."
+                }, status=404)
+
+            # Return the data as JSON
+            return JsonResponse({
+                "branch_of_medicine": branch_of_medicine,
+                "appointment_message": appointment_message,
+            }, status=200)
+
+        except Exception as e:
+            # Handle unexpected errors
             return JsonResponse(
                 {"error": f"An unexpected error occurred: {str(e)}"},
                 status=500

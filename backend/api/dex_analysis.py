@@ -1,6 +1,7 @@
 import yaml
 from openai import OpenAI
 from decouple import config
+from django.views.decorators.csrf import csrf_exempt
 
 gpt_api_key_path = config("GPT_API_KEY")
 
@@ -33,19 +34,28 @@ def query_gpt(prompt, context_type="general"):
         # Set system role message based on context
         if context_type == "generate_potential_conditions":
             system_message = "You are an expert in medical conditions and can analyze user inputs to suggest related health conditions."
+            a_model="gpt-3.5-turbo"
+            a_max_tokens = 300
         elif context_type == "generate_most_suitable_claim_type":
             system_message = "You are an expert in VA disability claims and can analyze user data to recommend the most suitable claim type."
+            a_model="gpt-4"
+            a_max_tokens = 700
+
+
         else:
             system_message = "You are a helpful assistant."
+            a_model="gpt-3.5-turbo"
+            a_max_tokens = 300
+
 
         # Query GPT with the given prompt
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model= a_model,
             messages=[
                 {"role": "system", "content": system_message},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=300,
+            max_tokens=a_max_tokens,
             temperature=0.4
         )
         return response.choices[0].message.content.strip()
@@ -71,6 +81,8 @@ def generate_potential_conditions(user_input):
     potential_conditions = query_gpt(prompt, context_type="generate_potential_conditions")
     return potential_conditions.split('\n\n')
 
+@staticmethod
+@csrf_exempt
 def generate_most_suitable_claim_type(request):
     """
     Generate the most suitable claim type based on stored user data:
@@ -91,7 +103,10 @@ def generate_most_suitable_claim_type(request):
     user_medical_condition_response = request.session.get('user_medical_condition_response', [])
     user_pain_duration = request.session.get('user_pain_duration', 'NONE')
     user_pain_severity = request.session.get('user_pain_severity', 'NONE')
-
+    print("Session data for GPT prompt:")
+    print(f"user_medical_condition_response: {user_medical_condition_response}")
+    print(f"user_pain_duration: {user_pain_duration}")
+    print(f"user_pain_severity: {user_pain_severity}")
     prompt = f"""
     Based on the following veteran's data:
 
@@ -136,9 +151,9 @@ def generate_most_suitable_claim_type(request):
     - Pain Duration: {user_pain_duration}
     - Pain Severity: {user_pain_severity}
 
-    Using the information above, determine the most suitable VA claim type for this veteran. Follow these **guidelines**:
+    Using the information above, determine the most suitable VA claim type for this veteran AND determine the Branch of Medicine & write an appointment message. Follow these **guidelines**:
 
-    ### Guidelines:
+    ### Guidelines for most suitable VA claim type:
     1. **New Claim**:
         - Use this if the veteran has reported a new condition that is not associated with any previously service-connected conditions or disability ratings.
         - Example Response:
@@ -162,6 +177,16 @@ def generate_most_suitable_claim_type(request):
         Type of claim: Secondary Service-Connected Claim
         Description: Your condition `{user_medical_condition_response[0] if user_medical_condition_response else 'N/A'}` might be affected by your existing service-connected condition `{disability_rating_data.get('individual_ratings', [{}])[0].get('condition', 'N/A')}`, which has a disability rating of `{disability_rating_data.get('individual_ratings', [{}])[0].get('rating', 'N/A')}%`.
         ```
+    ### Guidelines for Branch of Medicine & appointment message:
+    1. **Determine the Branch of Medicine**:
+        - Identify the appropriate branch of medicine based on the data from Medical Conditions in User-Reported Medical Details. (e.g., Orthopedics for knee pain, Neurology for headaches). Provide a single branch of medicine name without additional explanation.
+
+    2. **Generate the Appointment Message**:
+        - Write two concise sentences:
+            - The first sentence should describe the user's medical condition based on Medical Conditions and Pain Duration. (e.g. I’m experiencing knee pain that has been troubling me for the past 3 months.)
+            - The second sentence should explain the cause of the condition if it relates to the user's service history (e.g., "The pain started after I was injured by shrapnel during my deployment to Iraq."). If no service-related cause is evident, exclude the second sentence.
+
+
 
     ### Fallback Guidelines:
     - If session data for any section is missing, explicitly note "Data unavailable" in that section and proceed with available data.
@@ -170,9 +195,10 @@ def generate_most_suitable_claim_type(request):
 
 
     **Response Format**:
-    - Type of claim: <Name of claim>
-    - Description: <One ~ two sentence description explaining why this claim is best suited for this user given user input and data. Provide a concise description that fits within the token limit of 500.>
-
+    Type of claim: <Name of claim>
+    Description: <One ~ two sentence description explaining why this claim is best suited for this user given user input and data. Provide a concise description that fits within the token limit of 500.>
+    Branch of Medicine: <Name of branch of medicine>
+    Apppointment Message: <One ~ two sentences of appointment message from ### Guidelines for appointment message>
 
     Provide your response in this **Response Format** with **no additional information**. 
     """

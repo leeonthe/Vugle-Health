@@ -94,8 +94,9 @@ const DexPage: React.FC = () => {
   );
 
   const handleOptionSelect = async (
-    nextStep: string,
-    userResponse?: string
+    nextStep: string | null,
+    userResponse?: string,
+    gptResponse?: any,
   ) => {
     // Prevent duplicate calls
     if (state.actionTriggered) {
@@ -118,6 +119,27 @@ const DexPage: React.FC = () => {
         },
       });
     }
+
+    if (gptResponse) {
+      console.log("Adding GPT response to chat history...");
+      dispatch({
+        type: "ADD_PROMPT_DATA",
+        payload: {
+          ...gptResponse,
+          source: "suitable_claim_type",
+        },
+      });
+      dispatch({ type: "SET_ACTION_TRIGGERED", payload: false });
+      return;
+    }
+
+    if (!nextStep) {
+      console.error("No next step or GPT response provided.");
+      dispatch({ type: "SET_ACTION_TRIGGERED", payload: false });
+      return;
+    }
+
+
 
     /**
      * Adding a temporary loading message with a logo and animation to the chatHistory.
@@ -183,8 +205,6 @@ const DexPage: React.FC = () => {
               setCurrentStep(data.next);
             } else {
               console.log("HERE IS CALLED: ");
-              // Handle steps with no `next` field
-              // THIS IS FOR RETRIEVING GPT RESPONSE FROM BACKEND WHICH IS FORMATTED IN JSON, SINCE SUITABLE_CLAIM_TPYE.JSON DOES NOT HAVE NEXT FILED.
               dispatch({ type: "ADD_PROMPT_DATA", payload: data });
             }
             dispatch({ type: "SET_ACTION_TRIGGERED", payload: false });

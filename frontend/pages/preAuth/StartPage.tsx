@@ -11,7 +11,7 @@ const StartPage: React.FC<StartPageProps> = ({ navigation }) => {
       const shouldNavigate = true;
       if (shouldNavigate) {
         navigation.navigate('OnBoarding');
-        navigation.navigate('AppointmentPatientInfoPage');
+        // navigation.navigate('AppointmentPatientInfoPage');
       }
     }, 2000);
   

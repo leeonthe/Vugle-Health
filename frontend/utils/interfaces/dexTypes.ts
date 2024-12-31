@@ -4,3 +4,8 @@ export interface PotentialCondition {
     riskColor: string;
     description: string;
   }
+
+export interface AppointmentInfo {
+  branch_of_medicine: string;
+  appointment_message: string;
+}

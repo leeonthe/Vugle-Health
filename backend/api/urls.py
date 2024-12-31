@@ -30,5 +30,7 @@ urlpatterns = [
     path('dex/potential_conditions/', StorePotentialConditions.as_view(), name='store_potential_conditions'),
     path('dex/potential_conditions_list/', DexAnalysisResponse.get_potential_conditions, name='get_potential_conditions_list'),
     path('dex/suitable_claim_type/', DexAnalysisResponse.generate_most_suitable_claim_response, name='get_most_suitable_claim_response'),
+    path('dex/get_branch_of_medicine_and_appointment_message/', DexAnalysisResponse.get_branch_of_medicine_and_appointment_message, name='get_branch_of_medicine_and_appointment_message'),
+
 
 ]

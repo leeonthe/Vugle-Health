@@ -25,7 +25,8 @@ import PainScaleSlider from "@/components/common/PainScalesSlider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import fetchPotentialConditions from "../../../../utils/api_handler/fetchPotentialConditions";
-
+import axios from "axios";
+import fetchDexResponse from "@/utils/api_handler/fetchDexResponse";
 // TODO:
 //      + Diplay different container if isHealthLoading and isHealthSuccessful
 //      + Display Keyboard when TextInput is focused
@@ -91,7 +92,23 @@ const ChatRenderer: React.FC<ChatProps> = ({
 
   const triggerOptionAction = async (option: any) => {
     const { text, next } = option;
-    onOptionSelect(next, text || userInput || `${painScale}`);
+    if (!next) {
+      console.log("Next is null, fetching gpt response. ")
+      try {
+        // Fetch GPT response when `next` is missing
+        const gptResponse = await fetchDexResponse();
+        console.log("GPT Response:", gptResponse);
+        onOptionSelect(null, null, gptResponse);
+
+
+        // Optionally show GPT response in the UI
+      } catch (error) {
+        console.error("Error fetching GPT response:", error);
+      }
+
+    } else{
+      onOptionSelect(next, text || userInput || `${painScale}`);
+    }
   };
 
   const triggerOptionSingleAction = async (nextStep: string) => {
@@ -116,31 +133,31 @@ const ChatRenderer: React.FC<ChatProps> = ({
             const formData = new FormData();
             formData.append("file", file);
 
-            triggerOptionAction({ text: file.name, next: "choose_your_claim" });
+            // triggerOptionAction({ text: file.name, next: "choose_your_claim" });
 
             /**
              * FOR ACTUAL USEAGE
              *
              */
-            // try {
-            //   // Send POST request to backend
-            //   const response = await axios.post(
-            //                 "http://localhost:8000/api/dex/upload_dd214/",
-            //                 formData,
-            //                 {
-            //                     headers: {
-            //                         "Content-Type": "multipart/form-data",
-            //                         ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-            //                     },
-            //                 }
-            //             );
+            try {
+              // Send POST request to backend
+              const response = await axios.post(
+                            "http://localhost:8000/api/dex/upload_dd214/",
+                            formData,
+                            {
+                                headers: {
+                                    "Content-Type": "multipart/form-data",
+                                    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+                                },
+                            }
+                        );
 
-            //   console.log("File uploaded successfully:", response.data);
-            //   triggerOptionAction({ text: file.name, next: "choose_your_claim" });
+              console.log("File uploaded successfully:", response.data);
+              triggerOptionAction({ text: file.name, next: "choose_your_claim" });
 
-            // } catch (err) {
-            //   console.error("Error uploading file:", err);
-            // }
+            } catch (err) {
+              console.error("Error uploading file:", err);
+            }
           }
         };
         fileInput.click();
@@ -162,29 +179,29 @@ const ChatRenderer: React.FC<ChatProps> = ({
             name: fileName,
             type: file.mimeType || "application/pdf",
           });
-          triggerOptionAction({ text: file.name, next: "choose_your_claim" });
+          // triggerOptionAction({ text: file.name, next: "choose_your_claim" });
 
           /**
            * FOR ACUTAL USAGE
            *
            */
-          //  try {
-          //   // Send POST request to backend
-          //   const response = await axios.post(
-          //     "http://localhost:8000/api/dex/upload_dd214/",
-          //     formData,
-          //     {
-          //         headers: {
-          //             "Content-Type": "multipart/form-data",
-          //             ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-          //         },
-          //     }
-          // );
-          //   console.log("[MOBILE] File uploaded successfully to backend");
-          //   triggerOptionAction({ text: fileName, next: "choose_your_claim" });
-          // } catch (err) {
-          //   console.error("Error uploading file:", err);
-          // }
+           try {
+            // Send POST request to backend
+            const response = await axios.post(
+              "http://localhost:8000/api/dex/upload_dd214/",
+              formData,
+              {
+                  headers: {
+                      "Content-Type": "multipart/form-data",
+                      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+                  },
+              }
+          );
+            console.log("[MOBILE] File uploaded successfully to backend");
+            triggerOptionAction({ text: fileName, next: "choose_your_claim" });
+          } catch (err) {
+            console.error("Error uploading file:", err);
+          }
         }
       }
     } catch (err) {
