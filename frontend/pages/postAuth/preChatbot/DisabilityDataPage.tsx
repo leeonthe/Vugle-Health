@@ -11,6 +11,7 @@ import {
 import { useDisabilityRating } from "@/utils/hooks/auth_api/useDisabilityRating";
 import { useNavigation } from "@react-navigation/native";
 import Back from "../../../assets/images/logo/back.svg";
+
 const DisabilityDataPage: React.FC = () => {
   const navigation = useNavigation();
   const navigateToHomePage = () => {

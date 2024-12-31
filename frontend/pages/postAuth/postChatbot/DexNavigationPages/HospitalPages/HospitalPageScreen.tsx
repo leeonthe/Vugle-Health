@@ -1,14 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import FilterIcon from '../../../../assets/images/postAuth/dexPage/hospitalPage/filter-icon.svg';
-import FullStar from '../../../../assets/images/postAuth/dexPage/hospitalPage/full-star.svg';
-import HalfStar from '../../../../assets/images/postAuth/dexPage/hospitalPage/half-star.svg';
-import BlankStar from '../../../../assets/images/postAuth/dexPage/hospitalPage/blank-star.svg';
-import HospitalImage from '../../../../assets/images/postAuth/dexPage/hospitalPage/hospital1.png';
-import HospitalImage2 from '../../../../assets/images/postAuth/dexPage/hospitalPage/hospital2.png';
-import HospitalImage3 from '../../../../assets/images/postAuth/dexPage/hospitalPage/hospital3.png';
-import HospitalImage5 from '../../../../assets/images/postAuth/dexPage/hospitalPage/hospital5.png';
+import FilterIcon from '../../../../../assets/images/postAuth/dexPage/hospitalPage/filter-icon.svg';
+import FullStar from '../../../../../assets/images/postAuth/dexPage/hospitalPage/full-star.svg';
+import HalfStar from '../../../../../assets/images/postAuth/dexPage/hospitalPage/half-star.svg';
+import BlankStar from '../../../../../assets/images/postAuth/dexPage/hospitalPage/blank-star.svg';
+import HospitalImage from '../../../../../assets/images/postAuth/dexPage/hospitalPage/hospital1.png';
+import HospitalImage2 from '../../../../../assets/images/postAuth/dexPage/hospitalPage/hospital2.png';
+import HospitalImage3 from '../../../../../assets/images/postAuth/dexPage/hospitalPage/hospital3.png';
+import HospitalImage5 from '../../../../../assets/images/postAuth/dexPage/hospitalPage/hospital5.png';
 
 
 

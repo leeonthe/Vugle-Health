@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     color: "white",
   } as TextStyle,
   buttonContainer: {
-    marginTop: 200,
+    marginTop: 180,
     alignItems: "center",
   } as ViewStyle,
   button: {

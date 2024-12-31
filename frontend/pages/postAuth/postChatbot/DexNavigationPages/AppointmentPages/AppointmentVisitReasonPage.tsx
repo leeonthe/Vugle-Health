@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
         marginBottom: 45,
         marginTop: -20,
         marginLeft: 10,
+
       } as ViewStyle,
       title: {
         color: "#222222",
@@ -115,7 +116,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
       } as ViewStyle,
       buttonContainer: {
-        marginTop: 290, 
+        marginTop: 380, 
         alignItems: "center",
       } as ViewStyle,
       button: {

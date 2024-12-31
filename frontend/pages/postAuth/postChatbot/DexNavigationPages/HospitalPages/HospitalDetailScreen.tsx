@@ -11,14 +11,14 @@ import {
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { useNavigation } from '@react-navigation/native';
-import Divider from "../../../../assets/images/postAuth/dexPage/hospitalDetailPage/divider.svg";
-import TimeIcon from "../../../../assets/images/postAuth/dexPage/hospitalDetailPage/time.svg";
-import DistanceIcon from "../../../../assets/images/postAuth/dexPage/hospitalDetailPage/distance.svg";
-import FullStar from '../../../../assets/images/postAuth/dexPage/hospitalPage/full-star.svg';
-import HalfStar from '../../../../assets/images/postAuth/dexPage/hospitalPage/half-star.svg';
-import CopyIcon from "../../../../assets/images/postAuth/dexPage/hospitalDetailPage/copyIcon.svg";
-import Hospital6 from "../../../../assets/images/postAuth/dexPage/hospitalDetailPage/hospital6.png";
-import HospitalMap from "../../../../assets/images/postAuth/dexPage/hospitalDetailPage/hospitalMap.png";
+import Divider from "../../../../../assets/images/postAuth/dexPage/hospitalDetailPage/divider.svg";
+import TimeIcon from "../../../../../assets/images/postAuth/dexPage/hospitalDetailPage/time.svg";
+import DistanceIcon from "../../../../../assets/images/postAuth/dexPage/hospitalDetailPage/distance.svg";
+import FullStar from '../../../../../assets/images/postAuth/dexPage/hospitalPage/full-star.svg';
+import HalfStar from '../../../../../assets/images/postAuth/dexPage/hospitalPage/half-star.svg';
+import CopyIcon from "../../../../../assets/images/postAuth/dexPage/hospitalDetailPage/copyIcon.svg";
+import Hospital6 from "../../../../../assets/images/postAuth/dexPage/hospitalDetailPage/hospital6.png";
+import HospitalMap from "../../../../../assets/images/postAuth/dexPage/hospitalDetailPage/hospitalMap.png";
 import { Ionicons } from "@expo/vector-icons";
 
 const HospitalDetailScreen = () => {

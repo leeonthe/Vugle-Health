@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import { useAuthenticatedRequest } from "../../../../utils/hooks/dex_api/useAuthenticatedRequest";
+import { useAuthenticatedRequest } from "../../../../../utils/hooks/dex_api/useAuthenticatedRequest";
 
 const PotentialConditionsPage = ({ route }) => {
   const { potentialConditions, onReturn, onContinueToChatbot } = route.params;

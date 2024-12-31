@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, Button, ActivityIndicator, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { useEligibleLetter } from '@/utils/hooks/auth_api/useEligibleLetter';
 import Back from "../../../assets/images/logo/back.svg";

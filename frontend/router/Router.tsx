@@ -8,15 +8,16 @@ import Welcome from '../app/Welcome';
 import HomePage from '../pages/postAuth/preChatbot/HomePage'
 import DexStartPage from '../pages/postAuth/preChatbot/DexStartPage'
 import DexPage from '../pages/postAuth/postChatbot/chatbot/DexPage';
-import PotentialConditionsPage from '../pages/postAuth/postChatbot/DexNavigationPages/PotentialConditionsPage';
-import HospitalPageScreen from '../pages/postAuth/postChatbot/DexNavigationPages/HospitalPageScreen';
-import HospitalDetailScreen from '../pages/postAuth/postChatbot/DexNavigationPages/HospitalDetailScreen';
-import AppointmentPatientInfoPage from '@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentPatientInfoPage';
-import AppointmentVisitReasonPage from '@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentVisitReasonPage';
-import AppointmentDatePage from '@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentDatePage';
-import AppointmentTimePage from '@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentTimePage';
-import AppointmentMessagePage from '@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentMessagePage';
-import AppointmentSummaryPage from '@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentSummaryPage';
+import PotentialConditionsPage from '../pages/postAuth/postChatbot/DexNavigationPages/PotentialConditionPages/PotentialConditionsPage';
+import HospitalPageScreen from '../pages/postAuth/postChatbot/DexNavigationPages/HospitalPages/HospitalPageScreen';
+import HospitalDetailScreen from '../pages/postAuth/postChatbot/DexNavigationPages/HospitalPages/HospitalDetailScreen';
+import AppointmentPatientInfoPage from '../pages/postAuth/postChatbot/DexNavigationPages/AppointmentPages/AppointmentPatientInfoPage';
+import AppointmentVisitReasonPage from '../pages/postAuth/postChatbot/DexNavigationPages/AppointmentPages/AppointmentVisitReasonPage';
+import AppointmentDatePage from '../pages/postAuth/postChatbot/DexNavigationPages/AppointmentPages/AppointmentDatePage';
+import AppointmentTimePage from '../pages/postAuth/postChatbot/DexNavigationPages/AppointmentPages/AppointmentTimePage';
+import AppointmentMessagePage from '../pages/postAuth/postChatbot/DexNavigationPages/AppointmentPages/AppointmentMessagePage';
+import AppointmentSummaryPage from '../pages/postAuth/postChatbot/DexNavigationPages/AppointmentPages/AppointmentSummaryPage';
+
 import DexEndPage from '@/pages/postAuth/postChatbot/chatbot/DexEndPage';
 import DisabilityDataPage from '@/pages/postAuth/preChatbot/DisabilityDataPage';
 import MonthlyCompensation from '@/pages/postAuth/preChatbot/MonthlyCompensation';
