@@ -26,10 +26,11 @@ const HospitalDetailScreen = () => {
   const navigation = useNavigation();
 
   const route = useRoute();
-  const { hospitalName } = route.params;
+  const { hospitalName } = route.params as { hospitalName: string };
+
 
   const handleAppointmentPress = () => {
-    navigation.navigate("AppointmentPatientInfoPage");
+    navigation.navigate("AppointmentPatientInfoPage", {hospitalName});
   };
   
 

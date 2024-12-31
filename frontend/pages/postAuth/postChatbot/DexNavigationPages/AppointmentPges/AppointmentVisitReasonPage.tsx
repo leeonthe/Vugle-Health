@@ -9,7 +9,7 @@ import {
   TextStyle,
   ImageStyle,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Back from '../../../../../assets/images/logo/back.svg'; 
 import fetchAppointmentInfo from "@/utils/api_handler/fetchAppointmentInfo";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -17,7 +17,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const AppointmentVisitReasonPage: React.FC = () => {
     const [branchOfMedicine, setBranchOfMedicine] = useState<string>("Loading...");
     const navigation = useNavigation();
-  
+    const route = useRoute();
+  const { hospitalName } = route.params as { hospitalName: string };
+
     useEffect(() => {
       const getAppointmentInfo = async () => {
         try {
@@ -43,7 +45,7 @@ const AppointmentVisitReasonPage: React.FC = () => {
     };
   
     const handleNavigation = () => {
-      navigation.navigate("AppointmentDatePage");
+      navigation.navigate("AppointmentDatePage", {hospitalName});
     };
   
     return (

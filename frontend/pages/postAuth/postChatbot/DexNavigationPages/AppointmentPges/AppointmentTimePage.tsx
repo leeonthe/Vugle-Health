@@ -8,23 +8,31 @@ import {
   ViewStyle,
   TextStyle,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Back from "../../../../../assets/images/logo/back.svg";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AppointmentTimePage: React.FC = () => {
   const navigation = useNavigation();
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const route = useRoute();
+  const { hospitalName } = route.params as { hospitalName: string };
 
   const navigateToHomePage = () => {
     navigation.goBack();
   };
 
-  const handleNavigation = () => {
-    console.log("Selected time:", selectedTime);
-    // Add logic to store or use the selected time
-    navigation.navigate("AppointmentMessagePage");
+  const handleNavigation = async () => {
+    try {
+      if (selectedTime) {
+        await AsyncStorage.setItem("selectedTime", selectedTime);
+      }
+      navigation.navigate("AppointmentMessagePage", { hospitalName });
+    } catch (error) {
+      console.error("Error saving selected time:", error);
+    }
   };
-
+  
   const timeSlots = {
     morning: ["9:00", "9:30", "10:00", "10:30"],
     afternoon: ["12:30", "1:00", "1:30", "2:00", "2:30", "3:00", "3:30", "4:00"],

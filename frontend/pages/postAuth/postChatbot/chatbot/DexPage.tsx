@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import ChatRenderer from "./ChatRenderer";
-import { chatHistoryReducer} from "./chatHistoryReducer";
+import { chatHistoryReducer } from "./chatHistoryReducer";
 // hooks
 import { useChat } from "../../../../utils/hooks/dex_api/useChat";
 import { useDisabilityRating } from "../../../../utils/hooks/auth_api/useDisabilityRating";
@@ -96,7 +96,7 @@ const DexPage: React.FC = () => {
   const handleOptionSelect = async (
     nextStep: string | null,
     userResponse?: string,
-    gptResponse?: any,
+    gptResponse?: any
   ) => {
     // Prevent duplicate calls
     if (state.actionTriggered) {
@@ -138,8 +138,6 @@ const DexPage: React.FC = () => {
       dispatch({ type: "SET_ACTION_TRIGGERED", payload: false });
       return;
     }
-
-
 
     /**
      * Adding a temporary loading message with a logo and animation to the chatHistory.

@@ -8,8 +8,9 @@ import {
   ViewStyle,
   TextStyle,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Back from '../../../../../assets/images/logo/back.svg'; 
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AppointmentDatePage: React.FC = () => {
   const navigation = useNavigation();
@@ -20,16 +21,33 @@ const AppointmentDatePage: React.FC = () => {
     month: new Date().getMonth(),
     year: new Date().getFullYear(),
   });
+  const route = useRoute();
+  const { hospitalName } = route.params as { hospitalName: string };
+
 
   const navigateToHomePage = () => {
     navigation.goBack();
   };
 
-  const handleNavigation = () => {
-    console.log("Selected Date:", selectedData); // For later use
-    navigation.navigate("AppointmentTimePage");
+  const handleNavigation = async () => {
+    try {
+      // Format the selected date into a full date string
+      const formattedDate = new Date(
+        selectedData.year,
+        selectedData.month,
+        selectedData.date
+      ).toISOString();
+  
+      // Save the selected date to AsyncStorage
+      await AsyncStorage.setItem("selectedDate", formattedDate);
+  
+      // Navigate to the next page
+      navigation.navigate("AppointmentTimePage", { hospitalName });
+    } catch (error) {
+      console.error("Error saving selected date:", error);
+    }
   };
-
+  
   const getDaysInMonth = (year: number, month: number) => {
     return new Date(year, month + 1, 0).getDate();
   };

@@ -10,7 +10,7 @@ import {
   TextStyle,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Back from "../../../../../assets/images/logo/back.svg";
 import Edit from "../../../../../assets/images/postAuth/dexPage/appointmentPage/editButton.svg";
 
@@ -24,6 +24,8 @@ const AppointmentPatientInfoPage: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState<string>("(510) 836-5724");
 
   const navigation = useNavigation();
+  const route = useRoute();
+  const { hospitalName } = route.params as { hospitalName: string };
 
   // Retrieve `given_name` from AsyncStorage
   useEffect(() => {
@@ -47,7 +49,7 @@ const AppointmentPatientInfoPage: React.FC = () => {
   }, []);
 
   const handleNavigation = () => {
-    navigation.navigate("AppointmentVisitReasonPage");
+    navigation.navigate("AppointmentVisitReasonPage", {hospitalName});
   };
 
   const navigateToHomePage = () => {
