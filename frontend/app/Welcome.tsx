@@ -41,6 +41,8 @@ import AppointmentTimePage from "@/pages/postAuth/postChatbot/DexNavigationPages
 import AppointmentMessagePage from "@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentMessagePage";
 import AppointmentSummaryPage from "@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentSummaryPage";
 import DexEndPage from "@/pages/postAuth/postChatbot/chatbot/DexEndPage";
+import DisabilityDataPage from "@/pages/postAuth/preChatbot/DisabilityDataPage";
+import MonthlyCompensation from "@/pages/postAuth/preChatbot/MonthlyCompensation";
 
 type RootStackParamList = {
   HomePage: undefined;
@@ -60,8 +62,7 @@ const queryClient = new QueryClient();
 const WelcomePage: React.FC<UserStartScreenProps> = ({ route }) => {
   const { isDesktop } = useDevice();
 
-  
-// 1011537977V693883
+  // 1011537977V693883
   useEffect(() => {
     const handleWebTokens = async () => {
       // Only handle this for web users
@@ -331,6 +332,17 @@ const Welcome: React.FC = () => {
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="WelcomePage" component={WelcomePage} />
             <Stack.Screen name="HomePage" component={HomePage} />
+            <Stack.Screen
+              name="DisabilityDataPage"
+              component={DisabilityDataPage}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="MonthlyCompensation"
+              component={MonthlyCompensation}
+              options={{ headerShown: false }}
+            />
+
             <Stack.Screen name="DexStartPage" component={DexStartPage} />
             <Stack.Screen name="DexPage" component={DexPage} />
             <Stack.Screen
@@ -338,18 +350,51 @@ const Welcome: React.FC = () => {
               component={PotentialConditionsPage}
               options={{ headerShown: false }}
             />
-            <Stack.Screen name="HospitalPageScreen" component={HospitalPageScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="HospitalDetailScreen" component={HospitalDetailScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="AppointmentPatientInfoPage" component={AppointmentPatientInfoPage} options={{ headerShown: false }} />
-            <Stack.Screen name="AppointmentVisitReasonPage" component={AppointmentVisitReasonPage} options={{ headerShown: false }} />
-            <Stack.Screen name="AppointmentDatePage" component={AppointmentDatePage} options={{ headerShown: false }} />
-            <Stack.Screen name="AppointmentTimePage" component={AppointmentTimePage} options={{ headerShown: false }} />
-            <Stack.Screen name="AppointmentMessagePage" component={AppointmentMessagePage} options={{ headerShown: false }} />
-            <Stack.Screen name="AppointmentSummaryPage" component={AppointmentSummaryPage} options={{ headerShown: false }} />
-            <Stack.Screen name="DexEndPage" component={DexEndPage} options={{ headerShown: false }} />
-
-            
-            
+            <Stack.Screen
+              name="HospitalPageScreen"
+              component={HospitalPageScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="HospitalDetailScreen"
+              component={HospitalDetailScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="AppointmentPatientInfoPage"
+              component={AppointmentPatientInfoPage}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="AppointmentVisitReasonPage"
+              component={AppointmentVisitReasonPage}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="AppointmentDatePage"
+              component={AppointmentDatePage}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="AppointmentTimePage"
+              component={AppointmentTimePage}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="AppointmentMessagePage"
+              component={AppointmentMessagePage}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="AppointmentSummaryPage"
+              component={AppointmentSummaryPage}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="DexEndPage"
+              component={DexEndPage}
+              options={{ headerShown: false }}
+            />
           </Stack.Navigator>
         </DesktopView>
       ) : (

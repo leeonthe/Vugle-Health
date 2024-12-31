@@ -18,6 +18,8 @@ import AppointmentTimePage from '@/pages/postAuth/postChatbot/DexNavigationPages
 import AppointmentMessagePage from '@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentMessagePage';
 import AppointmentSummaryPage from '@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentSummaryPage';
 import DexEndPage from '@/pages/postAuth/postChatbot/chatbot/DexEndPage';
+import DisabilityDataPage from '@/pages/postAuth/preChatbot/DisabilityDataPage';
+import MonthlyCompensation from '@/pages/postAuth/preChatbot/MonthlyCompensation';
 
 const Stack = createNativeStackNavigator();
 
@@ -31,8 +33,13 @@ const Router: React.FC = () => {
       <Stack.Screen name="Login" component={LoginPage} options={{ headerShown: false }}/>
 
       {/* PostAuth Pages */}
+      {/* PostChatbot Pages */}
       <Stack.Screen name="Welcome" component={Welcome} options={{ headerShown: false }} /> 
       <Stack.Screen name="HomePage" component={HomePage} options={{headerShown: false}} />
+      <Stack.Screen name="DisabilityDataPage" component={DisabilityDataPage} options={{headerShown: false}} />
+      <Stack.Screen name="MonthlyCompensation" component={MonthlyCompensation} options={{headerShown: false}} />
+
+      {/* PreChatbot Pages */}
       <Stack.Screen name="DexStartPage" component={DexStartPage} options={{headerShown: false}} />
       <Stack.Screen name="DexPage" component={DexPage} options={{headerShown: false}} />
       <Stack.Screen name="PotentialConditionsPage" component={PotentialConditionsPage} options={{headerShown: false}} />

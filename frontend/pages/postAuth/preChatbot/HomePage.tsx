@@ -123,7 +123,7 @@ function HomePage() {
             </View>
             <TouchableOpacity
               style={styles.infoRight}
-              onPress={() => navigation.navigate('StatsDisabilityPage')}
+              onPress={() => navigation.navigate('DisabilityDataPage')}
             >
               <Text style={styles.viewText}>View</Text>
             </TouchableOpacity>
@@ -142,7 +142,7 @@ function HomePage() {
             </View>
             <TouchableOpacity
               style={styles.infoRight}
-              onPress={() => navigation.navigate('StatsCompPage')}
+              onPress={() => navigation.navigate('MonthlyCompensation')}
             >
               <Text style={styles.viewText}>View</Text>
             </TouchableOpacity>
