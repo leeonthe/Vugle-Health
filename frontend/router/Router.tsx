@@ -17,6 +17,7 @@ import AppointmentDatePage from '@/pages/postAuth/postChatbot/DexNavigationPages
 import AppointmentTimePage from '@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentTimePage';
 import AppointmentMessagePage from '@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentMessagePage';
 import AppointmentSummaryPage from '@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentSummaryPage';
+import DexEndPage from '@/pages/postAuth/postChatbot/chatbot/DexEndPage';
 
 const Stack = createNativeStackNavigator();
 
@@ -43,10 +44,7 @@ const Router: React.FC = () => {
       <Stack.Screen name="AppointmentTimePage" component={AppointmentTimePage} options={{ headerShown: false }} />
       <Stack.Screen name="AppointmentMessagePage" component={AppointmentMessagePage} options={{ headerShown: false }} />
       <Stack.Screen name="AppointmentSummaryPage" component={AppointmentSummaryPage} options={{ headerShown: false }} />
-      
-
-      
-
+      <Stack.Screen name="DexEndPage" component={DexEndPage} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 };

@@ -31,7 +31,7 @@
           },
           {
             "type": "text",
-            "content": "This is the end of the protoype of Vugle. Our goal is to provide a much easier process for claiming disability compensation for veterans! Our team expresses heartfelt gratitude for all veterans' service. More functionalities will be added in the future, so please stay tuned!",
+            "content": "This is the end of the protoype of Vugle. Our goal is to ensure that no veteran is left behind by simplifying the benefits claim process.\nOur team expresses heartfelt gratitude for all veterans' service. More functionalities will be added in the future, so please stay tuned!",
             "style": {
               "color": "#323D4C",
               "fontSize": 16,
@@ -59,7 +59,12 @@
       {
         "text": "Go back to main page",
         "next": "main_page"
+      },
+      {
+        "text": "Learn about developer",
+        "next": "developer_info"
       }
+
     ]
   }
   

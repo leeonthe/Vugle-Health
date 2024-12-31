@@ -63,7 +63,7 @@ const AppointmentSummaryPage: React.FC = () => {
   };
 
   const handleNavigation = () => {
-    navigation.navigate("AppointmentDatePage");
+    navigation.navigate("DexEndPage");
   };
 
   return (
@@ -102,7 +102,7 @@ const AppointmentSummaryPage: React.FC = () => {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={handleNavigation}>
-          <Text style={styles.buttonText}>Continue</Text>
+          <Text style={styles.buttonText}>Confirm and schedule</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

@@ -31,7 +31,7 @@
         },
         {
           "type": "text",
-          "content": "It’s okay if they are not severe. Any conditions or symptoms that are troubling you can help us improve your chance.",
+          "content": "It’s okay if they are not severe.\nAny conditions or symptoms that are troubling you can help us improve your chance.",
           "style": {
             "color": "#323D4C",
             "fontSize": 16,

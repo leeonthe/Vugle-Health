@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  Linking,
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import * as DocumentPicker from "expo-document-picker";
@@ -111,9 +112,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
     }
   };
 
-  const triggerOptionSingleAction = async (nextStep: string) => {
-    onOptionSelect(nextStep);
-  };
 
   const handleFileUpload = async () => {
     const accessToken = await AsyncStorage.getItem("access_token");
@@ -132,8 +130,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
             // Create FormData to send the file
             const formData = new FormData();
             formData.append("file", file);
-
-            // triggerOptionAction({ text: file.name, next: "choose_your_claim" });
 
             /**
              * FOR ACTUAL USEAGE
@@ -154,7 +150,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
 
               console.log("File uploaded successfully:", response.data);
               triggerOptionAction({ text: file.name, next: "choose_your_claim" });
-
             } catch (err) {
               console.error("Error uploading file:", err);
             }
@@ -347,6 +342,10 @@ const ChatRenderer: React.FC<ChatProps> = ({
       navigation.navigate('HospitalPageScreen');
   };
 
+  const handleNavigateToHomePage = () => {
+    navigation.navigate('HomePage');
+  };
+
 
   const handleGroupLogic = (groupIndex: number) => {
     const currentSource =
@@ -459,17 +458,28 @@ const ChatRenderer: React.FC<ChatProps> = ({
             <Logo style={styles.logo} />
           </View>
         );
-      case "link":
-        return (
-          <TouchableOpacity
-            key={`link-${index}`}
-            onPress={() => console.log("Link clicked")}
-          >
-            <Text style={[styles.linkText, element.style]}>
-              {element.content}
-            </Text>
-          </TouchableOpacity>
-        );
+        case "link":
+          return (
+            <TouchableOpacity
+              key={`link-${index}`}
+              onPress={() => {
+                const url = element.content;
+                if (/^(https?:\/\/[^\s$.?#].[^\s]*)$/i.test(url)) {
+                  // Valid URL, navigate to it
+                  Linking.openURL(url).catch(err =>
+                    console.error('Failed to open link:', err)
+                  );
+                } else {
+                  // Invalid URL, log or handle it without navigation
+                  console.log('Invalid URL:', url);
+                }
+              }}
+            >
+              <Text style={[styles.linkText, element.style]}>
+                {element.content}
+              </Text>
+            </TouchableOpacity>
+          );
 
       case "custom":
         return <View key={`custom-${index}`}>{element.content}</View>;
@@ -571,6 +581,20 @@ const ChatRenderer: React.FC<ChatProps> = ({
             <Text style={styles.optionText}>{option.text}</Text>
           </TouchableOpacity>
 
+        );
+      }
+
+      if (option.text === "Go back to main page") {
+        return(
+          <TouchableOpacity
+            key={`${key}-closing`}
+            style={styles.optionButton}
+            onPress={handleNavigateToHomePage}
+          >
+            <Text style={styles.optionText}>{option.text}</Text>
+            
+
+          </TouchableOpacity>
         );
       }
 
