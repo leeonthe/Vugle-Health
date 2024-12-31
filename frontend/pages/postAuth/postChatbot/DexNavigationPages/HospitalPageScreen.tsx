@@ -15,14 +15,9 @@ import HospitalImage5 from '../../../../assets/images/postAuth/dexPage/hospitalP
 const HospitalPageScreen = ({route}) => {
   const navigation = useNavigation();
 
-  // const handlePress = (hospitalName: string) => {
-  //   navigation.navigate('HospitalDetailScreen', { hospitalName });
-  // };
-
-  const handleAppointmentPress = () => {
-    navigation.navigate("AppointmentPatientInfoPage");
+  const handlePress = (hospitalName: string) => {
+    navigation.navigate('HospitalDetailScreen', { hospitalName });
   };
-  
 
   return (
     <View style={styles.container}>

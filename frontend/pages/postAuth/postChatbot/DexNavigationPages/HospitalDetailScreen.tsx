@@ -10,6 +10,7 @@ import {
   Modal,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
+import { useNavigation } from '@react-navigation/native';
 import Divider from "../../../../assets/images/postAuth/dexPage/hospitalDetailPage/divider.svg";
 import TimeIcon from "../../../../assets/images/postAuth/dexPage/hospitalDetailPage/time.svg";
 import DistanceIcon from "../../../../assets/images/postAuth/dexPage/hospitalDetailPage/distance.svg";
@@ -22,13 +23,15 @@ import { Ionicons } from "@expo/vector-icons";
 
 const HospitalDetailScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation();
 
   const route = useRoute();
   const { hospitalName } = route.params;
 
   const handleAppointmentPress = () => {
-    setModalVisible(true);
+    navigation.navigate("AppointmentPatientInfoPage");
   };
+  
 
   const handleCloseModal = () => {
     setModalVisible(false);
@@ -281,7 +284,7 @@ const HospitalDetailScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <Modal
+      {/* <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
@@ -307,7 +310,7 @@ const HospitalDetailScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
-      </Modal>
+      </Modal> */}
     </SafeAreaView>
   );
 };

@@ -11,6 +11,12 @@ import DexPage from '../pages/postAuth/postChatbot/chatbot/DexPage';
 import PotentialConditionsPage from '../pages/postAuth/postChatbot/DexNavigationPages/PotentialConditionsPage';
 import HospitalPageScreen from '../pages/postAuth/postChatbot/DexNavigationPages/HospitalPageScreen';
 import HospitalDetailScreen from '../pages/postAuth/postChatbot/DexNavigationPages/HospitalDetailScreen';
+import AppointmentPatientInfoPage from '@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentPatientInfoPage';
+import AppointmentVisitReasonPage from '@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentVisitReasonPage';
+import AppointmentDatePage from '@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentDatePage';
+import AppointmentTimePage from '@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentTimePage';
+import AppointmentMessagePage from '@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentMessagePage';
+import AppointmentSummaryPage from '@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentSummaryPage';
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +37,15 @@ const Router: React.FC = () => {
       <Stack.Screen name="PotentialConditionsPage" component={PotentialConditionsPage} options={{headerShown: false}} />
       <Stack.Screen name="HospitalPageScreen" component={HospitalPageScreen} options={{ headerShown: false }} />
       <Stack.Screen name="HospitalDetailScreen" component={HospitalDetailScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="AppointmentPatientInfoPage" component={AppointmentPatientInfoPage} options={{ headerShown: false }} />
+      <Stack.Screen name="AppointmentVisitReasonPage" component={AppointmentVisitReasonPage} options={{ headerShown: false }} />
+      <Stack.Screen name="AppointmentDatePage" component={AppointmentDatePage} options={{ headerShown: false }} />
+      <Stack.Screen name="AppointmentTimePage" component={AppointmentTimePage} options={{ headerShown: false }} />
+      <Stack.Screen name="AppointmentMessagePage" component={AppointmentMessagePage} options={{ headerShown: false }} />
+      <Stack.Screen name="AppointmentSummaryPage" component={AppointmentSummaryPage} options={{ headerShown: false }} />
+      
+
+      
 
     </Stack.Navigator>
   );

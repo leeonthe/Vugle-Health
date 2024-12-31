@@ -34,6 +34,12 @@ import PotentialConditionsPage from "../pages/postAuth/postChatbot/DexNavigation
 import MobileView from "../components/deviceLayout/MobileView";
 import HospitalPageScreen from "../pages/postAuth/postChatbot/DexNavigationPages/HospitalPageScreen";
 import HospitalDetailScreen from "../pages/postAuth/postChatbot/DexNavigationPages/HospitalDetailScreen";
+import AppointmentPatientInfoPage from "@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentPatientInfoPage";
+import AppointmentVisitReasonPage from "@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentVisitReasonPage";
+import AppointmentDatePage from "@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentDatePage";
+import AppointmentTimePage from "@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentTimePage";
+import AppointmentMessagePage from "@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentMessagePage";
+import AppointmentSummaryPage from "@/pages/postAuth/postChatbot/DexNavigationPages/AppointmentPges/AppointmentSummaryPage";
 
 type RootStackParamList = {
   HomePage: undefined;
@@ -102,6 +108,7 @@ const WelcomePage: React.FC<UserStartScreenProps> = ({ route }) => {
       if (userData?.given_name) {
         try {
           await AsyncStorage.setItem("given_name", userData.given_name);
+          await AsyncStorage.setItem("family_name", userData.family_name);
           console.log(
             "Stored given_name in AsyncStorage:",
             userData.given_name
@@ -332,7 +339,15 @@ const Welcome: React.FC = () => {
             />
             <Stack.Screen name="HospitalPageScreen" component={HospitalPageScreen} options={{ headerShown: false }} />
             <Stack.Screen name="HospitalDetailScreen" component={HospitalDetailScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="AppointmentPatientInfoPage" component={AppointmentPatientInfoPage} options={{ headerShown: false }} />
+            <Stack.Screen name="AppointmentVisitReasonPage" component={AppointmentVisitReasonPage} options={{ headerShown: false }} />
+            <Stack.Screen name="AppointmentDatePage" component={AppointmentDatePage} options={{ headerShown: false }} />
+            <Stack.Screen name="AppointmentTimePage" component={AppointmentTimePage} options={{ headerShown: false }} />
+            <Stack.Screen name="AppointmentMessagePage" component={AppointmentMessagePage} options={{ headerShown: false }} />
+            <Stack.Screen name="AppointmentSummaryPage" component={AppointmentSummaryPage} options={{ headerShown: false }} />
 
+            
+            
           </Stack.Navigator>
         </DesktopView>
       ) : (
