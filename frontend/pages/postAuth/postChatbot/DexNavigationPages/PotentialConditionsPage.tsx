@@ -31,7 +31,7 @@ const PotentialConditionsPage = ({ route }) => {
     if (addedConditions.length > 0) {
       try {
         await makeRequest(
-          "http://localhost:8000/api/auth/potential_conditions/",
+          "http://localhost:8000/api/dex/potential_conditions/",
           {
             conditions: addedConditions,
           }

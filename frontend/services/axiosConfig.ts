@@ -8,7 +8,7 @@ const fetchCSRFToken = async () => {
 
 // Axios instance with CSRF token
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api/auth',
+  baseURL: 'http://localhost:8000/api/',
   withCredentials: true, // Include cookies in requests
 });
 

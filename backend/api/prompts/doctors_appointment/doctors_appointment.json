@@ -52,7 +52,7 @@
       },
       {
         "text": "No, I can do it myself",
-        "next": "todo"
+        "next": "medical_centers_list"
       }
     ]
   }

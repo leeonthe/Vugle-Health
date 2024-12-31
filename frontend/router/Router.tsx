@@ -19,9 +19,7 @@ const Router: React.FC = () => {
     <Stack.Navigator initialRouteName="Start"> 
       {/* PreAuth Pages */}
       <Stack.Screen name="Start" component={StartPage} options={{ headerShown: false }} />
-      {/* <Stack.Screen name="HospitalPageScreen" component={HospitalPageScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="HospitalDetailScreen" component={HospitalDetailScreen} options={{ headerShown: false }} /> */}
-
+      
       <Stack.Screen name="OnBoarding" component={OnBoardingPage} options={{ headerShown: false }}/>
       <Stack.Screen name="Login" component={LoginPage} options={{ headerShown: false }}/>
 
@@ -31,6 +29,8 @@ const Router: React.FC = () => {
       <Stack.Screen name="DexStartPage" component={DexStartPage} options={{headerShown: false}} />
       <Stack.Screen name="DexPage" component={DexPage} options={{headerShown: false}} />
       <Stack.Screen name="PotentialConditionsPage" component={PotentialConditionsPage} options={{headerShown: false}} />
+      <Stack.Screen name="HospitalPageScreen" component={HospitalPageScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="HospitalDetailScreen" component={HospitalDetailScreen} options={{ headerShown: false }} />
 
     </Stack.Navigator>
   );

@@ -125,7 +125,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
             // try {
             //   // Send POST request to backend
             //   const response = await axios.post(
-            //                 "http://localhost:8000/api/auth/upload_dd214/",
+            //                 "http://localhost:8000/api/dex/upload_dd214/",
             //                 formData,
             //                 {
             //                     headers: {
@@ -171,7 +171,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
           //  try {
           //   // Send POST request to backend
           //   const response = await axios.post(
-          //     "http://localhost:8000/api/auth/upload_dd214/",
+          //     "http://localhost:8000/api/dex/upload_dd214/",
           //     formData,
           //     {
           //         headers: {
@@ -194,7 +194,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
 
   const handleConditionType = async (typedText: string) => {
     try {
-      await makeRequest("http://localhost:8000/api/auth/store_user_input", {
+      await makeRequest("http://localhost:8000/api/dex/store_user_input", {
         userInput: typedText,
         inputType: "conditionType",
       });
@@ -207,7 +207,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
 
   const handlePainDuration = async (typedText: string) => {
     try {
-      await makeRequest("http://localhost:8000/api/auth/store_user_input", {
+      await makeRequest("http://localhost:8000/api/dex/store_user_input", {
         userInput: typedText,
         inputType: "painDuration",
       });
@@ -323,6 +323,13 @@ const ChatRenderer: React.FC<ChatProps> = ({
   //     console.error("ERROR FETCHING POTENTIAL CONDITONS ", error);
   //   }
   // };
+
+
+  const handleNavigateToHospital = () => {
+    console.log("Navigating to HospitalPageScreen");
+      navigation.navigate('HospitalPageScreen');
+  };
+
 
   const handleGroupLogic = (groupIndex: number) => {
     const currentSource =
@@ -535,6 +542,19 @@ const ChatRenderer: React.FC<ChatProps> = ({
       // Handle this case: display no option field, but wait til data is fetched from backend.
       if (option.text === "TEST") {
         // triggerOptionAction
+      }
+
+      if (option.text === "View medical centers") {
+        return (
+        <TouchableOpacity
+            key={`${key}-hospital`}
+            style={styles.optionButton}
+            onPress={handleNavigateToHospital}
+          >
+            <Text style={styles.optionText}>{option.text}</Text>
+          </TouchableOpacity>
+
+        );
       }
 
       return (

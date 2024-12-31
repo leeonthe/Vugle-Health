@@ -32,6 +32,8 @@ import DexStartPage from "../pages/postAuth/preChatbot/DexStartPage";
 import DexPage from "../pages/postAuth/postChatbot/chatbot/DexPage";
 import PotentialConditionsPage from "../pages/postAuth/postChatbot/DexNavigationPages/PotentialConditionsPage";
 import MobileView from "../components/deviceLayout/MobileView";
+import HospitalPageScreen from "../pages/postAuth/postChatbot/DexNavigationPages/HospitalPageScreen";
+import HospitalDetailScreen from "../pages/postAuth/postChatbot/DexNavigationPages/HospitalDetailScreen";
 
 type RootStackParamList = {
   HomePage: undefined;
@@ -328,6 +330,9 @@ const Welcome: React.FC = () => {
               component={PotentialConditionsPage}
               options={{ headerShown: false }}
             />
+            <Stack.Screen name="HospitalPageScreen" component={HospitalPageScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="HospitalDetailScreen" component={HospitalDetailScreen} options={{ headerShown: false }} />
+
           </Stack.Navigator>
         </DesktopView>
       ) : (

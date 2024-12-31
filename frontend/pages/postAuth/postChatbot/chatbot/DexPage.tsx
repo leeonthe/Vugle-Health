@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import ChatRenderer from "./ChatRenderer";
-import { chatHistoryReducer, ChatHistoryAction } from "./chatHistoryReducer";
+import { chatHistoryReducer} from "./chatHistoryReducer";
 // hooks
 import { useChat } from "../../../../utils/hooks/dex_api/useChat";
 import { useDisabilityRating } from "../../../../utils/hooks/auth_api/useDisabilityRating";
@@ -23,10 +23,7 @@ const initialState = {
 const DexPage: React.FC = () => {
   const { useFetchPrompt, useSendSelection } = useChat();
   const [currentStep, setCurrentStep] = useState<string>("start");
-  // const [chatHistory, setChatHistory] = useState<ChatBubble[]>([]);
   const [state, dispatch] = useReducer(chatHistoryReducer, initialState);
-
-  const [actionTriggered, setActionTriggered] = useState(false);
 
   const [loadingState, setLoadingState] = useState({
     showLoading: false,

@@ -3,7 +3,7 @@ import { ChatBubble } from "../../interfaces/promptTypes";
 
 export const useChat = () => {
   const queryClient = useQueryClient();
-  const backendUrl = "http://localhost:8000/api/auth/prompt/";
+  const backendUrl = "http://localhost:8000/api/dex/prompt/";
 
   const fetchPrompt = async (fileName: string): Promise<ChatBubble> => {
     console.log(`Fetching: ${backendUrl}${fileName}/`);

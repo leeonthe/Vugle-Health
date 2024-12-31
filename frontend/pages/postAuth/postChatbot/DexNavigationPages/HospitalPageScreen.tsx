@@ -10,14 +10,19 @@ import HospitalImage2 from '../../../../assets/images/postAuth/dexPage/hospitalP
 import HospitalImage3 from '../../../../assets/images/postAuth/dexPage/hospitalPage/hospital3.png';
 import HospitalImage5 from '../../../../assets/images/postAuth/dexPage/hospitalPage/hospital5.png';
 
-interface HospitalPageScreenProps {}
 
-const HospitalPageScreen: React.FC<HospitalPageScreenProps> = () => {
+
+const HospitalPageScreen = ({route}) => {
   const navigation = useNavigation();
 
-  const handlePress = (hospitalName: string) => {
-    navigation.navigate('HospitalDetailScreen', { hospitalName });
+  // const handlePress = (hospitalName: string) => {
+  //   navigation.navigate('HospitalDetailScreen', { hospitalName });
+  // };
+
+  const handleAppointmentPress = () => {
+    navigation.navigate("AppointmentPatientInfoPage");
   };
+  
 
   return (
     <View style={styles.container}>

@@ -30,7 +30,7 @@ const PainScaleSlider: React.FC<PainScaleSliderProps> = ({
 
   const handleSubmitPainSeverity = async () => {
     try {
-      await makeRequest("http://localhost:8000/api/auth/store_user_input", {
+      await makeRequest("http://localhost:8000/api/dex/store_user_input", {
         userInput: painScale,
         inputType: "painSeverity",
       });
