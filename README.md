@@ -48,3 +48,42 @@ The system is designed with a **cohesive yet decoupled architecture** for scalab
 
 
 ## Getting Started
+
+
+After you click “VA Continue with VA.gov”, you will see below page:
+<p>
+  <img src="README_IMG/README_Auth_login.png" alt="Authentication Login" width="400">
+</p>
+<p align="center"><em>Figure 1: Authentication Login Page</em></p>
+
+
+You may use below information to begin the application. 
+
+### Logging in with ID.me (Recommended)
+To log in to the sandbox environment using ID.me:
+1. Enter the ID.me email from the Test User table.
+   - The password for all ID.me test accounts is: **SandboxPassword2024!**
+2. When asked about receiving an authentication code, don't change any preselected answers. Just click **Continue** to proceed to the next step.
+
+### Logging in with Login.gov
+To log in to the sandbox environment using Login.gov:
+1. Enter the Login.gov email from the Test User table.
+   - The password for all Login.gov test accounts is: **Password12345!!!**
+2. Use the Login.gov MFA seed to generate a 2FA code with an app such as Google Authenticator or Authy.
+
+### Test User Table
+
+| First Name | Last Name | ID.me                                      | Login.gov                                                        |
+|------------|-----------|-------------------------------------------|------------------------------------------------------------------|
+| Tamara     | Ellis     | Email: va.api.user+001-2024@gmail.com      | Email: va.api.user+001@gmail.com <br> 2-Factor Seed: LKI7FZ7ZEVRLGQRW |
+| Janet      | Moore     | Email: va.api.user+002-2024@gmail.com      | Email: va.api.user+002@gmail.com <br> 2-Factor Seed: B5C3L42PLUWO3U5T |
+| Ralph      | Lee       | Email: va.api.user+003-2024@gmail.com      | Email: va.api.user+003@gmail.com <br> 2-Factor Seed: DIN72VD3MUOWJEENIS2FTJZEAROTGBAC |
+| Sheba703   | Harris789 | Email: va.api.user+101-2024@gmail.com      | Email: va.api.user+101@gmail.com <br> 2-Factor Seed: BNBV63ON5ST7BHSU |
+
+
+
+
+
+
+
+
