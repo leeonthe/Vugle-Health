@@ -106,7 +106,7 @@ def generate_most_suitable_claim_type(request):
     print("Session data for GPT prompt:")
     print(f"user_medical_condition_response: {user_medical_condition_response}")
     print(f"user_pain_duration: {user_pain_duration}")
-    print(f"user_pain_severity: {user_pain_severity}")
+    print(f"user_pain_severity: {user_pain_severity}") 
     prompt = f"""
     Based on the following veteran's data:
 

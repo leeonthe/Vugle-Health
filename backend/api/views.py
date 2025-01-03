@@ -287,6 +287,7 @@ class DisabilityRatingView(View):
     API endpoint to fetch a Veteran's disability rating.
     Handles both web and mobile clients.
     """
+
     def get(self, request, *args, **kwargs):
         # Check for token in Authorization header (mobile clients)
         auth_header = request.headers.get("Authorization")
