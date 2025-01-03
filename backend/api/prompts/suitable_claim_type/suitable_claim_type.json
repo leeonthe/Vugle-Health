@@ -112,7 +112,7 @@
           "content": [
             {
               "type": "text",
-              "content": "STRs",
+              "content": "STRs...",
               "updated": "STRs",
               "style": {
                 "color": "#323D4C",
@@ -141,7 +141,7 @@
             {
               "type": "text",
               "content": "Medical Records",
-              "updated": "Medical Medical", 
+              "updated": "Medical Records", 
               "style": {
                 "color": "#323D4C",
                 "fontSize": 16,
@@ -196,7 +196,7 @@
   ],
   "options": [
     {
-      "text": "TEST"
+      "text": "View result"
     }
   ]
 }

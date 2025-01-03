@@ -37,6 +37,7 @@ interface ChatProps {
   onOptionSelect: (nextStep: string, userResponse?: string) => void;
   isHealthLoading: boolean;
   isHealthSuccess: boolean;
+  userName: string;
 }
 
 const ChatRenderer: React.FC<ChatProps> = ({
@@ -44,6 +45,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
   onOptionSelect,
   isHealthLoading: initialIsHealthLoading,
   isHealthSuccess: initialIsHealthSuccess,
+  userName,
 }) => {
   const [loadingStates, setLoadingStates] = useState<Record<number, boolean>>(
     {}
@@ -444,12 +446,17 @@ const ChatRenderer: React.FC<ChatProps> = ({
         );
 
       case "text":
+        const contentWithUserName = element.content.replace(
+          "{user_name}",
+          userName
+        );
         return (
           <Text
             key={`text-${index}`}
             style={[styles.messageText, element.style]}
           >
-            {element.content}
+            {/* {element.content} */}
+            {contentWithUserName}
           </Text>
         );
       case "image":
@@ -564,11 +571,6 @@ const ChatRenderer: React.FC<ChatProps> = ({
             }}
           />
         );
-      }
-
-      // Handle this case: display no option field, but wait til data is fetched from backend.
-      if (option.text === "TEST") {
-        // triggerOptionAction
       }
 
       if (option.text === "View medical centers") {

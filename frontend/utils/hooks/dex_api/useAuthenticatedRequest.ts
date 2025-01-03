@@ -22,14 +22,11 @@ export const useAuthenticatedRequest = () => {
       });
 
       if (response.status === 200) {
-        console.log(`Request to ${url} successful:`, response.data);
         return response.data;
       } else {
-        console.error(`Unexpected response from ${url}:`, response);
         throw new Error('Unexpected response');
       }
     } catch (error) {
-      console.error(`Error making request to ${url}:`, error);
       throw error;
     }
   };

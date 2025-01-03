@@ -6,7 +6,6 @@ export const useChat = () => {
   const backendUrl = "http://localhost:8000/api/dex/prompt/";
 
   const fetchPrompt = async (fileName: string): Promise<ChatBubble> => {
-    console.log(`Fetching: ${backendUrl}${fileName}/`);
     const response = await fetch(`${backendUrl}${fileName}/`); // fileName includes subfolders
     if (!response.ok) {
       throw new Error(`Error fetching prompt: ${response.statusText}`);

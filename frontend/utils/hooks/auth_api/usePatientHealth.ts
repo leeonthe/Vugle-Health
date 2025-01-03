@@ -82,7 +82,6 @@ const fetchPatientHealth = async (icn: string): Promise<PatientHealthResponse> =
   try {
     // Retrieve access token from AsyncStorage (for mobile clients)
     accessToken = await AsyncStorage.getItem('access_token');
-    console.log('Access Token Retrieved in usePatientHealth.ts:', accessToken);
   } catch (error) {
     console.error('Error retrieving access token:', error);
   }
@@ -101,12 +100,10 @@ const fetchPatientHealth = async (icn: string): Promise<PatientHealthResponse> =
   });
 
   if (!response.ok) {
-    console.error('Error response:', await response.text());
     throw new Error('Failed to fetch patient health data');
   }
 
   const data = await response.json();
-  console.log('Patient Health Response:', data);
   return data;
 };
 
@@ -115,11 +112,11 @@ const fetchPatientHealth = async (icn: string): Promise<PatientHealthResponse> =
 export const usePatientHealth = (icn: string): UseQueryResult<PatientHealthResponse> => {
   console.log('usePatientHealth Hook Triggered');
   return useQuery<PatientHealthResponse>({
-    queryKey: ['patientHealth', icn], // Ensure consistent query key
+    queryKey: ['patientHealth', icn], 
     queryFn: () => fetchPatientHealth(icn),
-    enabled: !!icn, // Ensure the query runs only when `icn` is valid
-    staleTime: 10 * 60 * 1000, // Cache for 10 minutes to reduce re-fetching
-    retry: 1, // Retry only once if there’s a failure
+    enabled: !!icn,
+    staleTime: 10 * 60 * 1000,
+    retry: 1,
     refetchOnWindowFocus: false, // Prevent re-fetching when the window is focused
   });
 };

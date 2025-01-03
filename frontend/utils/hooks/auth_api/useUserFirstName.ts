@@ -11,7 +11,6 @@ const fetchUserInfo = async (): Promise<UserInfoResponse> => {
 
   try {
     idToken = await AsyncStorage.getItem('id_token');
-    console.log('ID Token Retrieved in useUserFirstName.ts:', idToken);
   } catch (error) {
     console.error('Error retrieving ID token:', error);
   }
@@ -26,12 +25,10 @@ const fetchUserInfo = async (): Promise<UserInfoResponse> => {
   });
 
   if (!response.ok) {
-    console.error('Error response:', await response.text());
     throw new Error('Failed to fetch user info');
   }
 
   const data = await response.json();
-  console.log('User Info Response:', data);
   return { given_name: data.user_info.given_name };
 };
 

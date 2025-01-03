@@ -14,6 +14,7 @@ import { useChat } from "../../../../utils/hooks/dex_api/useChat";
 import { useDisabilityRating } from "../../../../utils/hooks/auth_api/useDisabilityRating";
 import { usePatientHealth } from "../../../../utils/hooks/auth_api/usePatientHealth";
 import { ChatBubble } from "../../../../utils/interfaces/promptTypes";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const initialState = {
   chatHistory: [],
@@ -24,6 +25,7 @@ const DexPage: React.FC = () => {
   const { useFetchPrompt, useSendSelection } = useChat();
   const [currentStep, setCurrentStep] = useState<string>("start");
   const [state, dispatch] = useReducer(chatHistoryReducer, initialState);
+  const [userName, setUserName] = useState<string>("");
 
   const [loadingState, setLoadingState] = useState({
     showLoading: false,
@@ -42,6 +44,22 @@ const DexPage: React.FC = () => {
   const icn = disabilityData?.disability_rating?.data?.id;
   const { isLoading: isHealthLoading, isSuccess: isHealthSuccess } =
     usePatientHealth(icn || "");
+
+
+    useEffect(() => {
+      const fetchUserName = async () => {
+        try {
+          const storedUserName = await AsyncStorage.getItem("given_name");
+          if (storedUserName) {
+            setUserName(storedUserName);
+          }
+        } catch (error) {
+          console.error("Error fetching user name from AsyncStorage:", error);
+        }
+      };
+  
+      fetchUserName();
+    }, []);
 
   // Add prompt data to chatHistory
   useEffect(() => {
@@ -233,6 +251,7 @@ const DexPage: React.FC = () => {
             onOptionSelect={handleOptionSelect}
             isHealthLoading={false}
             isHealthSuccess={false}
+            userName={userName}
           />
         )}
       </View>

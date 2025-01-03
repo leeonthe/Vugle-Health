@@ -78,7 +78,7 @@ const WelcomePage: React.FC<UserStartScreenProps> = ({ route }) => {
             await AsyncStorage.setItem("access_token", accessToken);
             await AsyncStorage.setItem("id_token", idToken);
 
-            console.log("Tokens stored in AsyncStorage for web users.");
+
 
             // Clean the URL after processing tokens
             const currentPath = window.location.pathname;
@@ -212,7 +212,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: "400",
+    fontFamily: "SF Pro Display",
+    fontWeight: "500",
     alignSelf: "flex-start",
     marginTop: 60,
     marginBottom: 13,

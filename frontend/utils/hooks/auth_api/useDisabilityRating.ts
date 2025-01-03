@@ -37,15 +37,13 @@ type IndividualRating = {
   
 // Fetch function to get disability rating
 const fetchDisabilityRating = async (): Promise<DisabilityRatingResponse> => {
-    console.log('Attempting to fetch disability rating...');
   
     let accessToken;
   
     try {
       accessToken = await AsyncStorage.getItem('access_token');
-      console.log('Access Token Retrieved in useDisabilityRating.ts:', accessToken);
     } catch (error) {
-      console.error('Error retrieving access token:', error);
+
     }
   
     const response = await fetch('http://localhost:8000/api/auth/disability-rating/', {
@@ -58,12 +56,10 @@ const fetchDisabilityRating = async (): Promise<DisabilityRatingResponse> => {
     });
   
     if (!response.ok) {
-      console.error('Error response:', await response.text());
       throw new Error('Failed to fetch disability rating');
     }
   
     const data = await response.json();
-    console.log('Disability Rating Response (Raw):', data);
   
     return data;
   };

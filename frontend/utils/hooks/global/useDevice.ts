@@ -22,6 +22,5 @@ export const useDevice = (): DeviceState => {
     isPortraitOrientation: OrientationDetector.isPortrait(),
   };
 
-  console.log('Device State in useDevice:', deviceState);
   return deviceState;
 };

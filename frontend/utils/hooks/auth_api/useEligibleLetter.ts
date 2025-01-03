@@ -67,9 +67,7 @@ const fetchEligibleLetters = async (icn: string): Promise<EligibleLettersRespons
   try {
     // Retrieve access token from AsyncStorage (for mobile clients)
     accessToken = await AsyncStorage.getItem('access_token');
-    console.log('Access Token Retrieved in useEligibleLetter.ts:', accessToken);
   } catch (error) {
-    console.error('Error retrieving access token:', error);
   }
 
   if (!accessToken) {
@@ -86,12 +84,10 @@ const fetchEligibleLetters = async (icn: string): Promise<EligibleLettersRespons
   });
 
   if (!response.ok) {
-    console.error('Error response:', await response.text());
     throw new Error('Failed to fetch eligible letters');
   }
 
   const data = await response.json();
-  console.log('Eligible Letters Response:', data);
   return data;
 };
 

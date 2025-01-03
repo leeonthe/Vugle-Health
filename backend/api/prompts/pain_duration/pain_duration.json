@@ -31,7 +31,7 @@
         },
         {
           "type": "text",
-          "content": "Thanks {user_givenName}. Now we will ask a few questions that will help us understand your conditions better.",
+          "content": "Thanks {user_name}. Now we will ask a few questions that will help us understand your conditions better.",
           "style": {
             "color": "#323D4C",
             "fontSize": 16,
