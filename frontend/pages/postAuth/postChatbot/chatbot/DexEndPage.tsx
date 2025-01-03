@@ -185,6 +185,7 @@ const DexEndPage: React.FC = () => {
             onOptionSelect={handleOptionSelect}
             isHealthLoading={false}
             isHealthSuccess={false}
+            userName="Null"
           />
         )}
       </View>

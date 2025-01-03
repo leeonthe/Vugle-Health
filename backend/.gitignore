@@ -10,10 +10,23 @@ venv/
 # macOS
 .DS_Store
 
+# Python cache files
 __pycache__/
 
-# Keys
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+
+# Keys and Secrets
 *.pem
 *.jwk
+etc/
 
+# Django setting
 settings.py
+
+# IDE settings 
+.vscode/
