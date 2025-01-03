@@ -23,6 +23,7 @@ __pycache__/
 # Keys and Secrets
 *.pem
 *.jwk
+.yaml
 etc/
 
 # Django setting
