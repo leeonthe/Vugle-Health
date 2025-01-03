@@ -55,12 +55,20 @@
 The system is designed with a **cohesive yet decoupled architecture** for scalability, maintainability, and a clear separation of concerns.
 
 #### Backend
-- Built with `Django` and `Django REST Framework (DRF)` to provide RESTful APIs.
-- **OAuth2 and OpenID Connect Integration**: Secure login implemented through VA.gov using the Authorization Code Grant flow.
-- **Document Parsing**: Processes DD214 forms using `Google Cloud's Document AI` to extract relevant data for claims analysis.
+- Built with `Django` and `Django REST Framework (DRF)` to provide **RESTful APIs**.
+- **API Integrations**: `Fetches` data from `VA API` using **OAuth** for thorough claim processing and detailed analysis.
+- **OAuth2 and OpenID Connect Integration**: Implements secure login and `token validation` using **VA.gov's Authorization Code Grant flow**.
+- **AI Integration**: Utilizes the `OpenAI` `API` to **analyze** **potential medical conditions** and **recommend** the most suitable `claim types` based on user data and inputs.
+- **Document Parsing**: Processes `DD214` forms using `Google Cloud's Document AI` to **extract** essential service-related data for `claims analysis`.
+- **Session Management**: Handles user **authentication data** and **session-specific information** across user interactions.
+
 
 #### Frontend
-- Developed with `React Native Expo` for cross-platform development.
+- Built with `React Native Expo` to provide consistent experience across `mobile` and `web` platforms.
+- **Reusable Components**: Structured `modular architecture` with `reusable` components for better **maintainability** and **scalability**.
+- **API Integration**: `Communicates` with the `backend` to **store** user inputs, **retrieve** specific data through `HTTPS API` `endpoints`.
+- **Chatbot Interface**: Implements a structured and interactive chatbot, `Dex`, to **guide** users through the `process` of `disability claims`. `Dex` dynamically **renders** elements such as `text prompts`, `images`, and interactive `options` based on **JSON-driven configuration**.
+- **State Management**: Manages `Dex` **state** and `user` **interactions** with `useReducer` to `handle` the **chat flow** and `maintain` a structured **history of user responses**.
 
 
 ## Getting Started
