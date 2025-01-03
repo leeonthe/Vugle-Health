@@ -1,22 +1,27 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import FilterIcon from '../../../../../assets/images/postAuth/dexPage/hospitalPage/filter-icon.svg';
-import FullStar from '../../../../../assets/images/postAuth/dexPage/hospitalPage/full-star.svg';
-import HalfStar from '../../../../../assets/images/postAuth/dexPage/hospitalPage/half-star.svg';
-import BlankStar from '../../../../../assets/images/postAuth/dexPage/hospitalPage/blank-star.svg';
-import HospitalImage from '../../../../../assets/images/postAuth/dexPage/hospitalPage/hospital1.png';
-import HospitalImage2 from '../../../../../assets/images/postAuth/dexPage/hospitalPage/hospital2.png';
-import HospitalImage3 from '../../../../../assets/images/postAuth/dexPage/hospitalPage/hospital3.png';
-import HospitalImage5 from '../../../../../assets/images/postAuth/dexPage/hospitalPage/hospital5.png';
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import FilterIcon from "../../../../../assets/images/postAuth/dexPage/hospitalPage/filter-icon.svg";
+import FullStar from "../../../../../assets/images/postAuth/dexPage/hospitalPage/full-star.svg";
+import HalfStar from "../../../../../assets/images/postAuth/dexPage/hospitalPage/half-star.svg";
+import BlankStar from "../../../../../assets/images/postAuth/dexPage/hospitalPage/blank-star.svg";
+import HospitalImage from "../../../../../assets/images/postAuth/dexPage/hospitalPage/hospital1.png";
+import HospitalImage2 from "../../../../../assets/images/postAuth/dexPage/hospitalPage/hospital2.png";
+import HospitalImage3 from "../../../../../assets/images/postAuth/dexPage/hospitalPage/hospital3.png";
+import HospitalImage5 from "../../../../../assets/images/postAuth/dexPage/hospitalPage/hospital5.png";
 
-
-
-const HospitalPageScreen = ({route}) => {
+const HospitalPageScreen = ({ route }) => {
   const navigation = useNavigation();
 
   const handlePress = (hospitalName: string) => {
-    navigation.navigate('HospitalDetailScreen', { hospitalName });
+    navigation.navigate("HospitalDetailScreen", { hospitalName });
   };
 
   return (
@@ -45,8 +50,10 @@ const HospitalPageScreen = ({route}) => {
           <Text style={styles.availabilityHeader}>Availability</Text>
         </View>
 
-        <TouchableOpacity onPress={() => handlePress('San Francisco VA Center')}>
-        {/* <TouchableOpacity> */}
+        <TouchableOpacity
+          onPress={() => handlePress("San Francisco VA Center")}
+        >
+          {/* <TouchableOpacity> */}
           <View style={styles.resultItem}>
             <View style={styles.resultInfo}>
               <Text style={styles.resultTitle}>San Francisco VA Center</Text>
@@ -63,7 +70,9 @@ const HospitalPageScreen = ({route}) => {
                 <Text style={styles.resultDistance}>0.7 mi</Text>
                 <Text style={styles.resultType}>Veterans hospital</Text>
               </View>
-              <Text style={styles.resultAddress}>401 3rd St, San Francisco</Text>
+              <Text style={styles.resultAddress}>
+                401 3rd St, San Francisco
+              </Text>
               <Text style={styles.resultAppointment}>Appointment by call</Text>
               <Text style={styles.resultAvailability}>Available today</Text>
             </View>
@@ -75,7 +84,9 @@ const HospitalPageScreen = ({route}) => {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => handlePress('San Francisco VA Downtown')}>
+        <TouchableOpacity
+          onPress={() => handlePress("San Francisco VA Downtown")}
+        >
           <View style={styles.resultItem}>
             <View style={styles.resultInfo}>
               <Text style={styles.resultTitle}>San Francisco VA Downtown</Text>
@@ -92,7 +103,9 @@ const HospitalPageScreen = ({route}) => {
                 <Text style={styles.resultDistance}>5.5 mi</Text>
                 <Text style={styles.resultType}>Medical clinic</Text>
               </View>
-              <Text style={styles.resultAddress}>4150 Clement St, San Francisco</Text>
+              <Text style={styles.resultAddress}>
+                4150 Clement St, San Francisco
+              </Text>
               <Text style={styles.resultAppointment}>Online appointment</Text>
               <Text style={styles.resultAvailability}>Available Tuesday</Text>
             </View>
@@ -104,7 +117,7 @@ const HospitalPageScreen = ({route}) => {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => handlePress('San Bruno VA Clinic')}>
+        <TouchableOpacity onPress={() => handlePress("San Bruno VA Clinic")}>
           <View style={styles.resultItem}>
             <View style={styles.resultInfo}>
               <Text style={styles.resultTitle}>San Bruno VA Clinic</Text>
@@ -122,7 +135,9 @@ const HospitalPageScreen = ({route}) => {
                 <Text style={styles.resultDistance}>3.7 mi</Text>
                 <Text style={styles.resultType}>Medical clinic</Text>
               </View>
-              <Text style={styles.resultAddress}>3801 Miranda Ave, San Francisco</Text>
+              <Text style={styles.resultAddress}>
+                3801 Miranda Ave, San Francisco
+              </Text>
               <Text style={styles.resultAppointment}>Appointment by call</Text>
               <Text style={styles.resultAvailability}>Available Wednesday</Text>
             </View>
@@ -134,33 +149,37 @@ const HospitalPageScreen = ({route}) => {
           </View>
         </TouchableOpacity>
 
-        <View style={styles.resultItem}>
-          <View style={styles.resultInfo}>
-            <Text style={styles.resultTitle}>Palo Alto VA Medical Center</Text>
-            <View style={styles.resultRatingContainer}>
-              <Text style={styles.resultRating}>3.5</Text>
-              <View style={styles.resultStars}>
-                {Array.from({ length: 3 }).map((_, index) => (
-                  <FullStar key={index} style={styles.star} />
-                ))}
-                <HalfStar style={styles.star} />
-                <BlankStar style={styles.star} />
+        <TouchableOpacity onPress={() => handlePress("Palo Alto VA Medical Center")}>
+          <View style={styles.resultItem}>
+            <View style={styles.resultInfo}>
+              <Text style={styles.resultTitle}>
+                Palo Alto VA Medical Center
+              </Text>
+              <View style={styles.resultRatingContainer}>
+                <Text style={styles.resultRating}>3.5</Text>
+                <View style={styles.resultStars}>
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <FullStar key={index} style={styles.star} />
+                  ))}
+                  <HalfStar style={styles.star} />
+                  <BlankStar style={styles.star} />
+                </View>
               </View>
+              <View style={styles.resultDistanceContainer}>
+                <Text style={styles.resultDistance}>11 mi</Text>
+                <Text style={styles.resultType}>Veterans hospital</Text>
+              </View>
+              <Text style={styles.resultAddress}>5855 Silver Creek PI</Text>
+              <Text style={styles.resultAppointment}>Appointment by call</Text>
+              <Text style={styles.resultAvailability}>Available Friday</Text>
             </View>
-            <View style={styles.resultDistanceContainer}>
-              <Text style={styles.resultDistance}>11 mi</Text>
-              <Text style={styles.resultType}>Veterans hospital</Text>
-            </View>
-            <Text style={styles.resultAddress}>5855 Silver Creek PI</Text>
-            <Text style={styles.resultAppointment}>Appointment by call</Text>
-            <Text style={styles.resultAvailability}>Available Friday</Text>
+            <Image
+              source={HospitalImage3}
+              style={styles.resultImage}
+              resizeMode="cover"
+            />
           </View>
-          <Image
-            source={HospitalImage3}
-            style={styles.resultImage}
-            resizeMode="cover"
-          />
-        </View>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -170,14 +189,14 @@ const styles = StyleSheet.create({
   // styles remain unchanged
   container: {
     flex: 1,
-    backgroundColor: '#F2F4F7',
+    backgroundColor: "#F2F4F7",
   },
   header: {
     paddingTop: 54,
     paddingBottom: 16,
     paddingHorizontal: 20,
-    backgroundColor: 'white',
-    alignItems: 'center',
+    backgroundColor: "white",
+    alignItems: "center",
   },
   headerContent: {
     paddingVertical: 12,
@@ -185,31 +204,31 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingRight: 80,
     paddingLeft: 80,
-    backgroundColor: '#F2F4F7',
+    backgroundColor: "#F2F4F7",
     borderRadius: 40,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
   headerTitle: {
-    color: '#323D4C',
+    color: "#323D4C",
     fontSize: 13,
-    fontFamily: 'SF Pro',
-    fontWeight: '590',
+    fontFamily: "SF Pro",
+    fontWeight: "590",
     lineHeight: 28,
-    wordWrap: 'break-word',
+    wordWrap: "break-word",
   },
   headerSubtitle: {
-    color: '#6B7685',
+    color: "#6B7685",
     fontSize: 13,
-    fontFamily: 'SF Pro',
-    fontWeight: '510',
+    fontFamily: "SF Pro",
+    fontWeight: "510",
     lineHeight: 28,
     marginLeft: 8,
-    wordWrap: 'break-word',
+    wordWrap: "break-word",
   },
   filtersContainer: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     paddingVertical: 10,
   },
   filterIcon: {
@@ -219,16 +238,16 @@ const styles = StyleSheet.create({
   },
   filterItem: {
     fontSize: 13,
-    fontFamily: 'SF Pro',
-    fontWeight: '510',
-    color: '#323D4C',
+    fontFamily: "SF Pro",
+    fontWeight: "510",
+    color: "#323D4C",
     marginBottom: 10,
     paddingHorizontal: 15,
     paddingVertical: 5,
     paddingLeft: 10,
     paddingRight: 10,
     borderRadius: 15,
-    borderColor: '#C8C7CC',
+    borderColor: "#C8C7CC",
     borderWidth: 1,
     marginHorizontal: 5,
   },
@@ -237,60 +256,60 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   resultsHeaderContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 19,
     marginTop: 12,
   },
   resultsHeader: {
     fontSize: 12,
-    fontFamily: 'SF Pro',
-    fontWeight: '510',
-    color: '#6B7685',
+    fontFamily: "SF Pro",
+    fontWeight: "510",
+    color: "#6B7685",
   },
   availabilityHeader: {
     fontSize: 12,
-    fontFamily: 'SF Pro',
-    fontWeight: '510',
-    color: '#323D4C',
+    fontFamily: "SF Pro",
+    fontWeight: "510",
+    color: "#323D4C",
   },
   resultItem: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
+    flexDirection: "row",
+    backgroundColor: "white",
     padding: 20,
     marginBottom: 8,
     borderRadius: 8,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.02,
     elevation: 2,
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   resultInfo: {
-    maxWidth: '70%',
+    maxWidth: "70%",
   },
   resultTitle: {
     fontSize: 16,
-    fontFamily: 'SF Pro',
-    fontWeight: '510',
-    color: '#191F28',
+    fontFamily: "SF Pro",
+    fontWeight: "510",
+    color: "#191F28",
     lineHeight: 28,
   },
   resultRatingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 4,
   },
   resultRating: {
     fontSize: 12,
-    fontFamily: 'SF Pro',
-    fontWeight: '510',
-    color: '#6B7685',
+    fontFamily: "SF Pro",
+    fontWeight: "510",
+    color: "#6B7685",
   },
   resultStars: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginLeft: 4,
   },
   star: {
@@ -304,42 +323,42 @@ const styles = StyleSheet.create({
     marginLeft: 2,
   },
   resultDistanceContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 4,
   },
   resultDistance: {
     fontSize: 12,
-    fontFamily: 'SF Pro',
-    fontWeight: '510',
-    color: '#6B7685',
+    fontFamily: "SF Pro",
+    fontWeight: "510",
+    color: "#6B7685",
     marginRight: 4,
   },
   resultType: {
     fontSize: 12,
-    fontFamily: 'SF Pro',
-    fontWeight: '510',
-    color: '#6B7685',
+    fontFamily: "SF Pro",
+    fontWeight: "510",
+    color: "#6B7685",
   },
   resultAddress: {
     fontSize: 12,
-    fontFamily: 'SF Pro',
-    fontWeight: '510',
-    color: '#6B7685',
+    fontFamily: "SF Pro",
+    fontWeight: "510",
+    color: "#6B7685",
     marginTop: 4,
   },
   resultAppointment: {
     fontSize: 12,
-    fontFamily: 'SF Pro',
-    fontWeight: '510',
-    color: '#6B7685',
+    fontFamily: "SF Pro",
+    fontWeight: "510",
+    color: "#6B7685",
     marginTop: 4,
   },
   resultAvailability: {
     fontSize: 13,
-    fontFamily: 'SF Pro',
-    fontWeight: '510',
-    color: '#237AF2',
+    fontFamily: "SF Pro",
+    fontWeight: "510",
+    color: "#237AF2",
     marginTop: 4,
   },
   resultImage: {
