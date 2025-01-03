@@ -28,16 +28,16 @@ Our vision is to ensure that no veteran is left behind. That every veteran recei
 ## Features
 Vugle-Health offers a robust suite of tools designed to assist veterans in navigating the benefits process with ease and efficiency:
 1. **Secure Login**
-- Vugle-Health integrates OAuth and OpenID Connect authentication through the official VA.gov site, ensuring a highly secure and reliable login experience for veterans. This implementation leverages the Authorization Code Grant flow for enhanced security.
+    - Vugle-Health integrates OAuth and OpenID Connect authentication through the official VA.gov site, ensuring a highly secure and reliable login experience for veterans. This implementation leverages the Authorization Code Grant flow for enhanced security.
 
 2. **AI Chabot: Dex**  
-- Dex is Vugle’s main feature—an AI-powered chatbot designed to simplify the disability claim process and educate veterans. Dex analyzes veterans' medical records and collects their current medical conditions to identify potential medical conditions and most suitable claim types. It offers personalized assistance, making the claims process faster and more intuitive.
+    - Dex is Vugle’s main feature—an AI-powered chatbot designed to simplify the disability claim process and educate veterans. Dex analyzes veterans' medical records and collects their current medical conditions to identify potential medical conditions and most suitable claim types. It offers personalized assistance, making the claims process faster and more intuitive.
 
 3. **Streamlined Application Process**  
-- Vugle-Health automates the retrieval and organization of critical data to enhance the accuracy and efficiency of disability claims. It fetches relevant information through OAuth authentication and parses veterans' DD214 forms (military service documentation) to identify the most suitable claim type and maximize their compensation rating.
+    - Vugle-Health automates the retrieval and organization of critical data to enhance the accuracy and efficiency of disability claims. It fetches relevant information through OAuth authentication and parses veterans' DD214 forms (military service documentation) to identify the most suitable claim type and maximize their compensation rating.
 
 4. **Web & Mobile Compatibility**
- - The platform detects the user’s device type and dynamically adjusts the interface for optimal usability. Vugle-Health provides a seamless mobile experience, ensuring veterans can easily manage their disability claims from their phones. The mobile UI is designed to provide the same comprehensive functionality as the web version, while maintaining a user-friendly experience tailored to smaller screens.
+   - The platform detects the user’s device type and dynamically adjusts the interface for optimal usability. Vugle-Health provides a seamless mobile experience, ensuring veterans can easily manage their disability claims from their phones. The mobile UI is designed to provide the same comprehensive functionality as the web version, while maintaining a user-friendly experience tailored to smaller screens.
 
 ## Technical Details
 
