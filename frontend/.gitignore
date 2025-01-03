@@ -49,3 +49,5 @@ coverage/
 
 # app-specific
 app-example
+
+*yml
