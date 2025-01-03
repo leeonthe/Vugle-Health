@@ -5,23 +5,15 @@ applications:
       phases:
         preBuild:
           commands:
-            - npm install --quiet --global expo-cli
-            - |-
-              if [ -f yarn.lock ]; then
-               yarn
-              elif [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
-               npm ci
-              else
-               npm install
-              fi
+            - npm install --global expo
+            - npm install
         build:
           commands:
-            - expo build:web
+            - expo export:web --output-dir dist
       artifacts:
-        baseDirectory: web-build
+        baseDirectory: dist
         files:
           - '**/*'
       cache:
         paths:
           - node_modules/**/*
-          - $(npm root --global)/**/*
