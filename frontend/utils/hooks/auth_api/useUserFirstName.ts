@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type UserInfoResponse = {
   given_name: string;
+  family_name: string;
 };
 
 const fetchUserInfo = async (): Promise<UserInfoResponse> => {
@@ -29,7 +30,7 @@ const fetchUserInfo = async (): Promise<UserInfoResponse> => {
   }
 
   const data = await response.json();
-  return { given_name: data.user_info.given_name };
+  return { given_name: data.user_info.given_name, family_name: data.user_info.family_name };
 };
 
 

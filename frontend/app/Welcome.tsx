@@ -114,7 +114,8 @@ const WelcomePage: React.FC<UserStartScreenProps> = ({ route }) => {
           await AsyncStorage.setItem("family_name", userData.family_name);
           console.log(
             "Stored given_name in AsyncStorage:",
-            userData.given_name
+            userData.given_name,
+            userData.family_name
           );
         } catch (error) {
           console.error("Error storing given_name in AsyncStorage:", error);

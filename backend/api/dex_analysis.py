@@ -183,7 +183,7 @@ def generate_most_suitable_claim_type(request):
 
     2. **Generate the Appointment Message**:
         - Write two concise sentences:
-            - The first sentence should describe the user's medical condition based on Medical Conditions and Pain Duration. (e.g. I’m experiencing knee pain that has been troubling me for the past 3 months.)
+            - The first sentence should describe the user's medical condition based on Medical Conditions and Pain Duration in first person point of view. (e.g. I’m experiencing knee pain that has been troubling me for the past 3 months.)
             - The second sentence should explain the cause of the condition if it relates to the user's service history (e.g., "The pain started after I was injured by shrapnel during my deployment to Iraq."). If no service-related cause is evident, exclude the second sentence.
 
 
@@ -198,7 +198,7 @@ def generate_most_suitable_claim_type(request):
     Type of claim: <Name of claim>
     Description: <One ~ two sentence description explaining why this claim is best suited for this user given user input and data. Provide a concise description that fits within the token limit of 500.>
     Branch of Medicine: <Name of branch of medicine>
-    Apppointment Message: <One ~ two sentences of appointment message from ### Guidelines for appointment message>
+    Apppointment Message: <One ~ two sentences of appointment message from ### Guidelines for appointment message.>
 
     Provide your response in this **Response Format** with **no additional information**. 
     """

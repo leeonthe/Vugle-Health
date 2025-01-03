@@ -471,15 +471,15 @@ const ChatRenderer: React.FC<ChatProps> = ({
           <TouchableOpacity
             key={`link-${index}`}
             onPress={() => {
-              const url = element.content;
-              if (/^(https?:\/\/[^\s$.?#].[^\s]*)$/i.test(url)) {
+              const urls = element.url;
+              if (/^(https?:\/\/[^\s$.?#].[^\s]*)$/i.test(urls)) {
                 // Valid URL, navigate to it
-                Linking.openURL(url).catch((err) =>
+                Linking.openURL(urls).catch((err) =>
                   console.error("Failed to open link:", err)
                 );
               } else {
                 // Invalid URL, log or handle it without navigation
-                console.log("Invalid URL:", url);
+                console.log("Invalid URL:", urls);
               }
             }}
           >
