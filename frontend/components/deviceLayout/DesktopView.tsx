@@ -5,11 +5,16 @@ const DesktopView: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       // Set the browser window to a fixed size (iPhone dimensions)
-      window.resizeTo(393, 852);
+      const scaledWidth = 393 * 0.67;
+      const scaledHeight = 852 * 0.67;
+
+      window.resizeTo(scaledWidth, scaledHeight);
+
+      window.resizeTo(scaledWidth, scaledHeight);
 
       // Center the window on the screen
-      const xPos = screen.width / 2 - 393 / 2;
-      const yPos = screen.height / 2 - 852 / 2;
+      const xPos = screen.width / 2 - scaledWidth / 2;
+      const yPos = screen.height / 2 - scaledHeight / 2;
       window.moveTo(xPos, yPos);
     }
   }, []);
@@ -39,6 +44,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff', 
     boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)', 
     overflow: 'hidden',
+    transform: [{scale: 0.67}],
   },
 });
 
