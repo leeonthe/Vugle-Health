@@ -1,5 +1,15 @@
 # Vugle-Health
 
+## Table of Contents
+- [Overview](#overview)
+- [Problem Statement](#problem-statement)
+- [Mission](#mission)
+- [Features](#features)
+- [Technical Details](#technical-details)
+- [Getting Started](#getting-started)
+- [Diagnosing Your Medical Conditions with Dex](#diagnosing-your-medical-conditions-with-dex)
+- [Make Doctor's Appointment with Dex](#make-doctors-appointment-with-dex)
+
 ## Overview
 Vugle-Health is an AI-integrated application designed to provide personalized financial assistance and healthcare benefit support to active duty U.S. military personnel and veterans. By leveraging AI technology, Vugle-Health educates veterans on their entitlements, simplifies the benefits application process, and expedites claim submissions, ensuring veterans receive the financial and health benefits they deserve.
 
@@ -81,9 +91,161 @@ To log in to the sandbox environment using Login.gov:
 | Sheba703   | Harris789 | Email: va.api.user+101-2024@gmail.com      | Email: va.api.user+101@gmail.com <br> 2-Factor Seed: BNBV63ON5ST7BHSU |
 
 
+## After Logging In
+
+After you log in, you will see the page shown below.
+
+You can click the **“How much I can earn?”** or **“Consult”** button in the footer to begin the AI-assisted Dex service.
+
+<p align="center">
+  <img src="README_IMG/README_HomePage.png" alt="Home Page" width="300" height="650">
+</p>
+<p align="center"><em>Figure 2: Home Page</em></p>
+
+---
+
+## About Dex
+
+Dex is an AI-powered tool that provides personalized analysis for veterans. It helps determine the best suitable claim type based on:
+- **Service treatment records**
+- **Medical records**
+- **Previous claims**
+- **DD214 file**
+
+These records are securely fetched via **OAuth login**. Using different user accounts will cause different results. 
+
+
+---
+
+## Enhanced Analysis with DD214
+
+Dex includes an advanced functionality to parse relevant data from uploaded **DD214 files**. This data is incorporated into the analysis for even more accurate recommendations.
+
+### Steps:
+1. Dex will prompt you to upload your **DD214 file**.
+   - You can upload your DD214 file for enhanced analysis.
+   - Alternatively, click **“I do not have it”** to proceed without uploading.
+2. For demonstration purposes, you can use the provided sample file:  
+   **[DD214-Example.pdf](#)**
+
+Dex will analyze the relevant information in the DD214 file to recommend the most suitable claim type for you. 
+
+<details> 
+<summary><strong>What is the relevant information used?</strong></summary>
+
+### Relevant Data Parsed from DD214
+
+Below are the key fields extracted from the DD214 document using the parsing logic:
+
+1. **Department, Component, and Branch**  
+   - Section 2: Extracts the military department and branch information (e.g., "Air Force").
+
+2. **Grade, Rate, or Rank**  
+   - Section 4a: Extracts the rank held by the veteran (e.g., "CAPT").
+
+3. **Pay Grade**  
+   - Section 4b: Extracts the pay grade associated with the veteran's rank (e.g., "D3").
+
+4. **Date Entered Active Duty**  
+   - Section 12a: Extracts the date the veteran entered active duty (formatted as Year, Month, Day).
+
+5. **Separation Date**  
+   - Section 12b: Extracts the date the veteran was separated from active duty (formatted as Year, Month, Day).
+
+6. **Net Active Service**  
+   - Section 12c: Extracts the net active service time during the period (Years, Months, Days).
+
+7. **Total Foreign Service**  
+   - Section 12f: Extracts the total time spent in foreign service (Years, Months, Days).
+
+8. **Primary Specialty**  
+   - Section 11: Extracts the primary military specialty title and duration (e.g., "64P3, Contracting, 5 Years and 4 Months").
+
+9. **Decorations, Medals, and Awards**  
+   - Section 13: Extracts the list of awarded decorations, medals, badges, and citations (e.g., "Air Force Commendation Medal").
+
+10. **Military Education**  
+    - Section 14: Extracts the titles and durations of completed military education (e.g., "Fundamentals of Systems Planning").
+
+11. **Remarks**  
+    - Section 18: Extracts additional comments and remarks regarding the veteran's service.
+
+12. **SGLI Coverage**  
+    - Section 10: Extracts the Servicemembers’ Group Life Insurance coverage amount (e.g., "$400,000").
+
+</details>
+
+
+---
 
 
 
+## Diagnosing Your Medical Conditions with Dex
 
+To begin, choose one of the following options: **“New condition”**, **“Existing condition”**, or **“Both”**, depending on your situation. Once selected, Dex will start diagnosing your current medical conditions and analyzing:
+
+1. **Potential related conditions**  
+2. **The most suitable claim type** you may want to file.
+
+**Please assume you are a veteran who is filing a disability claim!**
+
+You can type any medical condition into the system. For example:  
+- *“I am having trouble sleeping.”*  
+- *“I feel numbness or tingling in my lower leg or foot.”*  
+
+Based on the conditions you provide, Dex will analyze whether they are associated with your previous service history or medical records.
+
+<details>
+  <summary><strong>Example Fetched User Data</strong></summary>
+
+
+If you log in using Tamara Ellis' account, this user has below data:  
+- **Diagnosed Conditions**:
+  - Paralysis of the sciatic nerve
+  - Post-Traumatic Stress Disorder (PTSD)
+
+You can view detailed information about the user by clicking the **“View”** button next to **Disability rating** and **Monthly compensation** on **Figure 2: Home Page**.
+
+Therefore, if you are logged in via Tamra Ellis’ account and submitted medical conditions related to **Paralysis of the sciatic nerve** or **Post-Traumatic Stress Disorder**, Dex will analyze your data and recommend filing an **Increased Claim** or a **Secondary Service-Connected Claim**.
+
+
+</details>
+
+---
+### Maximizing Your Disability Rating with Dex
+
+Dex will evaluate your medical conditions and health records to suggest **Potential Related Conditions**. You can then:
+
+1. Click **“Let’s check”** to view the potential related conditions.
+   - Please allow a few seconds after clicking **“Let’s check”** for Dex to analyze and provide the potential related conditions!
+2. Add any conditions you believe you also have!  
+
+By doing so, Dex will consult users on how to maximize their disability rating and ensure they claim all eligible benefits.
+
+---
+
+### Now, allow Dex to analyze the most suitable claim type!
+
+After completing the Basic Assessment with Dex, Dex will begin reviewing the veteran’s data to determine the most suitable claim type.
+
+Click **“View result”** only once, and please allow a few seconds after clicking  **“Let’s check”** for Dex to analyze and provide the most suitable claim type!
+
+---
+
+### Make doctor’s appointment with Dex
+
+1. Click **“View medical centers”** to see available VA medical centers.  
+   - You can select any listed VA medical center to proceed.  
+
+2. After selecting a medical center, click **“Schedule an appointment”** to begin the appointment process.
+
+3. You will see the **Patient Information** section.  
+   - You may edit the patient information by clicking the **edit (TODO: replace with actual icon SVG)** icon.
+
+4. Complete the appointment process by clicking the **“Continue”** button.  
+   - Dex will display a branch of medicine based on your typed medical conditions and generate a message for the doctor on your behalf.
+
+5. Finally, click **“Confirm and schedule”** to complete the process.  
+   - This is the end of our Vugle prototype! 😊
 
 
