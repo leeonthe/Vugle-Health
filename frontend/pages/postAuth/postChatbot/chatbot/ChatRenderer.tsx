@@ -53,6 +53,20 @@ const ChatRenderer: React.FC<ChatProps> = ({
   const [triggeredGroups, setTriggeredGroups] = useState<Set<number>>(
     new Set()
   );
+  const [userInput, setUserInput] = React.useState<string>("");
+
+  const [painScale, setPainScale] = useState<number>(1);
+  const isKeyboardVisible = useKeyboardStatus();
+
+  const { isDesktop } = useDevice();
+  const navigation = useNavigation();
+
+  const [isHealthLoading, setIsHealthLoading] = useState(
+    initialIsHealthLoading
+  );
+  const [isHealthSuccess, setIsHealthSuccess] = useState(
+    initialIsHealthSuccess
+  );
 
   const handleLoadingState = (groupIndex: number) => {
     if (!(groupIndex in loadingStates)) {
@@ -76,44 +90,26 @@ const ChatRenderer: React.FC<ChatProps> = ({
     return loadingStates[groupIndex] ?? true;
   };
 
-  const [userInput, setUserInput] = React.useState<string>("");
-
-  const [painScale, setPainScale] = useState<number>(1);
-  const isKeyboardVisible = useKeyboardStatus();
-
-  const { isDesktop } = useDevice();
-  const navigation = useNavigation();
-
-  const [isHealthLoading, setIsHealthLoading] = useState(
-    initialIsHealthLoading
-  );
-  const [isHealthSuccess, setIsHealthSuccess] = useState(
-    initialIsHealthSuccess
-  );
-
   const { makeRequest } = useAuthenticatedRequest();
 
   const triggerOptionAction = async (option: any) => {
     const { text, next } = option;
     if (!next) {
-      console.log("Next is null, fetching gpt response. ")
+      console.log("Next is null, fetching gpt response. ");
       try {
         // Fetch GPT response when `next` is missing
         const gptResponse = await fetchDexResponse();
         console.log("GPT Response:", gptResponse);
         onOptionSelect(null, null, gptResponse);
 
-
         // Optionally show GPT response in the UI
       } catch (error) {
         console.error("Error fetching GPT response:", error);
       }
-
-    } else{
+    } else {
       onOptionSelect(next, text || userInput || `${painScale}`);
     }
   };
-
 
   const handleFileUpload = async () => {
     const accessToken = await AsyncStorage.getItem("access_token");
@@ -140,18 +136,23 @@ const ChatRenderer: React.FC<ChatProps> = ({
             try {
               // Send POST request to backend
               const response = await axios.post(
-                            "http://localhost:8000/api/dex/upload_dd214/",
-                            formData,
-                            {
-                                headers: {
-                                    "Content-Type": "multipart/form-data",
-                                    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-                                },
-                            }
-                        );
+                "http://localhost:8000/api/dex/upload_dd214/",
+                formData,
+                {
+                  headers: {
+                    "Content-Type": "multipart/form-data",
+                    ...(accessToken
+                      ? { Authorization: `Bearer ${accessToken}` }
+                      : {}),
+                  },
+                }
+              );
 
               console.log("File uploaded successfully:", response.data);
-              triggerOptionAction({ text: file.name, next: "choose_your_claim" });
+              triggerOptionAction({
+                text: file.name,
+                next: "choose_your_claim",
+              });
             } catch (err) {
               console.error("Error uploading file:", err);
             }
@@ -182,18 +183,20 @@ const ChatRenderer: React.FC<ChatProps> = ({
            * FOR ACUTAL USAGE
            *
            */
-           try {
+          try {
             // Send POST request to backend
             const response = await axios.post(
               "http://localhost:8000/api/dex/upload_dd214/",
               formData,
               {
-                  headers: {
-                      "Content-Type": "multipart/form-data",
-                      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-                  },
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                  ...(accessToken
+                    ? { Authorization: `Bearer ${accessToken}` }
+                    : {}),
+                },
               }
-          );
+            );
             console.log("[MOBILE] File uploaded successfully to backend");
             triggerOptionAction({ text: fileName, next: "choose_your_claim" });
           } catch (err) {
@@ -338,16 +341,14 @@ const ChatRenderer: React.FC<ChatProps> = ({
   //   }
   // };
 
-
   const handleNavigateToHospital = () => {
     console.log("Navigating to HospitalPageScreen");
-      navigation.navigate('HospitalPageScreen');
+    navigation.navigate("HospitalPageScreen");
   };
 
   const handleNavigateToHomePage = () => {
-    navigation.navigate('HomePage');
+    navigation.navigate("HomePage");
   };
-
 
   const handleGroupLogic = (groupIndex: number) => {
     const currentSource =
@@ -465,28 +466,28 @@ const ChatRenderer: React.FC<ChatProps> = ({
             <Logo style={styles.logo} />
           </View>
         );
-        case "link":
-          return (
-            <TouchableOpacity
-              key={`link-${index}`}
-              onPress={() => {
-                const url = element.content;
-                if (/^(https?:\/\/[^\s$.?#].[^\s]*)$/i.test(url)) {
-                  // Valid URL, navigate to it
-                  Linking.openURL(url).catch(err =>
-                    console.error('Failed to open link:', err)
-                  );
-                } else {
-                  // Invalid URL, log or handle it without navigation
-                  console.log('Invalid URL:', url);
-                }
-              }}
-            >
-              <Text style={[styles.linkText, element.style]}>
-                {element.content}
-              </Text>
-            </TouchableOpacity>
-          );
+      case "link":
+        return (
+          <TouchableOpacity
+            key={`link-${index}`}
+            onPress={() => {
+              const url = element.content;
+              if (/^(https?:\/\/[^\s$.?#].[^\s]*)$/i.test(url)) {
+                // Valid URL, navigate to it
+                Linking.openURL(url).catch((err) =>
+                  console.error("Failed to open link:", err)
+                );
+              } else {
+                // Invalid URL, log or handle it without navigation
+                console.log("Invalid URL:", url);
+              }
+            }}
+          >
+            <Text style={[styles.linkText, element.style]}>
+              {element.content}
+            </Text>
+          </TouchableOpacity>
+        );
 
       case "custom":
         return <View key={`custom-${index}`}>{element.content}</View>;
@@ -516,11 +517,10 @@ const ChatRenderer: React.FC<ChatProps> = ({
             onPress={handleFileUpload}
             style={styles.optionButton}
           >
-
             <Text style={styles.optionText}>{option.text}</Text>
           </TouchableOpacity>
         );
-      } 
+      }
 
       if (option.text === "TYPE") {
         if (option.inputType === "conditionType") {
@@ -575,27 +575,24 @@ const ChatRenderer: React.FC<ChatProps> = ({
 
       if (option.text === "View medical centers") {
         return (
-        <TouchableOpacity
+          <TouchableOpacity
             key={`${key}-hospital`}
             style={styles.optionButton}
             onPress={handleNavigateToHospital}
           >
             <Text style={styles.optionText}>{option.text}</Text>
           </TouchableOpacity>
-
         );
       }
 
       if (option.text === "Go back to main page") {
-        return(
+        return (
           <TouchableOpacity
             key={`${key}-closing`}
             style={styles.optionButton}
             onPress={handleNavigateToHomePage}
           >
             <Text style={styles.optionText}>{option.text}</Text>
-            
-
           </TouchableOpacity>
         );
       }
@@ -774,7 +771,7 @@ const styles = StyleSheet.create({
     lineHeight: 28,
     textAlign: "center",
   },
-  
+
   loadingMessageText: {
     color: "#323D4C",
     fontSize: 16,
@@ -790,7 +787,6 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     maxWidth: "90%",
     width: "auto",
-
   },
   rowContainer: {
     flexDirection: "row",
@@ -809,11 +805,10 @@ const styles = StyleSheet.create({
   rightAlignedContainer: {
     justifyContent: "center",
     alignItems: "center",
-    paddingTop: 25, 
+    paddingTop: 25,
   },
   loadingIndicator: {
     alignSelf: "center",
-  
   },
   checkMarkPosition: {
     alignSelf: "center",
