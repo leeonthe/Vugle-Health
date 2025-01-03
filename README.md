@@ -7,8 +7,9 @@
 - [Features](#features)
 - [Technical Details](#technical-details)
 - [Getting Started](#getting-started)
-- [Diagnosing Your Medical Conditions with Dex](#diagnosing-your-medical-conditions-with-dex)
-- [Make Doctor's Appointment with Dex](#make-doctors-appointment-with-dex)
+  - [Accessing the Application](#accessing-the-application)
+  - [Diagnosing Your Medical Conditions with Dex](#diagnosing-your-medical-conditions-with-dex)
+  - [Make Doctor's Appointment with Dex](#make-doctors-appointment-with-dex)
 
 ## Overview
 Vugle-Health is an AI-integrated application designed to provide personalized financial assistance and healthcare benefit support to active duty U.S. military personnel and veterans. By leveraging AI technology, Vugle-Health educates veterans on their entitlements, simplifies the benefits application process, and expedites claim submissions, ensuring veterans receive the financial and health benefits they deserve.
@@ -59,6 +60,7 @@ The system is designed with a **cohesive yet decoupled architecture** for scalab
 
 ## Getting Started
 
+## Accessing the Application
 
 After you click “VA Continue with VA.gov”, you will see below page:
 <p>
