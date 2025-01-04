@@ -79,12 +79,14 @@ CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
     'https://deployment2.d3uaea624sylv.amplifyapp.com',
+    'http://vugle-backend-v1.us-east-2.elasticbeanstalk.com',
     'http://localhost:8081',  # Web app frontend
     'http://localhost:19006',  # React Native Expo (mobile)
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://deployment2.d3uaea624sylv.amplifyapp.com',
+    'http://vugle-backend-v1.us-east-2.elasticbeanstalk.com',
     'http://localhost:8081',  # Web app frontend
     'http://localhost:19006',  # React Native Expo (mobile)
 ]
