@@ -44,6 +44,10 @@ import traceback
 
 def test_view(request):
     return HttpResponse("This is a test page.")
+
+def health_check(request):
+    return JsonResponse({"status": "ok"})
+    
 def get_csrf_token(request):
     """Endpoint to expose CSRF token to the frontend."""
     token = get_token(request)

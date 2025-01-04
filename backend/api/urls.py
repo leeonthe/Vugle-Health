@@ -13,6 +13,7 @@ from .views import (
     StorePotentialConditions,
     DexAnalysisResponse,
     test_view,
+    health_check,
 )
 
 urlpatterns = [
@@ -34,5 +35,7 @@ urlpatterns = [
     path('dex/get_branch_of_medicine_and_appointment_message/', DexAnalysisResponse.get_branch_of_medicine_and_appointment_message, name='get_branch_of_medicine_and_appointment_message'),
 
     path('test/', test_view, name='test'),
+    path('health/', health_check, name='health_check'),
+
 
 ]
