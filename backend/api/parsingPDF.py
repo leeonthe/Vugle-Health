@@ -17,7 +17,8 @@ def get_secret(secret_name, region_name="us-east-2"):
     Returns:
         str or dict: The secret value, either as a JSON string or plain text.
     """
-    client = boto3.client(service_name="secretsmanager", region_name=region_name)
+    session = boto3.session.Session()
+    client = session.client(service_name="secretsmanager", region_name=region_name)
     try:
         response = client.get_secret_value(SecretId=secret_name)
         if "SecretString" in response:

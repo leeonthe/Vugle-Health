@@ -17,7 +17,8 @@ def get_secret(secret_name):
         str: The secret value as a string.
     """
     region_name = "us-east-2" 
-    client = boto3.client(service_name="secretsmanager", region_name=region_name)
+    session = boto3.session.Session()
+    client = session.client(service_name="secretsmanager", region_name=region_name)
 
     try:
         response = client.get_secret_value(SecretId=secret_name)
@@ -28,7 +29,6 @@ def get_secret(secret_name):
     except ClientError as e:
         raise Exception(f"Error retrieving secret {secret_name}: {e}")
 
-gpt_api_key_path = config("GPT_API_KEY")
 
 def get_gpt_api_key():
     """
@@ -43,7 +43,9 @@ def get_gpt_api_key():
     except Exception as e:
         raise Exception(f"Error loading API key: {e}")
 
+
 client = OpenAI(api_key=get_gpt_api_key())
+
 
 def query_gpt(prompt, context_type="general"):
     """
