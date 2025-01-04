@@ -1,5 +1,8 @@
 export class OAuthHandler {
-  static backendUrl = 'http://localhost:8000';
+  // static backendUrl = 'http://localhost:8000';
+  static backendUrl = 'http://  vugle-backend-v1.us-east-2.elasticbeanstalk.com';
+
+
 
   static async initiateLogin(
     platform: 'mobile' | 'web',
