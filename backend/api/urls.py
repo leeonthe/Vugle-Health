@@ -12,6 +12,7 @@ from .views import (
     StoreUserInputView,
     StorePotentialConditions,
     DexAnalysisResponse,
+    test_view,
 )
 
 urlpatterns = [
@@ -32,5 +33,6 @@ urlpatterns = [
     path('dex/suitable_claim_type/', DexAnalysisResponse.generate_most_suitable_claim_response, name='get_most_suitable_claim_response'),
     path('dex/get_branch_of_medicine_and_appointment_message/', DexAnalysisResponse.get_branch_of_medicine_and_appointment_message, name='get_branch_of_medicine_and_appointment_message'),
 
+    path('test/', test_view, name='test'),
 
 ]

@@ -1,7 +1,32 @@
 import yaml
+import boto3
 from openai import OpenAI
 from decouple import config
 from django.views.decorators.csrf import csrf_exempt
+from botocore.exceptions import ClientError
+
+
+def get_secret(secret_name):
+    """
+    Fetch a specific secret value from AWS Secrets Manager.
+
+    Args:
+        secret_name (str): The name of the secret in Secrets Manager.
+
+    Returns:
+        str: The secret value as a string.
+    """
+    region_name = "us-east-2" 
+    client = boto3.client(service_name="secretsmanager", region_name=region_name)
+
+    try:
+        response = client.get_secret_value(SecretId=secret_name)
+        if "SecretString" in response:
+            return response["SecretString"]
+        elif "SecretBinary" in response:
+            return response["SecretBinary"].decode("utf-8")
+    except ClientError as e:
+        raise Exception(f"Error retrieving secret {secret_name}: {e}")
 
 gpt_api_key_path = config("GPT_API_KEY")
 
@@ -10,13 +35,11 @@ def get_gpt_api_key():
     Load the GPT API key from the specified YAML file.
     """
     try:
-        with open(gpt_api_key_path, "r") as file:
-            config = yaml.safe_load(file)
-            return config["gpt_api_key"]
-    except FileNotFoundError:
-        raise FileNotFoundError(f"YAML file not found at path: {gpt_api_key_path}")
+        yaml_content = get_secret("GPT_API_KEY")
+        config = yaml.safe_load(yaml_content)
+        return config["gpt_api_key"]
     except KeyError:
-        raise KeyError("gpt_api_key not found in the YAML file")
+        raise KeyError("gpt_api_key not found in the YAML content.")
     except Exception as e:
         raise Exception(f"Error loading API key: {e}")
 

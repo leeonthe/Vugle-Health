@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 # 
 from pathlib import Path
 from decouple import config
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,13 +23,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("DJANGO_SECRET_KEY")
+
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "fallback-secret-key")
+
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['vugle.us-east-2.elasticbeanstalk.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -66,22 +69,24 @@ SESSION_COOKIE_NAME = 'sessionid'
 
 # Session cookies
 SESSION_COOKIE_SAMESITE = 'None'  # Allows cross-origin requests
-SESSION_COOKIE_SECURE = False     # Set to True in production with HTTPS
+SESSION_COOKIE_SECURE = True     # Set to True in production with HTTPS
 
 # CSRF cookies
 CSRF_COOKIE_SAMESITE = 'None'  # Allows cross-origin requests
-CSRF_COOKIE_SECURE = False     # Set to True in production with HTTPS
+CSRF_COOKIE_SECURE = True     # Set to True in production with HTTPS
 
 MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
 
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
+    'https://deployment2.d3uaea624sylv.amplifyapp.com',
     'http://localhost:8081',  # Web app frontend
     'http://localhost:19006',  # React Native Expo (mobile)
 ]
 
 CSRF_TRUSTED_ORIGINS = [
+    'https://deployment2.d3uaea624sylv.amplifyapp.com',
     'http://localhost:8081',  # Web app frontend
     'http://localhost:19006',  # React Native Expo (mobile)
 ]
@@ -166,7 +171,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

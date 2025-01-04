@@ -25,6 +25,11 @@ from .dex_analysis import generate_potential_conditions
 from .dex_analysis import generate_most_suitable_claim_type
 from .dex_analysis import test_generate_most_suitable_claim_type
 
+from django.http import HttpResponse
+# AWS Secrets Manager
+from botocore.exceptions import ClientError
+import boto3
+
 import requests
 import base64
 import os
@@ -37,6 +42,8 @@ import time
 import uuid
 import traceback
 
+def test_view(request):
+    return HttpResponse("This is a test page.")
 def get_csrf_token(request):
     """Endpoint to expose CSRF token to the frontend."""
     token = get_token(request)
@@ -44,11 +51,11 @@ def get_csrf_token(request):
 
 class OAuthHandler:
     def __init__(self):
-        self.client_id = config('VA_CLIENT_ID')
-        self.client_secret = config('VA_CLIENT_SECRET')
-        self.authorization_url = config('VA_AUTHORIZATION_URL')
-        self.token_url = config('VA_TOKEN_URL')
-        self.redirect_uri = config('VA_REDIRECT_URI')
+        self.client_id = os.getenv('VA_CLIENT_ID')
+        self.client_secret = os.getenv('VA_CLIENT_SECRET')
+        self.authorization_url = os.getenv('VA_AUTHORIZATION_URL')
+        self.token_url = os.getenv('VA_TOKEN_URL')
+        self.redirect_uri = os.getenv('VA_REDIRECT_URI')
 
     def generate_state(self):
         """Generate a random state parameter for CSRF protection."""
@@ -60,7 +67,7 @@ class OAuthHandler:
 
     def get_signing_key(self, token):
         """Fetch the signing key from the VA keys endpoint."""
-        keys_url = config('VA_KEYS_URL')
+        keys_url = os.getenv('VA_KEYS_URL')
         try:
             jwk_client = jwt.PyJWKClient(keys_url)
             signing_key = jwk_client.get_signing_key_from_jwt(token)
@@ -242,7 +249,7 @@ class UserInfoView(View):
 
     def validate_access_token(self, token):
         """Validate the access token or ID token and extract user info."""
-        keys_url = config('VA_KEYS_URL')
+        keys_url = os.getenv('VA_KEYS_URL')
 
         try:
             # Fetch the signing key
@@ -302,7 +309,7 @@ class DisabilityRatingView(View):
         if not access_token:
             return JsonResponse({"error": "Access token missing or invalid."}, status=401)
 
-        api_url = config('VA_DISABILITY_RATING_API_URL')
+        api_url = os.getenv('VA_DISABILITY_RATING_API_URL')
         headers = {
             "Authorization": f"Bearer {access_token}",
             "accept": "application/json"
@@ -336,11 +343,56 @@ class DisabilityRatingView(View):
             return JsonResponse({"error": "An error occurred while fetching disability rating.", "details": str(e)}, status=500)
 
 
+def get_secret(secret_name):
+    """
+    Fetch a specific secret from AWS Secrets Manager.
+    
+    Args:
+        secret_name (str): The name of the secret in AWS Secrets Manager.
+    
+    Returns:
+        dict or str: The secret value (parsed JSON or plain string).
+    """
+    region_name = "us-east-2"  # Replace with your AWS region
+    client = boto3.client(service_name="secretsmanager", region_name=region_name)
+
+    try:
+        response = client.get_secret_value(SecretId=secret_name)
+
+        if "SecretString" in response:
+            return response["SecretString"]
+
+        elif "SecretBinary" in response:
+            return response["SecretBinary"].decode("utf-8")
+
+        print("GET_SECRET ISSUE")
+        return None
+
+    except ClientError as e:
+        print(f"Error retrieving secret {secret_name}: {e}")
+        raise
+
+
+def load_private_key(key_request):
+    """
+    Load the private key content from AWS Secrets Manager.
+    Args:
+        secret_name (str): The name of the secret in Secrets Manager that contains the private key.
+    Returns:
+        str: The private key content.
+    """
+    private_key = get_secret(key_request)
+    if private_key and private_key.startswith("-----BEGIN PRIVATE KEY-----"):
+        return private_key
+    else:
+        raise FileNotFoundError(f"Private key content not found or invalid for secret: {secret_name}")
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class EligibleLettersView(View):
-    ELIGIBLE_LETTER_TOKEN_URL = config('ELA_ELIGIBLE_LETTER_TOKEN_URL')
-    ELA_AUDIENCE_URL = config('ELA_AUDIENCE_URL')
-    LETTERS_URL = config('VA_ELIGIBLE_LETTER_API_URL')
+    ELIGIBLE_LETTER_TOKEN_URL = os.getenv('ELA_ELIGIBLE_LETTER_TOKEN_URL')
+    ELA_AUDIENCE_URL = os.getenv('ELA_AUDIENCE_URL')
+    LETTERS_URL = os.getenv('VA_ELIGIBLE_LETTER_API_URL')
 
     def get(self, request):
         ELA_icn = request.GET.get("icn", None)
@@ -396,13 +448,9 @@ class EligibleLettersView(View):
             return JsonResponse({"error": "Server error", "details": str(e)}, status=500)
 
     def _ela_generate_jwt(self):
-        private_key_path = config("ELA_PRIVATE_KEY_PATH")
-        client_id = config("ELA_JWT_CLIENT_ID")
+        private_key_content = load_private_key("ELA_PRIVATE_KEY_PATH")
+        client_id = os.getenv("ELA_JWT_CLIENT_ID")
         audience = self.ELA_AUDIENCE_URL
-
-        # Load the private key
-        with open(private_key_path, 'r') as key_file:
-            private_key = key_file.read()
 
         iat = int(time.time())
         exp = iat + 300
@@ -453,9 +501,9 @@ class EligibleLettersView(View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class PatientHealthView(View):
-    PATIENT_HEALTH_TOKEN_URL = config('PHA_ELIGIBLE_LETTER_TOKEN_URL')
-    PHA_AUDIENCE_URL = config('PHA_AUDIENCE_URL')
-    PATIENT_HEALTH_API_URL = config('VA_PATIENT_HEALTH_API_URL')
+    PATIENT_HEALTH_TOKEN_URL = os.getenv('PHA_ELIGIBLE_LETTER_TOKEN_URL')
+    PHA_AUDIENCE_URL = os.getenv('PHA_AUDIENCE_URL')
+    PATIENT_HEALTH_API_URL = os.getenv('VA_PATIENT_HEALTH_API_URL')
 
     def get(self, request):
         PHA_icn = request.GET.get("patient", None)
@@ -499,14 +547,9 @@ class PatientHealthView(View):
             return JsonResponse({"error": "Server error", "details": str(e)}, status=500)
 
     def _pha_generate_jwt(self):
-        private_key_path = config("PHA_PRIVATE_KEY_PATH")
-        if not os.path.exists(private_key_path):
-            raise FileNotFoundError(f"Private key file not found at {private_key_path}")
-        client_id = config("PHA_JWT_CLIENT_ID")
+        private_key_content = load_private_key("PHA_PRIVATE_KEY_PATH")
+        client_id = os.getenv("PHA_JWT_CLIENT_ID")
         audience = self.PHA_AUDIENCE_URL
-        # Load the private key
-        with open(private_key_path, 'r') as key_file:
-            private_key = key_file.read()
 
         iat = int(time.time())
         exp = iat + 300
@@ -521,7 +564,7 @@ class PatientHealthView(View):
             "jti": str(uuid.uuid4()),
         }
 
-        signed_jwt = jwt.encode(claims, private_key, algorithm="RS256")
+        signed_jwt = jwt.encode(claims, private_key_content, algorithm="RS256")
         return signed_jwt
 
     def _get_pha_access_token(self, jwt_token, icn):

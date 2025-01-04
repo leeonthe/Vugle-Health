@@ -1,27 +1,50 @@
 import yaml
-import os, re
+import os
+import re
+import boto3
 from google.cloud import documentai_v1beta3 as documentai
 from decouple import config 
+from botocore.exceptions import ClientError
 
-gcp_credentials_path = config("GOOGLE_APPLICATION_CREDENTIALS")
-processor_info_path = config("PROCESSOR_INFO")
-
-
-def load_processor_config(yaml_file_path):
+def get_secret(secret_name, region_name="us-east-2"):
     """
-    Load processor information from a YAML file.
+    Fetch a specific secret value from AWS Secrets Manager.
 
     Args:
-        yaml_file_path (str): Path to the YAML file.
+        secret_name (str): The name of the secret in Secrets Manager.
+        region_name (str): The AWS region where the secret is stored.
+
+    Returns:
+        str or dict: The secret value, either as a JSON string or plain text.
+    """
+    client = boto3.client(service_name="secretsmanager", region_name=region_name)
+    try:
+        response = client.get_secret_value(SecretId=secret_name)
+        if "SecretString" in response:
+            return json.loads(response["SecretString"])
+        elif "SecretBinary" in response:
+            return json.loads(response["SecretBinary"].decode("utf-8"))
+        return None
+    except ClientError as e:
+        print(f"Error retrieving secret {secret_name}: {e}")
+        raise e
+
+def load_processor_config(yaml_content):
+    """
+    Load processor information from a YAML string.
+
+    Args:
+        yaml_content (str): YAML content as a string.
 
     Returns:
         dict: Parsed processor configuration.
     """
-    if not os.path.exists(yaml_file_path):
-        raise FileNotFoundError(f"YAML file not found: {yaml_file_path}")
+    try:
+        return yaml.safe_load(yaml_content)
+    except yaml.YAMLError as e:
+        print(f"Error loading YAML content: {e}")
+        raise e
 
-    with open(yaml_file_path, "r") as file:
-        return yaml.safe_load(file)
 
 
 def analyze_document(file_path, processor_name):
@@ -36,8 +59,12 @@ def analyze_document(file_path, processor_name):
         str: Extracted text from the document.
     """
     try:
+        gcp_credentials = get_secret("GOOGLE_APPLICATION_CREDENTIALS")
+        processor_config_content = get_secret("PROCESSOR_INFO")
+        processor_config = load_processor_config(processor_config_content)
+
         # config
-        processor_config = load_processor_config(processor_info_path)
+        # processor_config = load_processor_config(processor_info_path)
         project_id = processor_config["gcp_project_id"]
         location = processor_config["gcp_location"]
         processor = processor_config["processors"].get(processor_name)
@@ -61,7 +88,7 @@ def analyze_document(file_path, processor_name):
 
         print(f"Detected MIME type: {mime_type}")
 
-        client = documentai.DocumentProcessorServiceClient.from_service_account_json(gcp_credentials_path)
+        client = documentai.DocumentProcessorServiceClient.from_service_account_json(gcp_credentials)
 
         with open(file_path, "rb") as f:
             document_content = f.read()
