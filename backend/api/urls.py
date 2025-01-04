@@ -14,6 +14,7 @@ from .views import (
     DexAnalysisResponse,
     test_view,
     health_check,
+    test_env,
 )
 
 urlpatterns = [
@@ -36,6 +37,8 @@ urlpatterns = [
 
     path('test/', test_view, name='test'),
     path('health/', health_check, name='health_check'),
+    path('test_env/', test_env, name='health_check'),
+
 
 
 ]

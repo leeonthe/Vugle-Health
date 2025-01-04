@@ -26,8 +26,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "fallback-secret-key")
 
-
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 

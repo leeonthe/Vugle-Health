@@ -45,6 +45,17 @@ import traceback
 def test_view(request):
     return HttpResponse("This is a test page.")
 
+def test_env(request):
+    return JsonResponse({
+        "DJANGO KEY": os.getenv("DJANGO_SECRET_KEY"),
+        "VA_CLIENT_ID": os.getenv("VA_CLIENT_ID"),
+        "VA_CLIENT_SECRET": os.getenv("VA_CLIENT_SECRET"),
+        "VA_AUTHORIZATION_URL": os.getenv("VA_AUTHORIZATION_URL"),
+        "VA_TOKEN_URL": os.getenv("VA_TOKEN_URL"),
+        "VA_REDIRECT_URI": os.getenv("VA_REDIRECT_URI"),
+    })
+
+
 def health_check(request):
     return JsonResponse({"status": "ok"})
     

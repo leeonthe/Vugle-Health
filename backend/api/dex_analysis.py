@@ -44,8 +44,12 @@ def get_gpt_api_key():
         raise Exception(f"Error loading API key: {e}")
 
 
-client = OpenAI(api_key=get_gpt_api_key())
-
+def get_openai_client():
+    """
+    Lazily initialize the OpenAI client.
+    """
+    api_key = get_gpt_api_key()
+    return OpenAI(api_key=api_key)
 
 def query_gpt(prompt, context_type="general"):
     """
@@ -55,6 +59,7 @@ def query_gpt(prompt, context_type="general"):
         - "generate_most_suitable_claim_type" for determining the most suitable VA claim type.
         - "general" (default) for a generic helpful assistant role.
     """
+    client = get_openai_client()
     try:
         # Set system role message based on context
         if context_type == "generate_potential_conditions":
