@@ -29,7 +29,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "fallback-secret-key")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['vugle-backend-v1.us-east-2.elasticbeanstalk.com', '.elasticbeanstalk.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['vugle-backend-v1.com', '.elasticbeanstalk.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -61,6 +61,7 @@ MIDDLEWARE = [
 # Use database-backed sessions
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
+SECURE_CROSS_ORIGIN_OPENER_POLICY=None
 
 # Set secure cookies for mobile and cross-origin use
 SESSION_COOKIE_NAME = 'sessionid'
@@ -68,7 +69,7 @@ SESSION_COOKIE_NAME = 'sessionid'
 # Session cookies
 SESSION_COOKIE_SAMESITE = 'None'  # Allows cross-origin requests
 SESSION_COOKIE_SECURE = True     # Set to True in production with HTTPS
-
+SECURE_SSL_REDIRECT = True
 # CSRF cookies
 CSRF_COOKIE_SAMESITE = 'None'  # Allows cross-origin requests
 CSRF_COOKIE_SECURE = True     # Set to True in production with HTTPS
@@ -78,15 +79,15 @@ MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
+    'https://vugle-backend-v1.com',
     'https://deployment2.d3uaea624sylv.amplifyapp.com',
-    'http://vugle-backend-v1.us-east-2.elasticbeanstalk.com',
     'http://localhost:8081',  # Web app frontend
     'http://localhost:19006',  # React Native Expo (mobile)
 ]
 
 CSRF_TRUSTED_ORIGINS = [
+    'https://vugle-backend-v1.com',
     'https://deployment2.d3uaea624sylv.amplifyapp.com',
-    'http://vugle-backend-v1.us-east-2.elasticbeanstalk.com',
     'http://localhost:8081',  # Web app frontend
     'http://localhost:19006',  # React Native Expo (mobile)
 ]
