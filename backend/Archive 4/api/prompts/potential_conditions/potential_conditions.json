@@ -1,0 +1,65 @@
+{
+    "chat_bubbles_id": 6,
+    "options_id": 6,
+    "chat_bubbles": [
+      {
+        "container": [
+          {
+            "type": "image",
+            "content": "app_logo",
+            "style": {
+              "width": 24,
+              "height": 24
+            }
+          }
+        ]
+      },
+      {
+        "container": [
+          {
+            "type": "text",
+            "content": "Potential related conditions",
+            "style": {
+              "color": "#323D4C",
+              "fontSize": 16,
+              "fontFamily": "SF Pro",
+              "fontWeight": "bold",
+              "lineHeight": 28,
+              "wordWrap": "break-word",
+              "marginBottom": 16
+            }
+          },
+          {
+            "type": "text",
+            "content": "Based on your health records and the condition you’ve mentioned, we’ve listed potential conditions that you might also be experiencing.",
+            "style": {
+              "color": "#323D4C",
+              "fontSize": 16,
+              "fontFamily": "SF Pro",
+              "fontWeight": "400",
+              "lineHeight": 28,
+              "wordWrap": "break-word",
+              "marginBottom": 16
+            }
+          }, 
+          {
+            "type": "link",
+            "content": "Why it's important",
+            "url": "https://example.com/more-info",
+            "style": {
+              "color": "#3182F6",
+              "textDecorationLine": "underline",
+              "marginBottom": 0
+            }
+          }
+        ]
+      }
+    ],
+    "options": [
+      {
+        "text": "Let's check",
+        "next": "pain_duration"
+      }
+    ]
+  }
+  

@@ -1,0 +1,56 @@
+{
+  "chat_bubbles_id": 8,
+  "options_id": 8,
+  "chat_bubbles": [
+    {
+      "container": [
+        {
+          "type": "image",
+          "content": "app_logo",
+          "style": {
+            "width": 24,
+            "height": 24
+          }
+        }
+      ]
+    },
+    {
+      "container": [
+        {
+          "type": "text",
+          "content": "How severe is your knee pain now?",
+          "style": {
+            "color": "#323D4C",
+            "fontSize": 16,
+            "fontFamily": "SF Pro",
+            "fontWeight": "bold",
+            "lineHeight": 28,
+            "wordWrap": "break-word",
+            "marginBottom": 16
+          }
+        },
+        {
+            "type": "text",
+            "content": "On a scale of (1 - 10)",
+            "style": {
+              "color": "#323D4C",
+              "fontSize": 16,
+              "fontFamily": "SF Pro",
+              "fontWeight": "400",
+              "lineHeight": 28,
+              "wordWrap": "break-word",
+              "marginBottom": 16
+            }
+          }
+      ]
+    }
+  ],
+  "options": [
+    {
+      "text": "SCALE_SLIDER",
+      "inputType": "painSeverity",
+      "next": "suitable_claim_type"
+    }
+  ]
+}
+
