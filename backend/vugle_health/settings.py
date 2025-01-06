@@ -61,7 +61,7 @@ MIDDLEWARE = [
 # Use database-backed sessions
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
-SECURE_CROSS_ORIGIN_OPENER_POLICY=None
+SECURE_CROSS_ORIGIN_OPENER_POLICY='same-origin'
 
 # Set secure cookies for mobile and cross-origin use
 SESSION_COOKIE_NAME = 'sessionid'

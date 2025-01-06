@@ -1,0 +1,171 @@
+{
+  "chat_bubbles_id": 1,
+  "options_id": 1,
+  "source": "start",
+  "chat_bubbles": [
+    {
+      "container": [
+        {
+          "type": "image",
+          "content": "app_logo",
+          "style": {
+            "width": 24,
+            "height": 24
+          }
+        }
+      ]
+    },
+    {
+      "container": [
+        {
+          "type": "text",
+          "content": "Nice to meet you, {user_name}. 😊",
+          "style": {
+            "color": "#323D4C",
+            "fontSize": 16,
+            "fontFamily": "SF Pro",
+            "fontWeight": "400",
+            "lineHeight": 28,
+            "wordWrap": "break-word",
+            "marginBottom": 8
+          }
+        }
+      ]
+    },
+    {
+      "container": [
+        {
+          "type": "text",
+          "content": "Retrieving Your Files",
+          "style": {
+            "color": "#323D4C",
+            "fontSize": 16,
+            "fontFamily": "SF Pro",
+            "fontWeight": "bold",
+            "lineHeight": 28,
+            "wordWrap": "break-word",
+            
+            "marginBottom": 16
+          }
+        },
+        {
+          "type": "text",
+          "content": "Before we begin, bear with me for a second to quickly pull your records from VA. It will help us evaluate the best approach for your claims.",
+          "style": {
+            "color": "#323D4C",
+            "fontSize": 16,
+            "fontFamily": "SF Pro",
+            "fontWeight": "400",
+            "lineHeight": 28,
+            "wordWrap": "break-word",
+            "marginBottom": 16
+          }
+        },
+        {
+          "type": "link",
+          "content": "View our privacy policy",
+          "url": "https://example.com/more-info",
+          "style": {
+            "color": "#3182F6",
+            "textDecorationLine": "underline",
+            "marginBottom": 0
+          }
+        }
+      ]
+    },
+    {
+      "container": [
+        {
+          "type": "group",
+          "content": [
+            {
+              "type": "text",
+              "content": "Retrieving STRs...",
+              "updated": "STRs",
+              "style": {
+                "color": "#323D4C",
+                "fontSize": 16,
+                "fontFamily": "SF Pro",
+                "fontWeight": "400",
+                "lineHeight": 28,
+                "marginBottom": 8
+              }
+            },
+            {
+              "type": "animation",
+              "content": "circle-loading",
+              "condition": "usePatientHealth.isLoading"
+            },
+            {
+              "type": "loadingImage",
+              "content": "green-check",
+              "condition": "usePatientHealth.isSuccess"
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "content": [
+            {
+              "type": "text",
+              "content": "Retrieving Medical Records...",
+              "updated": "Medical Records",
+              "style": {
+                "color": "#323D4C",
+                "fontSize": 16,
+                "fontFamily": "SF Pro",
+                "fontWeight": "400",
+                "lineHeight": 28,
+                "marginRight": 8
+              }
+            },
+            {
+              "type": "animation",
+              "content": "circle-loading",
+              "condition": "usePatientHealth.isLoading"
+            },
+            {
+              "type": "loadingImage",
+              "content": "green-check",
+              "condition": "usePatientHealth.isSuccess"
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "content": [
+            {
+              "type": "text",
+              "content": "Retrieving Previous Claims...",
+              "updated": "Previous Claims",
+              "style": {
+                "color": "#323D4C",
+                "fontSize": 16,
+                "fontFamily": "SF Pro",
+                "fontWeight": "400",
+                "lineHeight": 28,
+                "marginBottom": 8
+              }
+            },
+            {
+              "type": "animation",
+              "content": "circle-loading",
+              "condition": "usePatientHealth.isLoading"
+            },
+            {
+              "type": "loadingImage",
+              "content": "green-check",
+              "condition": "usePatientHealth.isSuccess"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "options": [
+    {
+      "text": "NONE",
+      "next": "upload_dd214"
+    }
+  ]
+}

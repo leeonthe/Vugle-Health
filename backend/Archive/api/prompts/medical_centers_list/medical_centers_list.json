@@ -1,0 +1,55 @@
+{
+    "chat_bubbles_id": 13,
+    "options_id": 13,
+    "chat_bubbles": [
+      {
+        "container": [
+          {
+            "type": "image",
+            "content": "app_logo",
+            "style": {
+              "width": 24,
+              "height": 24
+            }
+          }
+        ]
+      },
+      {
+        "container": [
+          {
+            "type": "text",
+            "content": "List of VA medicals near by you",
+            "style": {
+              "color": "#323D4C",
+              "fontSize": 16,
+              "fontFamily": "SF Pro",
+              "fontWeight": "bold",
+              "lineHeight": 28,
+              "wordWrap": "break-word",
+              "marginBottom": 16
+            }
+          },
+          {
+            "type": "text",
+            "content": "Here you go! Some centers offer virtual option as well. Please check the availability for each centers carefully.",
+            "style": {
+              "color": "#323D4C",
+              "fontSize": 16,
+              "fontFamily": "SF Pro",
+              "fontWeight": "400",
+              "lineHeight": 28,
+              "wordWrap": "break-word",
+              "marginBottom": 16
+            }
+          }
+        ]
+      }
+    ],
+    "options": [
+      {
+        "text": "View medical centers",
+        "next": "closing"
+      }
+    ]
+  }
+  
