@@ -49,7 +49,7 @@
 ### Tech Stack
 - **Backend:** `Django (Python)`
 - **Frontend:** `React Native Expo (TypeScript)`
-- **Deployment:** `AWS Elastic Beanstalk (Backend)`, `AWS Amplify (Frontend)` 
+- **Deployment:** `AWS Elastic Beanstalk`, `AWS EC2`, `AWS Amplify`
 
 ### System Architecture
 The system is designed with a **cohesive yet decoupled architecture** for scalability, maintainability, and a clear separation of concerns.
@@ -69,6 +69,15 @@ The system is designed with a **cohesive yet decoupled architecture** for scalab
 - **API Integration**: `Communicates` with the `backend` to **store** user inputs, **retrieve** specific data through `HTTPS API` `endpoints`.
 - **Chatbot Interface**: Implements a structured and interactive chatbot, `Dex`, to **guide** users through the `process` of `disability claims`. `Dex` dynamically **renders** elements such as `text prompts`, `images`, and interactive `options` based on **JSON-driven configuration**.
 - **State Management**: Manages `Dex` **state** and `user` **interactions** with `useReducer` to `handle` the **chat flow** and `maintain` a structured **history of user responses**.
+
+#### Deployment
+
+Frontend Deployment
+- `AWS Amplify`: Used for hosting and managing the React Native frontend with deployment pipelines. 
+
+Backend Deployment
+- `AWS Elastic Beanstalk`: Manages the deployment of the Django backend to support stateful applications.
+- `AWS EC2`: Virtual servers provisioned and managed by Elastic Beanstalk to run backend services.
 
 
 ## Getting Started
