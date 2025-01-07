@@ -43,6 +43,8 @@ import time
 import uuid
 import traceback
 import logging
+import urllib.parse
+
 
 logger = logging.getLogger(__name__)
 
@@ -235,22 +237,29 @@ class OAuthHandler:
         except InvalidTokenError as e:
             print(f"Token validation error: {e}")
             return redirect('/error')
+
+        # Redirect to the frontend with the tokens in secure cookies
+        # response = HttpResponseRedirect('https://deploymentfrontend.dsy5xilsqi40y.amplifyapp.com/Welcome')  # Redirecting to HTTPS frontend
+        # Setting cookies with secure and httponly flags
+        # response = redirect('https://deploymentfrontend.dsy5xilsqi40y.amplifyapp.com/Welcome')
+        # response.set_cookie('access_token', access_token, httponly=True, secure=True, samesite='None', max_age=3600)
+        # response.set_cookie('id_token', id_token, httponly=True, secure=True, samesite='None', max_age=3600)
         
+        redirect_url = f'https://deploymentfrontend.dsy5xilsqi40y.amplifyapp.com/Welcome?access_token={urllib.parse.quote(access_token)}&id_token={urllib.parse.quote(id_token)}'
+        response = HttpResponseRedirect(redirect_url)
         if platform == 'web':
         # Redirect web users directly
             print("WEB CALLED")
-        
-            # return redirect('http://localhost:8081/Welcome')
-            # return redirect(f'http://localhost:8081/Welcome?access_token={access_token}&id_token={id_token}')
-            return redirect(f'https://deploymentfrontend.dsy5xilsqi40y.amplifyapp.com/Welcome?access_token={access_token}&id_token={id_token}')
+            return response
 
 
         else:
             print("APP CALLED") 
             # return redirect(f'http://localhost:8081/Welcome?access_token={access_token}&id_token={id_token}')
-            return redirect(f'https://deploymentfrontend.dsy5xilsqi40y.amplifyapp.com/Welcome?access_token={access_token}&id_token={id_token}')
+            # return redirect(f'https://deploymentfrontend.dsy5xilsqi40y.amplifyapp.com/Welcome?access_token={access_token}&id_token={id_token}')
+            return response
 
-    #    
+
 
 
 def oauth_login(request):

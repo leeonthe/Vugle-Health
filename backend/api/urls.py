@@ -39,7 +39,7 @@ urlpatterns = [
     path('test/', test_view, name='test'),
     path('health/', health_check, name='health_check'),
     path('test_env/', test_env, name='health_check'),
-    path('get_tokens/', get_token, name='get_tokens'),
+    path('get_tokens/', get_tokens, name='get_tokens'),
 
 
 ]
