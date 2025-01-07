@@ -134,7 +134,21 @@ class OAuthHandler:
             print("Session data stored after oauth_login:", dict(request.session.items()))
             return redirect(oauth_url)
         except Exception as e:
-            return HttpResponseServerError("WTF", Exception)
+            logger.error(f"Error in oauth_login: {str(e)}", exc_info=True)
+
+            # Return a detailed error only in DEBUG mode
+            if settings.DEBUG:
+                error_message = {
+                    "error": "An error occurred during OAuth login.",
+                    "details": str(e),  # Include detailed exception message
+                }
+            else:
+                error_message = {
+                    "error": "An error occurred during OAuth login. Please try again later.",
+                }
+
+            return JsonResponse(error_message, status=500)
+
 
     def oauth_callback(self, request):
         print("Session data in callback:", dict(request.session.items()))
