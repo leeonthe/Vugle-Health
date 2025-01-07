@@ -246,11 +246,11 @@ class OAuthHandler:
         # response.set_cookie('id_token', id_token, httponly=True, secure=True, samesite='None', max_age=3600)
         
         redirect_url = f'https://deploymentfrontend.dsy5xilsqi40y.amplifyapp.com/Welcome?access_token={urllib.parse.quote(access_token)}&id_token={urllib.parse.quote(id_token)}'
-        response = HttpResponseRedirect(redirect_url)
+        # response = HttpResponseRedirect(redirect_url)
         if platform == 'web':
         # Redirect web users directly
             print("WEB CALLED")
-            return response
+            return redirect(redirect_url)
 
 
         else:
