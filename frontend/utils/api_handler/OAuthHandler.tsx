@@ -7,8 +7,8 @@ export class OAuthHandler {
     setShowMobileView: Function,
     setAuthUrl: Function
   ) {
-    // const loginUrl = `${this.backendUrl}/api/auth/login?platform=${platform}`;
-    const loginUrl = `${this.backendUrl}/api/test/`;
+    const loginUrl = `${this.backendUrl}/api/auth/login?platform=${platform}`;
+    // const loginUrl = `${this.backendUrl}/api/test/`;
 
 
     try {
