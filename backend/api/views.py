@@ -261,6 +261,25 @@ def oauth_callback(request):
     handler = OAuthHandler()
     return handler.oauth_callback(request)
 
+
+def get_tokens(request):
+    """
+    Returns the access_token and id_token from the session for authenticated users.
+    """
+    access_token = request.session.get('access_token')
+    id_token = request.session.get('id_token')
+
+    if not access_token or not id_token:
+        return JsonResponse(
+            {"error": "Tokens not found. Please authenticate again."},
+            status=404
+        )
+
+    return JsonResponse({
+        "access_token": access_token,
+        "id_token": id_token
+    }, status=200)
+
  # Exempt CSRF for mobile clients
 @method_decorator(csrf_exempt, name='dispatch')
 class UserInfoView(View):
