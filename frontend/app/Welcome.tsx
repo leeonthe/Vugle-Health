@@ -83,7 +83,7 @@ const WelcomePage: React.FC<UserStartScreenProps> = ({ route }) => {
 
             // Clean the URL after processing tokens
             const currentPath = window.location.pathname;
-            const cleanUrl = ${window.location.origin}${currentPath};
+            const cleanUrl = `${window.location.origin}${currentPath}`;
             window.history.replaceState({}, document.title, cleanUrl);
           } catch (error) {
             console.error("Error storing tokens for web users:", error);
