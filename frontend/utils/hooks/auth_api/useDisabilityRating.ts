@@ -46,7 +46,7 @@ const fetchDisabilityRating = async (): Promise<DisabilityRatingResponse> => {
 
     }
   
-    const response = await fetch('http://localhost:8000/api/auth/disability-rating/', {
+    const response = await fetch('https://vugle-backend-v1.com/api/auth/disability-rating/', {
       method: 'GET',
       headers: {
         ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),

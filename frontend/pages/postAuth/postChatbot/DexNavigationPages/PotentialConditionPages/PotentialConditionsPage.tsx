@@ -31,7 +31,7 @@ const PotentialConditionsPage = ({ route }) => {
     if (addedConditions.length > 0) {
       try {
         await makeRequest(
-          "http://localhost:8000/api/dex/potential_conditions/",
+          "https://vugle-backend-v1.com/api/dex/potential_conditions/",
           {
             conditions: addedConditions,
           }

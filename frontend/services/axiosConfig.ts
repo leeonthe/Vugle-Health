@@ -2,13 +2,13 @@ import axios from 'axios';
 
 // Fetch CSRF token
 const fetchCSRFToken = async () => {
-  const response = await axios.get('http://localhost:8000/api/csrf/');
+  const response = await axios.get('https://vugle-backend-v1.com/api/csrf/');
   return response.data.csrfToken;
 };
 
 // Axios instance with CSRF token
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api/',
+  baseURL: 'https://vugle-backend-v1.com/api/',
   withCredentials: true, // Include cookies in requests
 });
 

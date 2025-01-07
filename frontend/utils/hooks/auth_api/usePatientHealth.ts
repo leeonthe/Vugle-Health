@@ -91,7 +91,7 @@ const fetchPatientHealth = async (icn: string): Promise<PatientHealthResponse> =
     throw new Error('Access token not found');
   }
 
-  const response = await fetch(`http://localhost:8000/api/auth/patient-health/?patient=${icn}`, {
+  const response = await fetch(`https://vugle-backend-v1.com/api/auth/patient-health/?patient=${icn}`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${accessToken}`,

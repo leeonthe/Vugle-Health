@@ -75,7 +75,7 @@ const fetchEligibleLetters = async (icn: string): Promise<EligibleLettersRespons
     throw new Error('Access token not found');
   }
 
-  const response = await fetch(`http://localhost:8000/api/auth/eligible-letters/?icn=${icn}`, {
+  const response = await fetch(`https://vugle-backend-v1.com/api/auth/eligible-letters/?icn=${icn}`, {
     method: 'GET',
     headers: {
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),

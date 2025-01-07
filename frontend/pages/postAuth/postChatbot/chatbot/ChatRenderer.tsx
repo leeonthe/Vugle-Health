@@ -136,7 +136,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
             try {
               // Send POST request to backend
               const response = await axios.post(
-                "http://localhost:8000/api/dex/upload_dd214/",
+                "https://vugle-backend-v1.com/api/dex/upload_dd214/",
                 formData,
                 {
                   headers: {
@@ -186,7 +186,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
           try {
             // Send POST request to backend
             const response = await axios.post(
-              "http://localhost:8000/api/dex/upload_dd214/",
+              "https://vugle-backend-v1.com/api/dex/upload_dd214/",
               formData,
               {
                 headers: {
@@ -211,7 +211,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
 
   const handleConditionType = async (typedText: string) => {
     try {
-      await makeRequest("http://localhost:8000/api/dex/store_user_input", {
+      await makeRequest("https://vugle-backend-v1.com/api/dex/store_user_input", {
         userInput: typedText,
         inputType: "conditionType",
       });
@@ -224,7 +224,7 @@ const ChatRenderer: React.FC<ChatProps> = ({
 
   const handlePainDuration = async (typedText: string) => {
     try {
-      await makeRequest("http://localhost:8000/api/dex/store_user_input", {
+      await makeRequest("https://vugle-backend-v1.com/api/dex/store_user_input", {
         userInput: typedText,
         inputType: "painDuration",
       });

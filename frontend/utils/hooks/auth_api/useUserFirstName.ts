@@ -16,7 +16,7 @@ const fetchUserInfo = async (): Promise<UserInfoResponse> => {
     console.error('Error retrieving ID token:', error);
   }
 
-  const response = await fetch('http://localhost:8000/api/auth/user-info/', {
+  const response = await fetch('https://vugle-backend-v1.com/api/auth/user-info/', {
     method: 'GET',
     headers: {
       ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),

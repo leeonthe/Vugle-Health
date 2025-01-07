@@ -3,7 +3,7 @@ import { ChatBubble } from "../../interfaces/promptTypes";
 
 export const useChat = () => {
   const queryClient = useQueryClient();
-  const backendUrl = "http://localhost:8000/api/dex/prompt/";
+  const backendUrl = "https://vugle-backend-v1.com/api/dex/prompt/";
 
   const fetchPrompt = async (fileName: string): Promise<ChatBubble> => {
     const response = await fetch(`${backendUrl}${fileName}/`); // fileName includes subfolders
