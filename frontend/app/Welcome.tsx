@@ -63,55 +63,41 @@ const queryClient = new QueryClient();
 
 const WelcomePage: React.FC<UserStartScreenProps> = ({ route }) => {
   const { isDesktop } = useDevice();
-  const { fetchTokens, accessToken, idToken, error, loading } = useTokens();
+
   // 1011537977V693883
   useEffect(() => {
     const handleWebTokens = async () => {
       // Only handle this for web users
       if (isDesktop) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const accessToken = urlParams.get("access_token");
+        const idToken = urlParams.get("id_token");
 
-
-        try {
-          await fetchTokens(); // Calls the backend to fetch tokens
-          if (accessToken && idToken) {
+        if (accessToken && idToken) {
+          try {
+            // Store tokens in AsyncStorage
             await AsyncStorage.setItem("access_token", accessToken);
             await AsyncStorage.setItem("id_token", idToken);
-          } else if (error) {
-            console.error("Error fetching tokens:", error);
+
+
+
+            // Clean the URL after processing tokens
+            const currentPath = window.location.pathname;
+            const cleanUrl = ${window.location.origin}${currentPath};
+            window.history.replaceState({}, document.title, cleanUrl);
+          } catch (error) {
+            console.error("Error storing tokens for web users:", error);
           }
-        } catch (err) {
-          console.error("Error saving tokens for non-web users:", err);
+        } else {
+          console.warn(
+            "Access Token or ID Token not found in the URL for web."
+          );
         }
-
-        // const urlParams = new URLSearchParams(window.location.search);
-        // const accessToken = urlParams.get("access_token");
-        // const idToken = urlParams.get("id_token");
-
-        // if (accessToken && idToken) {
-        //   try {
-        //     // Store tokens in AsyncStorage
-        //     await AsyncStorage.setItem("access_token", accessToken);
-        //     await AsyncStorage.setItem("id_token", idToken);
-
-
-
-        //     // Clean the URL after processing tokens
-        //     const currentPath = window.location.pathname;
-        //     const cleanUrl = `${window.location.origin}${currentPath}`;
-        //     window.history.replaceState({}, document.title, cleanUrl);
-        //   } catch (error) {
-        //     console.error("Error storing tokens for web users:", error);
-        //   }
-        // } else {
-        //   console.warn(
-        //     "Access Token or ID Token not found in the URL for web."
-        //   );
-        // }
       }
     };
 
     handleWebTokens();
-  }, [isDesktop, fetchTokens, accessToken, idToken, error]);
+  }, [isDesktop]);
 
   const navigation = useNavigation<NavigationProp>();
   const {
