@@ -17,6 +17,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useDevice } from "../utils/hooks/global/useDevice";
 import { useUserFirstName } from "../utils/hooks/auth_api/useUserFirstName";
 import { useNavigation } from "@react-navigation/native";
+import useTokens  from "../utils/hooks/auth_api/useTokens";
 
 // SVG
 import DischargeStatus from "../assets/images/postAuth/WelcomePage/Discharge_status.svg";
@@ -62,41 +63,55 @@ const queryClient = new QueryClient();
 
 const WelcomePage: React.FC<UserStartScreenProps> = ({ route }) => {
   const { isDesktop } = useDevice();
-
+  const { fetchTokens, accessToken, idToken, error, loading } = useTokens();
   // 1011537977V693883
   useEffect(() => {
     const handleWebTokens = async () => {
       // Only handle this for web users
       if (isDesktop) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const accessToken = urlParams.get("access_token");
-        const idToken = urlParams.get("id_token");
 
-        if (accessToken && idToken) {
-          try {
-            // Store tokens in AsyncStorage
+
+        try {
+          await fetchTokens(); // Calls the backend to fetch tokens
+          if (accessToken && idToken) {
             await AsyncStorage.setItem("access_token", accessToken);
             await AsyncStorage.setItem("id_token", idToken);
-
-
-
-            // Clean the URL after processing tokens
-            const currentPath = window.location.pathname;
-            const cleanUrl = `${window.location.origin}${currentPath}`;
-            window.history.replaceState({}, document.title, cleanUrl);
-          } catch (error) {
-            console.error("Error storing tokens for web users:", error);
+          } else if (error) {
+            console.error("Error fetching tokens:", error);
           }
-        } else {
-          console.warn(
-            "Access Token or ID Token not found in the URL for web."
-          );
+        } catch (err) {
+          console.error("Error saving tokens for non-web users:", err);
         }
+
+        // const urlParams = new URLSearchParams(window.location.search);
+        // const accessToken = urlParams.get("access_token");
+        // const idToken = urlParams.get("id_token");
+
+        // if (accessToken && idToken) {
+        //   try {
+        //     // Store tokens in AsyncStorage
+        //     await AsyncStorage.setItem("access_token", accessToken);
+        //     await AsyncStorage.setItem("id_token", idToken);
+
+
+
+        //     // Clean the URL after processing tokens
+        //     const currentPath = window.location.pathname;
+        //     const cleanUrl = `${window.location.origin}${currentPath}`;
+        //     window.history.replaceState({}, document.title, cleanUrl);
+        //   } catch (error) {
+        //     console.error("Error storing tokens for web users:", error);
+        //   }
+        // } else {
+        //   console.warn(
+        //     "Access Token or ID Token not found in the URL for web."
+        //   );
+        // }
       }
     };
 
     handleWebTokens();
-  }, [isDesktop]);
+  }, [isDesktop, fetchTokens, accessToken, idToken, error]);
 
   const navigation = useNavigation<NavigationProp>();
   const {
