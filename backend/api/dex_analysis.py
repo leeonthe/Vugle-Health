@@ -38,20 +38,18 @@ def get_gpt_api_key():
         str: The GPT API key.
     """
     try:
-        # Fetch the parent secret
         secret_data = get_secret("skrt/vugle-health/skrt")
-        
-        # Extract the GPT_API_KEY key and parse its JSON content
         if "GPT_API_KEY" in secret_data:
-            gpt_api_key_data = json.loads(secret_data["GPT_API_KEY"])  # Parse JSON inside GPT_API_KEY
+            gpt_api_key_data = json.loads(secret_data["GPT_API_KEY"])
             if "gpt_api_key" in gpt_api_key_data:
                 return gpt_api_key_data["gpt_api_key"]
             else:
-                raise KeyError("gpt_api_key field not found in the GPT_API_KEY JSON content.")
+                raise KeyError("gpt_api_key field not found in GPT_API_KEY JSON content.")
         else:
             raise KeyError("GPT_API_KEY not found in the secret.")
     except Exception as e:
-        raise Exception(f"Error loading GPT API key: {e}")
+        print(f"Error loading GPT API key: {e}")
+        raise
 
 
 def get_openai_client():
@@ -84,8 +82,6 @@ def query_gpt(prompt, context_type="general"):
             system_message = "You are an expert in VA disability claims and can analyze user data to recommend the most suitable claim type."
             a_model="gpt-4"
             a_max_tokens = 700
-
-
         else:
             system_message = "You are a helpful assistant."
             a_model="gpt-3.5-turbo"
@@ -102,10 +98,11 @@ def query_gpt(prompt, context_type="general"):
             max_tokens=a_max_tokens,
             temperature=0.4
         )
+
         return response.choices[0].message.content.strip()
     except Exception as e:
         print(f"Error querying GPT: {e}")
-        return ""
+        raise
 
 def generate_potential_conditions(user_input):
     """
@@ -123,8 +120,16 @@ def generate_potential_conditions(user_input):
     Separate each condition with a blank line.
     """
     potential_conditions = query_gpt(prompt, context_type="generate_potential_conditions")
-    print("GPT Potential response", potential_conditions)
-    return potential_conditions.split('\n\n')
+    print("GPT Potential response:", potential_conditions)
+    try:
+        parsed_conditions = potential_conditions.split('\n\n')
+        if not parsed_conditions or len(parsed_conditions) < 4:
+            raise ValueError("Insufficient conditions generated")
+        return parsed_conditions
+    except Exception as e:
+        print(f"Error parsing GPT response: {e}")
+        raise
+    # return potential_conditions.split('\n\n')
 
 @staticmethod
 @csrf_exempt

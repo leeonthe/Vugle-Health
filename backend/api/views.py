@@ -983,6 +983,7 @@ class DexAnalysisResponse():
     def generate_most_suitable_claim_response(request):
         try:
             print("Generating GPT response for suitable claim type...")
+            print("REQUEST IN generate_most_suitable_claim_response: ", request)
             gpt_response = generate_most_suitable_claim_type(request)
             # gpt_response = test_generate_most_suitable_claim_type()
             print("GPT Response:", gpt_response)
