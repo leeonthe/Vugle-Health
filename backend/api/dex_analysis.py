@@ -1,5 +1,7 @@
 import yaml
 import boto3
+import json
+
 from openai import OpenAI
 from decouple import config
 from django.views.decorators.csrf import csrf_exempt
@@ -23,9 +25,9 @@ def get_secret(secret_name):
     try:
         response = client.get_secret_value(SecretId=secret_name)
         if "SecretString" in response:
-            return yaml.safe_load(response["SecretString"])  # Parse the SecretString into a dictionary
+            return json.loads(response["SecretString"])  # Parse the SecretString into a dictionary
         elif "SecretBinary" in response:
-            return yaml.safe_load(response["SecretBinary"].decode("utf-8"))
+            return json.loads(response["SecretBinary"].decode("utf-8"))
     except ClientError as e:
         raise Exception(f"Error retrieving secret {secret_name}: {e}")
 
@@ -40,11 +42,11 @@ def get_gpt_api_key():
     try:
         secret_data = get_secret("skrt/vugle-health/skrt")
         if "GPT_API_KEY" in secret_data:
-            gpt_api_key_data = json.loads(secret_data["GPT_API_KEY"])
+            gpt_api_key_data = json.loads(secret_data["GPT_API_KEY"])  # Parse JSON inside GPT_API_KEY
             if "gpt_api_key" in gpt_api_key_data:
-                return gpt_api_key_data["gpt_api_key"]
+                return gpt_api_key_data["gpt_api_key"]  # Extract the actual API key
             else:
-                raise KeyError("gpt_api_key field not found in GPT_API_KEY JSON content.")
+                raise KeyError("gpt_api_key not found in GPT_API_KEY JSON content.")
         else:
             raise KeyError("GPT_API_KEY not found in the secret.")
     except Exception as e:
@@ -119,12 +121,11 @@ def generate_potential_conditions(user_input):
     Ensure the response includes a minimum of 4 lists of conditions, each with a concise description that fits within the token limit of 300.
     Separate each condition with a blank line.
     """
-    potential_conditions = query_gpt(prompt, context_type="generate_potential_conditions")
-    print("GPT Potential response:", potential_conditions)
+    print("generate_potential_conditions called")
     try:
+        potential_conditions = query_gpt(prompt, context_type="generate_potential_conditions")
+        print("GPT response in generate_potential_conditions:", potential_conditions)
         parsed_conditions = potential_conditions.split('\n\n')
-        if not parsed_conditions or len(parsed_conditions) < 4:
-            raise ValueError("Insufficient conditions generated")
         return parsed_conditions
     except Exception as e:
         print(f"Error parsing GPT response: {e}")
