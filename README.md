@@ -14,6 +14,7 @@
 ## Overview
 `Vugle` is an `AI-integrated application` designed to provide **personalized financial assistance** and **healthcare benefit support** to **_active duty U.S. military personnel and veterans._** By leveraging **_AI technology,_** Vugle `educates veterans on their entitlements`, `simplifies the benefits application process`, and `expedites claim submissions`, ensuring veterans **receive the financial and health benefits they deserve**.
 
+[Try Vugle Prototype](https://deploymentfrontend.dsy5xilsqi40y.amplifyapp.com)
 ## Problem Statement 
 `Veterans` in the U.S. face `significant barriers` when accessing their `benefits`: 
 - **_Cumbersome Application Processes_**
@@ -81,6 +82,11 @@ Backend Deployment
 
 
 ## Getting Started
+
+For `Web` users, use the following link:
+[Web Application](https://deploymentfrontend.dsy5xilsqi40y.amplifyapp.com)
+
+For `Mobile` users, use the following link:
 
 ## Accessing the Application
 
