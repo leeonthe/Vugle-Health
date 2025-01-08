@@ -2,10 +2,10 @@
 
 ## Table of Contents
 - [Overview](#overview)
-- [Problem Statement](#problem-statement)
-- [Mission](#mission)
-- [Features](#features)
-- [Technical Details](#technical-details)
+  - [Problem Statement](#problem-statement)
+  - [Mission](#mission)
+  - [Features](#features)
+  - [Technical Details](#technical-details)
 - [Getting Started](#getting-started)
   - [Accessing the Application](#accessing-the-application)
   - [Diagnosing Your Medical Conditions with Dex](#diagnosing-your-medical-conditions-with-dex)
