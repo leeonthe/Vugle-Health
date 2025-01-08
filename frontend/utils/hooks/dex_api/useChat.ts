@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChatBubble } from "../../interfaces/promptTypes";
+import axios from 'axios';
 
 export const useChat = () => {
   const queryClient = useQueryClient();
@@ -12,25 +13,31 @@ export const useChat = () => {
     }
     return response.json();
   };
-
   const sendSelection = async (
     currentFile: string,
     userSelection: string
   ): Promise<ChatBubble> => {
-    const response = await fetch(backendUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        current_file: currentFile,
-        user_selection: userSelection,
-      }), // e.g., current_file: 'start/start'
-    });
-    if (!response.ok) {
-      throw new Error(`Error processing selection: ${response.statusText}`);
+    try {
+      const response = await axios.post(
+        backendUrl,
+        {
+          current_file: currentFile,
+          user_selection: userSelection,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true, 
+        }
+      );
+  
+      return response.data; 
+    } catch (error: any) {
+      throw new Error(
+        `Error processing selection: ${error.response?.statusText || error.message}`
+      );
     }
-    return response.json();
   };
 
   const useFetchPrompt = (fileName: string) =>
