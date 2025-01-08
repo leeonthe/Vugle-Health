@@ -424,7 +424,7 @@ def get_secret(secret_name):
     Returns:
         dict or str: The secret value (parsed JSON or plain string).
     """
-    region_name = "us-east-2"  # Replace with your AWS region
+    region_name = "us-east-2" 
     client = boto3.client(service_name="secretsmanager", region_name=region_name)
 
     try:

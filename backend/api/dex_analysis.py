@@ -14,39 +14,52 @@ def get_secret(secret_name):
         secret_name (str): The name of the secret in Secrets Manager.
 
     Returns:
-        str: The secret value as a string.
+        dict: The secret value as a dictionary (parsed from JSON).
     """
-    region_name = "us-east-2" 
+    region_name = "us-east-2"
     session = boto3.session.Session()
     client = session.client(service_name="secretsmanager", region_name=region_name)
 
     try:
         response = client.get_secret_value(SecretId=secret_name)
         if "SecretString" in response:
-            return response["SecretString"]
+            return yaml.safe_load(response["SecretString"])  # Parse the SecretString into a dictionary
         elif "SecretBinary" in response:
-            return response["SecretBinary"].decode("utf-8")
+            return yaml.safe_load(response["SecretBinary"].decode("utf-8"))
     except ClientError as e:
         raise Exception(f"Error retrieving secret {secret_name}: {e}")
 
 
 def get_gpt_api_key():
     """
-    Load the GPT API key from the specified YAML file.
+    Load the GPT API key from the `skrt/vugle-health/skrt` secret.
+    
+    Returns:
+        str: The GPT API key.
     """
     try:
-        yaml_content = get_secret("GPT_API_KEY")
-        config = yaml.safe_load(yaml_content)
-        return config["gpt_api_key"]
-    except KeyError:
-        raise KeyError("gpt_api_key not found in the YAML content.")
+        # Fetch the parent secret
+        secret_data = get_secret("skrt/vugle-health/skrt")
+        
+        # Extract the GPT_API_KEY key and parse its JSON content
+        if "GPT_API_KEY" in secret_data:
+            gpt_api_key_data = json.loads(secret_data["GPT_API_KEY"])  # Parse JSON inside GPT_API_KEY
+            if "gpt_api_key" in gpt_api_key_data:
+                return gpt_api_key_data["gpt_api_key"]
+            else:
+                raise KeyError("gpt_api_key field not found in the GPT_API_KEY JSON content.")
+        else:
+            raise KeyError("GPT_API_KEY not found in the secret.")
     except Exception as e:
-        raise Exception(f"Error loading API key: {e}")
+        raise Exception(f"Error loading GPT API key: {e}")
 
 
 def get_openai_client():
     """
     Lazily initialize the OpenAI client.
+    
+    Returns:
+        OpenAI: The OpenAI client instance.
     """
     api_key = get_gpt_api_key()
     return OpenAI(api_key=api_key)
@@ -60,6 +73,7 @@ def query_gpt(prompt, context_type="general"):
         - "general" (default) for a generic helpful assistant role.
     """
     client = get_openai_client()
+    print("CLIENT CALLED")
     try:
         # Set system role message based on context
         if context_type == "generate_potential_conditions":
@@ -109,6 +123,7 @@ def generate_potential_conditions(user_input):
     Separate each condition with a blank line.
     """
     potential_conditions = query_gpt(prompt, context_type="generate_potential_conditions")
+    print("GPT Potential response", potential_conditions)
     return potential_conditions.split('\n\n')
 
 @staticmethod
@@ -247,6 +262,32 @@ def test_generate_most_suitable_claim_type():
     return testResponse
 
 if __name__ == "__main__":
-    user_input = "I have trouble in sleeping."
-    conditions = test_generate_most_suitable_claim_type()
-    print(conditions)
+    # user_input = "I have trouble in sleeping."
+    # conditions = test_generate_most_suitable_claim_type()
+    # print(conditions)
+    # Test fetching GPT API key
+    try:
+        print("Testing: Fetching GPT API Key...")
+        gpt_api_key = get_gpt_api_key()
+        print(f"GPT API Key successfully retrieved: {gpt_api_key}")
+    except Exception as e:
+        print(f"Error retrieving GPT API Key: {e}")
+
+    # Test fetching the entire secret
+    try:
+        print("\nTesting: Fetching entire secret 'skrt/vugle-health/skrt'...")
+        secret_data = get_secret("skrt/vugle-health/skrt")
+        print("Secret successfully retrieved:")
+        print(secret_data)
+    except Exception as e:
+        print(f"Error retrieving the secret: {e}")
+
+    # Test initializing the OpenAI client
+    try:
+        print("\nTesting: Initializing OpenAI client...")
+        openai_client = get_openai_client()
+        print("OpenAI client successfully initialized.")
+        print(openai_client)
+    except Exception as e:
+        print(f"Error initializing OpenAI client: {e}")
+

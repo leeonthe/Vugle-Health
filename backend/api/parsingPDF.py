@@ -1,12 +1,12 @@
 import yaml
+import json
 import os
 import re
 import boto3
 from google.cloud import documentai_v1beta3 as documentai
 from decouple import config 
 from botocore.exceptions import ClientError
-
-def get_secret(secret_name, region_name="us-east-2"):
+def get_secret(secret_name):
     """
     Fetch a specific secret value from AWS Secrets Manager.
 
@@ -18,6 +18,7 @@ def get_secret(secret_name, region_name="us-east-2"):
         str or dict: The secret value, either as a JSON string or plain text.
     """
     session = boto3.session.Session()
+    region_name="us-east-2"
     client = session.client(service_name="secretsmanager", region_name=region_name)
     try:
         response = client.get_secret_value(SecretId=secret_name)
@@ -60,27 +61,29 @@ def analyze_document(file_path, processor_name):
         str: Extracted text from the document.
     """
     try:
-        gcp_credentials = get_secret("GOOGLE_APPLICATION_CREDENTIALS")
-        processor_config_content = get_secret("PROCESSOR_INFO")
-        processor_config = load_processor_config(processor_config_content)
+        # Fetch the full secret containing all key-value pairs
+        secret_data = get_secret("skrt/vugle-health/skrt")
 
-        # config
-        # processor_config = load_processor_config(processor_info_path)
+        # Extract individual keys
+        gcp_credentials = json.loads(secret_data["GOOGLE_APPLICATION_CREDENTIALS"])  # Parse JSON for GCP credentials
+        processor_config = json.loads(secret_data["PROCESSOR_INFO"])  # Parse YAML for processors
+
+        # Extract processor details
         project_id = processor_config["gcp_project_id"]
         location = processor_config["gcp_location"]
         processor = processor_config["processors"].get(processor_name)
 
         if not processor:
-            raise ValueError(f"Processor '{processor_name}' not found in configuration.")
+            raise ValueError(f"Processor '{processor_name}' not found. Available processors: {list(processor_config['processors'].keys())}")
 
         processor_id = processor["processor_id"]
 
         print(f"Processing file: {file_path} using processor: {processor['name']}")
 
-        # Determine MIME type based on file extension
+        # Determine MIME type
         if file_path.lower().endswith(".pdf"):
             mime_type = "application/pdf"
-        elif file_path.lower().endswith(".jpg") or file_path.lower().endswith(".jpeg"):
+        elif file_path.lower().endswith((".jpg", ".jpeg")):
             mime_type = "image/jpeg"
         elif file_path.lower().endswith(".png"):
             mime_type = "image/png"
@@ -89,7 +92,8 @@ def analyze_document(file_path, processor_name):
 
         print(f"Detected MIME type: {mime_type}")
 
-        client = documentai.DocumentProcessorServiceClient.from_service_account_json(gcp_credentials)
+        # Use Google Document AI Client
+        client = documentai.DocumentProcessorServiceClient.from_service_account_info(gcp_credentials)
 
         with open(file_path, "rb") as f:
             document_content = f.read()
