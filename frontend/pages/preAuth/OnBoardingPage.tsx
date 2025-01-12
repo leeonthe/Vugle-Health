@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  Linking,
 } from "react-native";
 import Swiper from "react-native-swiper";
 
@@ -14,9 +15,12 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Benefits from "../../assets/images/preAuth/onBoarding/benefitsInfo.svg";
 import Glance from "../../assets/images/preAuth/onBoarding/glance.svg";
 import Loans from "../../assets/images/preAuth/onBoarding/loans.svg";
+// import Curr from "../../assets/images/logo/image.png";
 
 const { width, height } = Dimensions.get("window");
-
+const handlePress = () => {
+  Linking.openURL('https://github.com/leeonthe/Vugle-Health');
+};
 // Use `any` for navigation type
 type OnBoardingPageProps = NativeStackScreenProps<any, "OnBoarding">;
 
@@ -60,11 +64,13 @@ const OnBoardingPage: React.FC<OnBoardingPageProps> = ({ navigation }) => {
 
         <View style={styles.slide}>
           <Image
-            source={require("../../assets/images/preAuth/onBoarding/logo.png")}
-            style={styles.image}
+            source={require("../../assets/images/logo/image.png")}
+            style={styles.curr}
           />
-          <Text style={styles.title}>Will be updated!</Text>
-          <Text style={styles.subtitle}>Please stayed tuned</Text>
+          <Text style={styles.currTitle}>Visit GitHub for detailed info</Text>
+          <TouchableOpacity onPress={handlePress}>
+            <Text style={styles.subtitle}>https://github.com/leeonthe/Vugle-Health</Text>
+          </TouchableOpacity>
         </View>
       </Swiper>
       <TouchableOpacity
@@ -95,6 +101,21 @@ const styles = StyleSheet.create({
     height: height * 0.4,
     resizeMode: "contain",
     marginBottom: 15,
+  },
+  curr: {
+
+    marginTop: 80, 
+
+  },
+  currTitle: {
+    fontSize: 20,
+    color: "black",
+    fontWeight: "bold",
+    fontFamily: "SF Pro Display",
+    lineHeight: 22,
+    textAlign: "center",
+    marginVertical: 10,
+    marginTop: 120,
   },
   title: {
     fontSize: 20,
@@ -133,7 +154,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 8,
     alignItems: "center",
-    marginBottom: 30,
+    marginBottom: 70,
   },
   buttonText: {
     color: "#fff",
