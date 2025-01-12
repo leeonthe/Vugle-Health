@@ -132,8 +132,6 @@ def generate_potential_conditions(user_input):
         raise
     # return potential_conditions.split('\n\n')
 
-@staticmethod
-@csrf_exempt
 def generate_most_suitable_claim_type(request):
     """
     Generate the most suitable claim type based on stored user data:
