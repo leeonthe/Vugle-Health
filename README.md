@@ -156,8 +156,7 @@ Dex includes an advanced functionality to parse relevant data from uploaded **DD
    - You can upload your DD214 file for enhanced analysis.
    - Alternatively, click **“I do not have it”** to proceed without uploading.
 2. For demonstration purposes, you can use the provided sample file:  
-   **[DD214-Example.pdf](README_IMG/DD214-Example.pdf)**
-   **[DD214-Example.png](README_IMG/DD214-Example.pdf)**
+   **[DD214-Example.png](README_IMG/DD214-Example.png)**
 
 
 Dex will analyze the relevant information in the DD214 file to recommend the most suitable claim type for you. 
