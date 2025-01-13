@@ -48,7 +48,7 @@
       "container": [
         {
             "type": "text",
-            "content": "How long has your knee pain been troubling you?",
+            "content": "How long have your current medical condition(s) been troubling you?",
             "style": {
               "color": "#323D4C",
               "fontSize": 16,
