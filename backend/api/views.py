@@ -365,7 +365,6 @@ class DisabilityRatingView(View):
     API endpoint to fetch a Veteran's disability rating.
     Handles both web and mobile clients.
     """
-
     def get(self, request, *args, **kwargs):
         # Check for token in Authorization header (mobile clients)
         auth_header = request.headers.get("Authorization")
@@ -373,8 +372,6 @@ class DisabilityRatingView(View):
             print("DISABILITY RATING WEB VIEW ACCESS TOKEN CALLED")
             access_token = auth_header.split(" ")[1]
         else:
-            # Check session for web clients
-            # print("DISABILITY RATING WEB VIEW ACCESS TOKEN CALLED")
             access_token = request.session.get("access_token")
 
         if not access_token:
@@ -436,28 +433,34 @@ def get_secret(secret_name):
         elif "SecretBinary" in response:
             return response["SecretBinary"].decode("utf-8")
 
-        print("GET_SECRET ISSUE")
-        return None
-
     except ClientError as e:
-        print(f"Error retrieving secret {secret_name}: {e}")
+        print(f"Error retrieving secret {secret_name}: {e.response['Error']['Message']}")
         raise
 
+    return None
 
-def load_private_key(key_request):
+
+def load_private_key(key):
     """
     Load the private key content from AWS Secrets Manager.
+    
     Args:
-        secret_name (str): The name of the secret in Secrets Manager that contains the private key.
+        key (str): The specific key within the secret to fetch (e.g., 'ELA_PRIVATE_KEY_PATH' or 'PHA_PRIVATE_KEY_PATH').
+    
     Returns:
         str: The private key content.
     """
-    private_key = get_secret(key_request)
+    secret_name = "skrt/vugle-health/skrt"  # Full secret name in AWS Secrets Manager
+    secret_data = get_secret(secret_name)
+
+    # Extract the specific key's value
+    private_key = json.loads(secret_data).get(key)
+
+    # Validate the private key content
     if private_key and private_key.startswith("-----BEGIN PRIVATE KEY-----"):
         return private_key
     else:
-        raise FileNotFoundError(f"Private key content not found or invalid for secret: {secret_name}")
-
+        raise ValueError(f"Invalid private key content retrieved for key '{key}' in secret '{secret_name}'.")
 
 @method_decorator(csrf_exempt, name='dispatch')
 class EligibleLettersView(View):
@@ -519,6 +522,7 @@ class EligibleLettersView(View):
             return JsonResponse({"error": "Server error", "details": str(e)}, status=500)
 
     def _ela_generate_jwt(self):
+        # private_key_content = load_private_key()
         private_key_content = load_private_key("ELA_PRIVATE_KEY_PATH")
         client_id = os.getenv("ELA_JWT_CLIENT_ID")
         audience = self.ELA_AUDIENCE_URL
