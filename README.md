@@ -271,7 +271,7 @@ Click **“View result”** only once, and please allow a few seconds after clic
 2. After selecting a medical center, click **“Schedule an appointment”** to begin the appointment process.
 
 3. You will see the **Patient Information** section.  
-   - You may edit the patient information by clicking the **edit (TODO: replace with actual icon SVG)** icon.
+   - You may edit the patient information by clicking the **edit** icon.
 
 4. Complete the appointment process by clicking the **“Continue”** button.  
    - Dex will display a branch of medicine based on your typed medical conditions and generate a message for the doctor on your behalf.
